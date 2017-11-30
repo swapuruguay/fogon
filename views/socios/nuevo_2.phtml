@@ -1,0 +1,22 @@
+<form id="form1" action="<?php echo BASE_URL . 'socios/guardar/0'?>" method="POST">
+    
+    <label class="etiquetas">Nro de Socio</label><input type="text" name='id' id='id' readonly /><br>
+    <label class="etiquetas">Nombre</label><input type="text" name='nombre' id='nombre' /><br>
+    <label class="etiquetas">Apellido</label><input type="text" name='apellido' id='apellido' /><br>
+    <label class="etiquetas">Domicilio</label><input type="text" name='domicilio' id='domicilio' /><br>
+    <label class="etiquetas">Categor&iacute;a</label><select name="categorias">
+    <?php foreach($this->categorias as $cat):?>
+        
+        <option id="<?php echo $cat->getId(); ?>" value="<?php echo $cat->getNombre()."_" . $cat->getId(); ?>">
+            <?php echo $cat->getNombre(); ?></option>
+    <?php endforeach; ?>
+    </select><br>
+    
+    <label class="etiquetas">Fecha Ingreso</label><input type="text" name='fecha_ingreso' id='fecha_ingreso' /><br>
+    <label class="etiquetas">Fecha Nacimiento</label><input type="text" name='fecha_nacimiento' id='fecha_nacimiento' /><br>  
+    <label class="etiquetas">Tel&eacute;fono</label><input type="text" name='telefono' id='telefono' /><br>
+    <label class="etiquetas">E-mail</label><input type="text" name='email' id='email' /><br>
+    <input type="submit" value="Guardar" />
+</form>
+
+

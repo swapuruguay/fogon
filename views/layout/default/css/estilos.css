@@ -1,0 +1,215 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 19/08/2015, 19/08/2015 11:37:47 PM
+    Author     : walter
+*/
+*{
+    padding: 0;
+    margin: 0;
+    
+}
+
+body {
+    font-family: "Trebuchet MS";
+    background: aquamarine;
+    width: 100%;
+}
+
+section#main, footer{
+    
+    margin: 0 auto;
+    text-align: center;
+    width: 90%;
+}
+
+@font-face {
+    font-family: 'nunitoregular';
+    src: url('fonts/nunito-regular-webfont.eot');
+    src: url('fonts/nunito-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/nunito-regular-webfont.woff2') format('woff2'),
+         url('fonts/nunito-regular-webfont.woff') format('woff'),
+         url('fonts/nunito-regular-webfont.ttf') format('truetype'),
+         url('fonts/nunito-regular-webfont.svg#nunitoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'daniel';
+    src: url('fonts/daniel-webfont.eot');
+    src: url('fonts/daniel-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/daniel-webfont.woff2') format('woff2'),
+         url('fonts/daniel-webfont.woff') format('woff'),
+         url('fonts/daniel-webfont.ttf') format('truetype'),
+         url('fonts/daniel-webfont.svg#nunitoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'courgette';
+    src: url('fonts/courgette-regular-webfont.eot');
+    src: url('fonts/courgette-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/courgette-regular-webfont.woff2') format('woff2'),
+         url('fonts/courgette-regular-webfont.woff') format('woff'),
+         url('fonts/courgette-regular-webfont.ttf') format('truetype'),
+         url('fonts/courgette-regular-webfont.svg#nunitoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+    input{
+        margin: 5px;
+        
+        
+    }
+    
+      
+    select {
+        
+    }
+    
+    form{
+        margin: 0 auto;
+        text-align: center;
+       /* display: table-cell;*/
+        /*display: inline-block;*/
+        /*background: #00b3ff;*/
+        width: 40%;
+
+    }
+    #form1 .etiquetas{
+        
+        display: inline-block;
+        width: 20%;
+    }
+    
+    #form_pago {
+        text-align: left;      
+        width: 100%;
+    }
+    
+    #form_pago .etiquetas {
+        width: 100%;
+        min-width: 20%;
+        display: block;
+    }
+    
+    
+    
+    #form1 input[type="text"] {
+        border: solid 1px;
+        border-radius: 5px;
+        height: 1.2em;
+        padding: 0.2em;
+    }
+
+    .boton{
+        border: outset 2px;
+        padding: 3px;
+        border-radius: 5px;
+        /*box-shadow: 6px 6px 5px #888888;*/
+
+    }
+
+    a{ 
+        color:#0000cc; 
+    }
+
+    a:link{
+        /*background: chartreuse;*/
+        color:#0000cc;
+        text-decoration: none;
+
+    }
+    a:hover{
+        background-color:antiquewhite;
+        color: red;
+    }
+    
+    ul{
+        list-style: none;
+        
+        
+    }
+    
+    li{
+        border: solid 0.1em;
+        display: inline;
+        margin: 0.5em;
+        padding: 0.2em;
+      
+        
+    }
+    
+    article#contenido {
+        width:100%;
+        text-align: center;
+    }
+    
+    #img{
+        width:100%;
+        text-align: left;
+        
+    }
+    
+    
+    .img {
+        
+        height: 25%;
+        margin: 1em;
+        min-height: 30px;
+        padding: 2em;
+        width: 25%;
+    }
+    
+    .titulo{
+        display:table-cell;
+        vertical-align: middle;
+        width: 45%;
+    }
+    
+    header{
+        width: 100%;
+        
+    }
+    
+    h3{
+        margin: 1em;
+        text-align: center;
+    }
+    
+    h2{
+        font-size: 2em;
+        
+    }
+        
+    .impar{
+        
+        background: darkkhaki;
+        font-size: 0.8em;
+    }
+    
+    .par{
+        background: #d9f3ff;    
+        font-size: 0.8em;
+    }
+    
+    table{
+        width:100%;
+        border-collapse: collapse;
+    }
+    
+    td{
+        padding: 0.2em;
+    }
+
+    article#formularios {
+        margin: 0 auto;
+        text-align: center;
+        width:50%;
+    }

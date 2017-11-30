@@ -1,0 +1,155 @@
+
+<div class="container">
+    <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/'. $this->socio->getId(); ?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
+      <div class="form-group">
+          <label class="control-label col-sm-2">Nro de Socio</label>
+              <?php if($this->socio->getEstado() == 'B') :  ?>
+          <strong><span class="text-danger">Socio Eliminado</span></strong>
+              <?php endif ?>
+        <div class="col-sm-1">
+          <input type="text" name='id' id='id' readonly value="<?php echo $this->socio->getId(); ?>" class="form-control">
+        </div>
+      </div>
+      <input type="hidden" name="idsoc" id="idsoc" value="<?php echo $this->socio->getId(); ?>">
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nombre</label>
+        <div class="col-sm-4">
+          <input type="text" name='nombre' id='nombre' value="<?php echo utf8_decode($this->socio->getNombre()); ?>" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Apellido</label>
+        <div class="col-sm-4">
+          <input type="text" name='apellido' id='apellido' value="<?php echo utf8_decode($this->socio->getApellido()); ?>" class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Documento</label>
+        <div class="col-sm-4">
+          <input type="text" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Domicilio</label>
+        <div class="col-sm-4">
+          <input type="text" name='domicilio' id='domicilio' value="<?php echo utf8_decode($this->socio->getDomicilio()); ?>" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Categor&iacute;a</label>
+        <div class="col-sm-4">
+          <select name="categorias" class="form-control">
+          <?php foreach($this->categorias as $cat):?>
+              <?php
+                  $selected = ($cat->getNombre() === $this->socio->getCategoria()->getNombre()?"SELECTED":"");
+              ?>
+              <option id="<?php echo $cat->getId(); ?>" value="<?php echo $cat->getNombre()."_" . $cat->getId(); ?>" <?php echo $selected ?>>
+                  <?php echo $cat->getNombre(); ?></option>
+          <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-4">
+              <div class="checkbox">
+                  <label>
+                      <input type="checkbox" name="exento" id="exento" <?php echo ($this->socio->getExento())? 'CHECKED':'' ?> value="ok"> Exento
+                  </label>
+              </div>
+          </div>
+      </div>
+      <div class="form-group">
+        <label for="foto" class="control-label col-sm-2">Foto</label>
+        <div class="col-sm-4">
+          <input type="file" name="foto" id="foto" class="form-control">
+        </div>
+        <img id="img-previa" src="<?php echo BASE_URL .'views/socios/img/' .$this->socio->getFoto() ?>" alt="Mi imagen" class="img-thumbnail" style="height:128px; width:96px;">
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Fecha Ingreso</label>
+        <div class="col-sm-3">
+          <input type="text" name='fecha_ingreso' id='fecha_ingreso' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaIngreso())); ?>" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Fecha Nacimiento</label>
+        <div class="col-sm-3">
+          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaNacimiento())); ?>" class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Tel&eacute;fono</label>
+        <div class="col-sm-3">
+          <input type="text" name='telefono' id='telefono' value="<?php echo $this->socio->getTelefono(); ?>" class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">E-mail</label>
+        <div class="col-sm-3">
+          <input type="text" name='email' id='email' value="<?php echo $this->socio->getEmail(); ?>" class="form-control">
+        </div>
+
+      </div>
+
+
+
+      <input type="submit" value="Guardar" class="btn btn-success"/>
+
+  </form>
+    <br>
+  <div>
+      <a href="" id="ver">Ver Saldo >>></a>
+  </div>
+  <div id="saldos" style=" display: none; width: 30%;">
+      <div class='col-md-6'>
+      <table id="movs" class="table table-condensed table-bordered table-striped">
+
+      </table>
+          <span id='total'></span>
+      </div>
+  </div>
+
+</div>
+<script type="text/javascript">
+    $("#ver").click(function(event){
+        event.preventDefault();
+        if($("#saldos").css('display') === 'none') {
+            $("#saldos").css('display', 'table-cell');
+            var texto = $('#id').val()
+            $("#ver").html(' <<< Ocultar saldo ');
+            $.post('/movimientos/getSaldo','id='+texto,
+                    escribeMov,'json');
+
+        } else {
+            $("#saldos").css('display', 'none');
+            $("#ver").html('Ver saldo >>>');
+        }
+
+    });
+
+$("#movs").on('click', '.eliminar', function(event) {
+    event.preventDefault();
+    var id = this.id;
+    $.post('/movimientos/eliminar','id='+id,
+                    escribeMov,'json');
+});
+
+
+function mostrarImagen(input) {
+ if (input.files && input.files[0]) {
+  var reader = new FileReader();
+  reader.onload = function (e) {
+   $('#img-previa').attr('src', e.target.result);
+  }
+  reader.readAsDataURL(input.files[0]);
+ }
+}
+ 
+$("#foto").change(function(){
+ mostrarImagen(this);
+});
+</script>

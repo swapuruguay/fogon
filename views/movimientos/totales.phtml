@@ -1,0 +1,42 @@
+<div class="container">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="fecha" class="control-label col-md-2">Fecha</label>
+            <div class="col-md-3">
+                <input type="text" name="fecha" id="fecha" class="form-control">
+            </div>
+        </div>
+        <input type="submit" id="boton" value="Consultar" name="btn" class="btn btn-primary">
+
+    </form>
+    <div>&nbsp;</div>
+    <div id="resultado" class="col-md-6">
+        <table id="tabla" class="table table-bordered table-condensed table-striped">
+
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $("#boton").click(function(evt){
+        evt.preventDefault();
+        var fecha = $("#fecha").val()
+        $.post(
+            '/fogon/movimientos/getTotales',
+            'fecha='+fecha,
+            function(resp) {
+                var texto = "<tr><th class='text-center'>Categor&iacute;a</th><th class='text-center'>Cantidad</th><th class='text-center'>Importe</th></tr>\n"
+                var tot = 0
+
+                for(var i = 0; i < resp.length; i++) {
+                    tot+= parseInt(resp[i].importe)
+                    texto+= "<tr><td>"+resp[i].cat+"</td><td class='text-right'>"+resp[i].cantidad+"</td><td class='text-right'>"+resp[i].importe+"</td></tr>"
+                }
+                texto+= "<tr><td colspan=2 class='text-center'><strong>Total ===></strong> </td><td class='text-right'><strong>"+tot+"</strong></td></tr>"
+                $("#tabla").html(texto)
+            },'json'
+        )
+        console.log('ok')
+    });
+
+</script>

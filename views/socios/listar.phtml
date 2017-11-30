@@ -1,0 +1,51 @@
+<div class="container">
+<h2>Listado de socios</h2>
+<article id="formularios">
+<div class="row">
+
+  <div class="form-group">
+    <form class="form-horizontal">
+    <label class="control-label col-md-2">Buscar</label>
+    <div class="col-sm-12 col-md-3">
+      <input type="text" id="busqueda" name="busqueda" class="form-control" >
+    </div>
+  </div>
+</form>
+</div>
+<br>
+<div class="row">
+  <div class="col-sm-12 col-md-6">
+    <table id="tabla" class="table table-striped table-condensed table-bordered">
+      <tr>
+          <th>Nro.</th><th>Nombre</th><th>Apellido</th><th></th><th></th>
+      </tr>
+      <?php $contador = 1; ?>
+      <?php foreach($this->socios as $soc): ?>
+
+      <tr>
+          <td><?php echo $soc->getId(); ?></td>
+          <td><?php echo utf8_decode($soc->getNombre()); ?></td>
+          <td><?php echo utf8_decode($soc->getApellido()); ?></td>
+          <td><a href="<?php echo BASE_URL . 'socios/editar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
+          <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
+              <?php $contador++; ?>
+      </tr>
+
+
+      <?php endforeach; ?>
+    </table>
+  </div>
+</div>
+    </article>
+  </div>
+<br>
+<div style="text-align: center; width:60%; margin:0 auto; display: block;">
+<ul id="pagination-digg">
+<?php foreach($this->enlaces as $enlace) : ?>
+    <?php echo $enlace; ?>
+<?php endforeach; ?>
+
+
+</ul>
+</div>
+<br><br>

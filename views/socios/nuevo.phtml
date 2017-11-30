@@ -1,0 +1,113 @@
+<br>
+<div class="container">
+  <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/0'?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nro de Socio</label>
+        <div class="col-sm-1">
+          <input type="text" name='id' id='id' value="<?php echo $this->nroSocio ?>" readonly class="form-control">
+        </div>
+      </div>
+      <input type="hidden" name="idsoc" id="idsoc" value=0>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nombre</label>
+        <div class="col-sm-4">
+          <input type="text" name='nombre' id='nombre'  class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Apellido</label>
+        <div class="col-sm-4">
+          <input type="text" name='apellido' id='apellido'  class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Documento</label>
+        <div class="col-sm-4">
+          <input type="text" name='documento' id='documento'  class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Domicilio</label>
+        <div class="col-sm-4">
+          <input type="text" name='domicilio' id='domicilio'  class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Categor&iacute;a</label>
+        <div class="col-sm-4">
+          <select name="categorias" class="form-control">
+          <?php foreach($this->categorias as $cat):?>
+
+              <option id="<?php echo $cat->getId(); ?>" value="<?php echo $cat->getNombre()."_" . $cat->getId(); ?>">
+                  <?php echo $cat->getNombre(); ?></option>
+          <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-4">
+              <div class="checkbox">
+                  <label>
+                      <input type="checkbox" name="exento" id="exento" value="ok"> Exento
+                  </label>
+              </div>
+          </div>
+      </div>
+      <div class="form-group">
+        <label for="foto" class="control-label col-sm-2">Foto</label>
+        <div class="col-sm-4">
+          <input type="file" name="foto" id="foto" class="form-control">
+        </div>
+        <img id="img-previa" src="<?php echo BASE_URL .'views/socios/img/socio.png' ?>" alt="Mi imagen" class="img-thumbnail" style="height:128px; width:96px;">
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Fecha Ingreso</label>
+        <div class="col-sm-3">
+          <input type="text" name='fecha_ingreso' id='fecha_ingreso'   class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Fecha Nacimiento</label>
+        <div class="col-sm-3">
+          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Tel&eacute;fono</label>
+        <div class="col-sm-3">
+          <input type="text" name='telefono' id='telefono'  class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">E-mail</label>
+        <div class="col-sm-3">
+          <input type="text" name='email' id='email' class="form-control">
+        </div>
+
+      </div>
+
+
+
+      <input type="submit" value="Guardar" class="btn btn-success"/>
+
+  </form>
+</div>
+<script type="text/javascript">
+function mostrarImagen(input) {
+ if (input.files && input.files[0]) {
+  var reader = new FileReader();
+  reader.onload = function (e) {
+   $('#img-previa').attr('src', e.target.result);
+  }
+  reader.readAsDataURL(input.files[0]);
+ }
+}
+ 
+$("#foto").change(function(){
+ mostrarImagen(this);
+});
+</script>

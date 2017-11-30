@@ -1,0 +1,28 @@
+<p>&nbsp;</p>
+<div class="container">
+    <h3>Ingrese mes y a&ntilde;o a imprimir</h3>
+    <div id="divpago">
+        <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/imprimir140' ?>" method="POST" class="form-horizontal">
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Mes</label>
+                <div class="col-md-4">
+                    <input type="text" name='mes' id='mes' class="form-control">
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">A&ntilde;o</label>
+                <div class="col-md-4">
+                    <input type="text" name='anio' id='anio' class="form-control">
+                </div>
+            </div>
+
+
+            <input type="submit" value="Imprimir" class="btn btn-primary"/>
+
+        </form>
+
+    </div>
+</div>

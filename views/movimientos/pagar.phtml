@@ -1,0 +1,72 @@
+<p>&nbsp;</p>
+<div id="divpago" class="container">
+    <form id="form_pago" action="<?php echo BASE_URL . 'socios/guardar/0' ?>" method="POST" class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-md-2">Fecha</label>
+            <div class="col-md-2">
+
+                <input type="text" name='fecha' id='fecha' class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+
+            <label class="control-label col-md-2">Nro de Socio</label>
+            <div class="col-md-1">
+                <input type="text" name='id' id='id' class="form-control">
+            </div>
+            <label id="nombre" name="nombre" class="control-label col-md-4">Name</label>
+
+
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Importe</label>
+            <div class="col-md-2">
+
+                <input type="text" name='importe' id='importe' class="form-control">
+            </div>
+        </div>
+
+        <input type="button" value="Guardar" class="btn btn-primary"/>
+
+    </form>
+    <div id="ultimos" style ="width: 100%; display: inline;" ></div>
+</div>
+<script>
+
+    $('#id').change(function() {
+        $.post('/fogon/socios/loadSocioAjax', 'id='+$(this).val(), function(resp) {
+            $('#nombre').html(resp.nombre)
+        }, 'json')
+    })
+    $('#form_pago').delegate('#id','keypress', function(e) {
+        if(e.keyCode == 13) {
+            $('#importe').focus();
+        }
+    })
+
+    $('#form_pago').delegate('#importe','keypress', function(e) {
+        if(e.keyCode == 13) {
+            obj = $('#id');
+            var data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
+            $.post('/fogon/movimientos/ingresarPago', data, function(resp) {
+
+              var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped">'
+              contenido += '<tr><th>Id</th><th>Nombre</th><th>Importe</th></tr>'
+                for(var i = 0; i < resp.length; i++) {
+                    contenido+= '<tr>'
+
+                    contenido += '<td>'+ resp[i].id+'</td><td>'+resp[i].nombre+'</td><td>'+resp[i].importe+'</td></tr>'
+                }
+                contenido += '</table>'
+                $("#ultimos").html('<p></p>');
+                $("#ultimos").append(contenido);
+                console.log(resp[0].nombre);
+            }, 'json')
+
+            obj.val('');
+            obj.focus();
+        }
+    })
+
+
+</script>
