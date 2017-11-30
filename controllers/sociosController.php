@@ -82,9 +82,9 @@ class sociosController extends Controller{
             $id = filter_input(INPUT_POST ,'idsoc', FILTER_SANITIZE_NUMBER_INT);
             if($id == 0) {
                 $socio = $modelo->buildSocio();
-                $socio->setNombre(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING));
-                $socio->setApellido(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING));
-                $socio->setDomicilio(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING));
+                $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
+                $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
+                $socio->setDomicilio(utf8_encode(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING)));
                 $socio->setTelefono(filter_input(INPUT_POST ,'telefono', FILTER_SANITIZE_STRING));
                 $nro = $modelo->getNroNuevo('socios');
                 if(isset($_FILES['foto'])) {
@@ -121,10 +121,10 @@ class sociosController extends Controller{
             } else {
                 $socio = $modelo->buildSocio();
                 $socio->setId($id);
-                $socio->setNombre(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING));
-                $socio->setApellido(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING));
+                $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
+                $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
                 $socio->setDocumento($_POST['documento']);
-                $socio->setDomicilio(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING));
+                $socio->setDomicilio(utf8_encode(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING)));
                 $socio->setTelefono(filter_input(INPUT_POST ,'telefono', FILTER_SANITIZE_STRING));
                 $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
                 if($_FILES['foto']['name'] != '') {
