@@ -118,13 +118,13 @@ class movimientosController extends Controller{
                     $pdf->SetXY(120,$pos_y);
                     $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
                     $pdf->SetXY(10,$pos_y + 9);
-                    $pdf->Cell(80,4,  utf8_decode($socio->__toString()),0,0,'C');
+                    $pdf->Cell(80,4,  utf8_decode(utf8_decode($socio->__toString())),0,0,'C');
                     $pdf->SetXY(85,$pos_y + 9);
-                    $pdf->Cell(90,4,  utf8_decode($socio->__toString()),0,0,'C');
+                    $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->__toString())),0,0,'C');
                     $pdf->SetXY(10,$pos_y + 18);
-                    $pdf->Cell(80,4, utf8_decode($socio->getDomicilio()),0,0,'C');
+                    $pdf->Cell(80,4, utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
                     $pdf->SetXY(85,$pos_y + 18);
-                    $pdf->Cell(90,4,  utf8_decode($socio->getDomicilio()),0,0,'C');
+                    $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
                     $pdf->SetXY(175,$pos_y + 18);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
                     $pdf->SetXY(20,$pos_y + 27);
@@ -185,13 +185,13 @@ class movimientosController extends Controller{
                     $pdf->SetXY(115,$pos_y);
                     $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
                     $pdf->SetXY(5,$pos_y + 9);
-                    $pdf->Cell(80,4,  utf8_decode($socio->__toString()),0,0,'C');
+                    $pdf->Cell(80,4,  utf8_decode(utf8_decode($socio->__toString())),0,0,'C');
                     $pdf->SetXY(80,$pos_y + 9);
-                    $pdf->Cell(90,4,  utf8_decode($socio->__toString()),0,0,'C');
+                    $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->__toString())),0,0,'C');
                     $pdf->SetXY(5,$pos_y + 18);
-                    $pdf->Cell(80,4, utf8_decode($socio->getDomicilio()),0,0,'C');
+                    $pdf->Cell(80,4, utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
                     $pdf->SetXY(80,$pos_y + 18);
-                    $pdf->Cell(90,4,  utf8_decode($socio->getDomicilio()),0,0,'C');
+                    $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
                     $pdf->SetXY(170,$pos_y + 18);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
                     $pdf->SetXY(21,$pos_y + 27);
@@ -201,7 +201,7 @@ class movimientosController extends Controller{
                     $pdf->SetXY(103,$pos_y + 27);
                     $pdf->Cell(50,4, $row[$it]->importe, 0,0);
                     $pdf->SetXY(83,$pos_y + 34);
-                    
+
                     //$pos_y+=73;
                     $pos_y+= 73;
                     $pdf->SetY($pos_y);
@@ -282,7 +282,7 @@ class movimientosController extends Controller{
                 $pdf->SetY($pos_y + 10);
                 $pdf->SetFont('Arial','I',8);
                 $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
-               
+
                 if($pdf->PageNo() < $paginas) {
                       $pos_y = 25;
                         $pdf->AddPage();
@@ -290,7 +290,7 @@ class movimientosController extends Controller{
                     $pdf->SetY($pos_y + 20);
                     $tot = json_decode($this->getTotalesE($mes, $anio));
                     $totales = $tot[0]->importe+$tot[1]->importe+$tot[2]->importe;
-                    
+
                     $pdf->Cell(0,10, utf8_decode('Total Activos: ').$tot[0]->importe, 0, 0, 'C');
                     $pdf->SetY($pos_y + 25);
                     $pdf->Cell(0,10, utf8_decode('Total Cadetes: ').$tot[1]->importe, 0, 0, 'C');
@@ -298,7 +298,7 @@ class movimientosController extends Controller{
                     $pdf->Cell(0,10, utf8_decode('Total Jubilados: ').$tot[2]->importe, 0, 0, 'C');
                     $pdf->SetY($pos_y + 35);
                     $pdf->Cell(0,10, utf8_decode('Total General: ').$totales, 0, 0, 'C');
-                  
+
                 }
 
 
@@ -373,9 +373,9 @@ class movimientosController extends Controller{
         $retorno = $this->_ajax->getTotales($fecha);
         echo json_encode($retorno);
     }
-    
+
     private function getTotalesE($mes, $anio) {
-        
+
         $retorno = $this->_ajax->getTotales($anio.'-'.$mes.'-01');
         return json_encode($retorno);
     }

@@ -5,24 +5,24 @@
     <tr>
         <th>Nro.</th><th>Nombre</th><th>Apellido</th><th>Categor&iacute;a</th><th>Saldo</th><th></th><th></th>
     </tr>
-   
+
     <?php foreach($this->socios as $soc): ?>
         <?php if($soc->getCategoria()->getImporte() > 0) : ?>
             <?php if($soc->getSaldo() / $soc->getCategoria()->getImporte() >= 2 ) : ?>
-               
+
                     <tr>
-        
+
                     <td><?php echo $soc->getId(); ?></td>
-                    <td><?php echo $soc->getNombre(); ?></td>
-                    <td><?php echo $soc->getApellido(); ?></td>
+                    <td><?php echo utf8_decode($soc->getNombre()); ?></td>
+                    <td><?php echo utf8_decode($soc->getApellido()); ?></td>
                     <td><?php echo $soc->getCategoria()->getNombre() ?></td>
                     <td><?php echo $soc->getSaldo(); ?></td>
                     <td><a href="<?php echo BASE_URL . 'socios/editar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
                     <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
-                    
-        
+
+
                     </tr>
-                
+
             <?php endif ?>
         <?php endif ?>
     <?php endforeach; ?>

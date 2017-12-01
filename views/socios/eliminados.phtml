@@ -24,8 +24,8 @@
 
       <tr>
           <td><?php echo $soc->getId(); ?></td>
-          <td><?php echo $soc->getNombre(); ?></td>
-          <td><?php echo $soc->getApellido(); ?></td>
+          <td><?php echo utf8_decode($soc->getNombre()); ?></td>
+          <td><?php echo utf8_decode($soc->getApellido()); ?></td>
           <td><a href="<?php echo BASE_URL . 'socios/activar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/active.png' ?>"></a></td>
           <td><a href="<?php echo BASE_URL. 'socios/editar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
               <?php $contador++; ?>
