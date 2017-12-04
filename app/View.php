@@ -12,7 +12,7 @@ class View
         $this->_controlador = $peticion->getControlador();
     }
 
-    public function renderizar($vista, $item = false)
+    public function renderizar($vista, $l=true, $item = false)
     {
         $menu = array(
             'inicio' => array('display' => 'Inicio', 'url' => BASE_URL),
