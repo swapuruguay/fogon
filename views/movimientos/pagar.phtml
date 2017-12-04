@@ -34,7 +34,7 @@
 <script>
 
     $('#id').change(function() {
-        $.post('/fogon/socios/loadSocioAjax', 'id='+$(this).val(), function(resp) {
+        $.post('/socios/loadSocioAjax', 'id='+$(this).val(), function(resp) {
             $('#nombre').html(resp.nombre)
         }, 'json')
     })
@@ -48,7 +48,7 @@
         if(e.keyCode == 13) {
             obj = $('#id');
             var data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
-            $.post('/fogon/movimientos/ingresarPago', data, function(resp) {
+            $.post('/movimientos/ingresarPago', data, function(resp) {
 
               var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped">'
               contenido += '<tr><th>Id</th><th>Nombre</th><th>Importe</th></tr>'

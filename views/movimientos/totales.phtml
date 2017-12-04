@@ -22,7 +22,7 @@
         evt.preventDefault();
         var fecha = $("#fecha").val()
         $.post(
-            '/fogon/movimientos/getTotales',
+            '/movimientos/getTotales',
             'fecha='+fecha,
             function(resp) {
                 var texto = "<tr><th class='text-center'>Categor&iacute;a</th><th class='text-center'>Cantidad</th><th class='text-center'>Importe</th></tr>\n"
