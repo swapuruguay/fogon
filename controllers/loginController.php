@@ -12,29 +12,33 @@
  * @author walter
  */
 class loginController extends Controller{
-    
+
+    private $modelo;
     public function __construct(){
         parent::__construct();
     }
-    
+
     public function index()
     {
-        Session::set('autenticado', true);
-        Session::set('level', 'especial');
-        
-        Session::set('var1', 'var1');
-        Session::set('var2', 'var2');
-        
-        $this->redireccionar('login/mostrar');
+      $this->_view->renderizar('index', false);
     }
-    
-    public function mostrar()
+
+    public function loguear()
     {
-        echo 'Level: '. Session::get('level') . '<br>';
-        echo 'Var1: '. Session::get('var1') . '<br>';
-        echo 'Var2: '. Session::get('var2') . '<br>';
+      $modelo  = $this->loadModel('login');
+      $username = filter_input(INPUT_POST ,'username', FILTER_SANITIZE_STRING);
+      $password = filter_input(INPUT_POST ,'password', FILTER_SANITIZE_STRING);
+      $password = md5($password);
+      echo $password;
+      $user = $modelo->getUser($username, $password);
+      if($user) {
+        Session::set('autenticado', true);
+        $this->redireccionar('index');
+      } else {
+        $this->redireccionar('login');
+      }
     }
-    
+
     public function cerrar()
     {
         Session::destroy();

@@ -18,6 +18,9 @@ class indexController extends Controller {
     }
     
     public function index() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $this->_view->titulo = NOMBRE;
         $this->_view->renderizar('index');
     }

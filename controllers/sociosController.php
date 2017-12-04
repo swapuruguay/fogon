@@ -27,6 +27,9 @@ class sociosController extends Controller{
     }
 
     public function index() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         //$modelo->getNroNuevo('socios');
         $this->_view->renderizar('index');
@@ -34,7 +37,9 @@ class sociosController extends Controller{
     }
 
     public function listar($pag=0) {
-
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $this->_view->socios = $modelo->getAll();
         $totalRegistros = count($this->_view->socios);
@@ -58,6 +63,9 @@ class sociosController extends Controller{
     }
 
     public function nuevo() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modeloCat = $this->loadModel('categorias');
         $this->_view->categorias = $modeloCat->getAll();
         $this->_view->nroSocio = $this->_ajax->getNroNuevo('socios');
@@ -65,6 +73,9 @@ class sociosController extends Controller{
     }
 
     public function editar($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $modeloCat = $this->loadModel('categorias');
         $socio = $modelo->getById($id);
@@ -76,6 +87,9 @@ class sociosController extends Controller{
     }
 
     public function guardar() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $modeloCat = $this->loadModel('categorias');
         if(isset($_POST['idsoc'])) {
@@ -161,6 +175,9 @@ class sociosController extends Controller{
     }
 
     public function confirmar($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $socio = $modelo->getById($id);
         $this->_view->socio = $socio;
@@ -168,6 +185,9 @@ class sociosController extends Controller{
     }
 
     public function eliminar($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $socio = $modelo->getById($id);
         if($modelo->delete($socio)) {
@@ -181,6 +201,9 @@ class sociosController extends Controller{
     }
 
     public function atrasados() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo = $this->loadModel('socios');
         $this->_view->socios = $modelo->getAtrasados();
         $this->_view->renderizar('atrasados');
@@ -220,7 +243,9 @@ class sociosController extends Controller{
     }
 
     public function eliminados($pag=0) {
-
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $this->_view->socios = $modelo->getEliminados();
         $totalRegistros = count($this->_view->socios);
@@ -244,6 +269,9 @@ class sociosController extends Controller{
     }
 
     public function activar($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $socio = $modelo->getById($id);
         $this->_view->socio = $socio;
@@ -251,6 +279,9 @@ class sociosController extends Controller{
     }
 
     public function activarf($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo  = $this->loadModel('socios');
         $socio = $modelo->getById($id);
         if($modelo->activar($socio)) {
@@ -264,11 +295,16 @@ class sociosController extends Controller{
     }
 
     public function totales() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $this->_view->renderizar('totales');
     }
 
     public function listarsocios() {
-
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelSocios = $this->loadModel('socios');
         $row = $modelSocios->getAll('apel');
         $registros = count($row);

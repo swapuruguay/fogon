@@ -21,6 +21,9 @@ class movimientosController extends Controller{
     }
 
     public function index() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $this->_view->titulo = 'Titulo';
         $this->_view->renderizar('index');
     }
@@ -44,6 +47,9 @@ class movimientosController extends Controller{
     }
 
     public function pagar() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $this->_view->titulo = 'Titulo';
         $this->_view->renderizar('pagar');
     }
@@ -81,6 +87,9 @@ class movimientosController extends Controller{
     }
 
     public function preprint() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $this->_view->titulo = 'Titulo';
         $this->_view->renderizar('formprint');
     }
@@ -223,7 +232,9 @@ class movimientosController extends Controller{
     }
 
     public function listarec($mes, $anio) {
-
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
         $row = $modelo->getMes($anio, $mes);
@@ -319,11 +330,17 @@ class movimientosController extends Controller{
     }
 
     public function generar() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $this->_view->titulo = 'Titulo';
         $this->_view->renderizar('generar');
     }
 
     public function generacuota() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $mes = filter_input(INPUT_POST, 'mes', FILTER_SANITIZE_NUMBER_INT);
         $anio = filter_input(INPUT_POST, 'anio', FILTER_SANITIZE_NUMBER_INT);
         $this->_view->mes = $mes;
@@ -333,6 +350,9 @@ class movimientosController extends Controller{
     }
 
     public function confirmar($mes, $anio) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $model = $this->loadModel('movimientos');
         $result = $model->verificarMes($mes, $anio);
         if($result) {
@@ -365,6 +385,9 @@ class movimientosController extends Controller{
     }
 
     public function totales() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
         $this->_view->renderizar('totales');
     }
 

@@ -33,7 +33,7 @@ class Session {
     }
 
     public static function set($clave, $valor) {
-        if(!empty($_SESSION[$clave]))
+        if(!empty($clave))
             $_SESSION[$clave] = $valor;
     }
 
