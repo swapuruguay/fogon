@@ -118,9 +118,9 @@ class movimientosController extends Controller{
                     if(!($it < $registros))
                         break;
                     $socio = $modelSocios->getById($row[$it]->id_socio_fk);
-                    $pdf->SetXY(20,$pos_y);
+                    $pdf->SetXY(25,$pos_y);
                     $pdf->Cell(50,4,$socio->getId(),0,0);
-                    $pdf->SetXY(55,$pos_y);
+                    $pdf->SetXY(60,$pos_y);
                     $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
                     $pdf->SetXY(85,$pos_y);
                     $pdf->Cell(50,4,$socio->getId(),0,0);
@@ -136,13 +136,13 @@ class movimientosController extends Controller{
                     $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
                     $pdf->SetXY(175,$pos_y + 18);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
-                    $pdf->SetXY(20,$pos_y + 27);
+                    $pdf->SetXY(25,$pos_y + 27);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
-                    $pdf->SetXY(55,$pos_y + 27);
+                    $pdf->SetXY(60,$pos_y + 27);
                     $pdf->Cell(50,4, $row[$it]->importe, 0,0);
                     $pdf->SetXY(105,$pos_y + 27);
                     $pdf->Cell(50,4, $row[$it]->importe, 0,0);
-                    $pos_y+=77;
+                    $pos_y+=74;
                     $pdf->SetY($pos_y);
 
                     $it++;
