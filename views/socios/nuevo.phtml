@@ -97,6 +97,18 @@
   </form>
 </div>
 <script type="text/javascript">
+
+ const frm = document.getElementById('form1')
+
+ frm.addEventListener('submit', (evt) => {
+   evt.preventDefault()
+   if(frm.apellido.value == '') {
+     alert('Debe ingresar nombre y apellido por serparado')
+     return
+   }
+   frm.submit()
+ })
+
 function mostrarImagen(input) {
  if (input.files && input.files[0]) {
   var reader = new FileReader();
