@@ -1,0 +1,70 @@
+<p>&nbsp;</p>
+<div id="divpago" class="container">
+    <h3 class="etiquetas">Cambio de constraseña</h3>
+    <form id="form_password" class="form-horizontal">
+        <div class="form-group">
+
+            <label class="control-label col-md-2">Password actual</label>
+            <div class="col-md-4">
+
+                <input data-hash="<?php echo Session::get('usuario')->password ?>" type="password" data-id = "<?php echo Session::get('usuario')->idusuario ?>" name='actual' id='actual' class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Nueva contraseña</label>
+            <div class="col-md-4">
+                <input type="password" name='nuevo' id='nuevo' class="form-control">
+
+            </div>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Repita contraseña</label>
+            <div class="col-md-4">
+                <input type="password" name='repetir' id='repetir' class="form-control">
+
+            </div>
+
+        </div>
+
+        <input type="submit" value="Cambiar" class="btn btn-info"/>
+
+    </form>
+
+    <div id="mensaje" style="color: red; font-weight: bold; font-size: 2em; text-align:center; margin: 10px;">
+
+    </div>
+
+</div>
+
+<script>
+  let form = document.getElementById('form_password')
+  let mensaje = document.getElementById('mensaje')
+  form.addEventListener('submit', async evt => {
+    evt.preventDefault()
+    if(md5(form.actual.value) != form.actual.dataset.hash) {
+      // console.log(form.actual.dataset.hash)
+      // console.log(form.actual.value)
+      mensaje.innerHTML = 'Password actual incorrecta'
+      return
+    }
+
+    if(form.nuevo.value != form.repetir.value) {
+      mensaje.innerHTML = 'No coincide el nuevo password con la verificación, revise'
+      return
+    }
+    formData = new FormData()
+    formData.append('id', form.actual.dataset.id)
+    formData.append('password', form.nuevo.value)
+    mensaje.style.color = 'green'
+    let respuesta = await fetch('/usuarios/change', {
+      method: 'post',
+      body: formData
+    })
+    let res = await respuesta.text()
+    mensaje.innerHTML = res
+    form.actual.value = ''
+    form.nuevo.value=''
+    form.repetir.value=''
+  })
+</script>

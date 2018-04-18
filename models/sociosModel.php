@@ -40,6 +40,49 @@ class sociosModel extends Model{
 
     }
 
+    public function getAdelantos($orden = 'id_socio_fk') {
+        $sql = "SELECT a.*, s.nombre, s.apellido from adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk order by ".$orden;
+        $consulta = $this->_db->query($sql);
+        $listado = $consulta->fetchall(PDO::FETCH_OBJ);
+        $arreglo = array();
+
+        foreach($listado as $valor) {
+            //$socio->setCategoria($this->_modeloCategorias->getById($valor->id_categoria_fk));
+            //$socio->setDomicilio($valor->domicilio);
+            $adelanto = array(
+              'nombre' => $valor->nombre,
+              'id' => $valor->idadelanto,
+              'apellido' => $valor->apellido,
+              'id_socio_fk' => $valor->id_socio_fk,
+              'desde' => $valor->desde,
+              'hasta' => $valor->hasta
+            );
+            $arreglo[] = $adelanto;
+
+
+        }
+        return $arreglo;
+
+    }
+
+    public function getAdelanto($id) {
+        $sql = "SELECT a.*, s.nombre, s.apellido from adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk WHERE idadelanto = $id";
+        $consulta = $this->_db->query($sql);
+        $listado = $consulta->fetch(PDO::FETCH_OBJ);
+        $adelanto = array(
+              'nombre' => $listado->nombre,
+              'id' => $listado->idadelanto,
+              'apellido' => $listado->apellido,
+              'id_socio_fk' => $listado->id_socio_fk,
+              'desde' => $listado->desde,
+              'hasta' => $listado->hasta
+            );
+
+
+            return $adelanto;
+        }
+
+
     public function getEliminados() {
 
         $listado = $this->_db->query("SELECT * FROM socios WHERE estado='B' order by nombre");

@@ -268,6 +268,15 @@ class sociosController extends Controller{
 
     }
 
+    public function listarAdelantos() {
+      if(!Session::get('autenticado')) {
+          $this->redireccionar('login');
+      }
+      $modelo  = $this->loadModel('socios');
+      $this->_view->socios = $modelo->getAdelantos();
+      $this->_view->renderizar('listar-adelantos');
+    }
+
     public function activar($id) {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
@@ -384,5 +393,28 @@ class sociosController extends Controller{
 
     }
 
+    public function nuevoAdelanto() {
+
+          if(!Session::get('autenticado')) {
+              $this->redireccionar('login');
+          }
+          $this->_view->titulo = 'Titulo';
+          $this->_view->renderizar('nuevo-adelanto');
+    }
+
+    public function editarAdelanto($id) {
+
+      if(!Session::get('autenticado')) {
+          $this->redireccionar('login');
+      }
+
+      $modelo  = $this->loadModel('socios');
+      $adelanto = $modelo->getAdelanto($id);
+      $this->_view->adelanto = $adelanto;
+
+      $this->_view->renderizar('editar-adelanto');
+
+
+}
 
 }

@@ -3,14 +3,14 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 */
-/* 
+/*
     Created on : 19/08/2015, 19/08/2015 11:37:47 PM
     Author     : walter
 */
 *{
     padding: 0;
     margin: 0;
-    
+
 }
 
 body {
@@ -20,7 +20,7 @@ body {
 }
 
 section#main, footer{
-    
+
     margin: 0 auto;
     text-align: center;
     width: 90%;
@@ -64,15 +64,15 @@ section#main, footer{
 
     input{
         margin: 5px;
-        
-        
+
+
     }
-    
-      
+
+
     select {
-        
+
     }
-    
+
     form{
         margin: 0 auto;
         text-align: center;
@@ -83,24 +83,24 @@ section#main, footer{
 
     }
     #form1 .etiquetas{
-        
+
         display: inline-block;
         width: 20%;
     }
-    
+
     #form_pago {
-        text-align: left;      
+        text-align: left;
         width: 100%;
     }
-    
+
     #form_pago .etiquetas {
         width: 100%;
         min-width: 20%;
         display: block;
     }
-    
-    
-    
+
+
+
     #form1 input[type="text"] {
         border: solid 1px;
         border-radius: 5px;
@@ -116,8 +116,8 @@ section#main, footer{
 
     }
 
-    a{ 
-        color:#0000cc; 
+    a{
+        color:#0000cc;
     }
 
     a:link{
@@ -130,80 +130,80 @@ section#main, footer{
         background-color:antiquewhite;
         color: red;
     }
-    
+
     ul{
         list-style: none;
-        
-        
+
+
     }
-    
+
     li{
         border: solid 0.1em;
         display: inline;
         margin: 0.5em;
         padding: 0.2em;
-      
-        
+
+
     }
-    
+
     article#contenido {
         width:100%;
         text-align: center;
     }
-    
+
     #img{
         width:100%;
         text-align: left;
-        
+
     }
-    
-    
+
+
     .img {
-        
+
         height: 25%;
         margin: 1em;
         min-height: 30px;
         padding: 2em;
         width: 25%;
     }
-    
+
     .titulo{
         display:table-cell;
         vertical-align: middle;
         width: 45%;
     }
-    
+
     header{
         width: 100%;
-        
+
     }
-    
+
     h3{
         margin: 1em;
         text-align: center;
     }
-    
+
     h2{
         font-size: 2em;
-        
+
     }
-        
+
     .impar{
-        
+
         background: darkkhaki;
         font-size: 0.8em;
     }
-    
+
     .par{
-        background: #d9f3ff;    
+        background: #d9f3ff;
         font-size: 0.8em;
     }
-    
+
     table{
         width:100%;
         border-collapse: collapse;
     }
-    
+
     td{
         padding: 0.2em;
     }
@@ -213,3 +213,4 @@ section#main, footer{
         text-align: center;
         width:50%;
     }
+    

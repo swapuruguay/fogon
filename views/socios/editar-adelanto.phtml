@@ -1,0 +1,37 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <form id="form1" action="<?php echo BASE_URL . 'socios/guardarAdelanto/0' ?>" method="POST">
+
+        <label class="etiquetas">Nro de Socio</label><input type="text" name='id' id='id' class="form-control" value="<?php echo $this->adelanto['id_socio_fk'] ?>">
+        <label id="nombre" style="display: inline-block;"></label><br>
+        <label class="etiquetas">Desde</label><input type="date" name='nombre' id='desde' class="form-control" value="<?php echo $this->adelanto['desde'] ?>"><br>
+        <label class="etiquetas">Hasta</label><input type="date" name='hasta' id='hasta' class="form-control" value="<?php echo $this->adelanto['hasta'] ?>"><br>
+        <input class="btn btn-success" type="submit" value="Guardar" />
+
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  setTimeout( async () => {
+    let form = document.getElementById('form1')
+    let nombre = document.getElementById('nombre')
+    let ids = document.getElementById('id')
+    //
+    // ids.addEventListener('change', async (evt) => {
+      let formData = new FormData()
+      formData.append('id', ids.value)
+      let respuesta = await fetch(`/socios/loadSocioAjax`, {
+        method: 'post',
+        body: formData
+      })
+      let res = await respuesta.json()
+      nombre.innerHTML = res.nombre
+    // })
+
+  }, 1500)
+</script>

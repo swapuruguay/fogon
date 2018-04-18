@@ -29,10 +29,11 @@ class loginController extends Controller{
       $username = filter_input(INPUT_POST ,'username', FILTER_SANITIZE_STRING);
       $password = filter_input(INPUT_POST ,'password', FILTER_SANITIZE_STRING);
       $password = md5($password);
-      echo $password;
       $user = $modelo->getUser($username, $password);
       if($user) {
         Session::set('autenticado', true);
+        Session::set('usuario', $user);
+        //print_r(Session::get('usuario'));
         $this->redireccionar('index');
       } else {
         $this->redireccionar('login');
