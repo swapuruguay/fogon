@@ -45,4 +45,9 @@ class usuariosController extends Controller {
         echo "Ocurrió un error, intente más tarde";
       }
     }
+
+    public function logout() {
+      Session::destroy();
+      $this->redireccionar('index');
+    }
 }
