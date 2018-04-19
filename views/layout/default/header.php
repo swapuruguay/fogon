@@ -19,10 +19,12 @@
             <header>
                 <div id="img">
                     <div class="titulo"><img src="<?php echo BASE_URL . 'public/img/encabezado.redimensionado.png' ?>" alt="Encabezado" class="img-responsive img-circle" ></div>
+              <div class="container">
                 <div class="titulo"><h2><?php echo NOMBRE ?></h2></div>
                 <div class="text-right titulo">
-                  <h2>Bienvenido <?php echo Session::get('usuario')->nombre; ?></h2>
+                  <h2>Bienvenid@ <?php echo Session::get('usuario')->nombre; ?></h2>
                 </div>
+              </div>
                 </div>
 
                 <nav>

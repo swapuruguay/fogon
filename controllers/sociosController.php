@@ -126,7 +126,7 @@ class sociosController extends Controller{
                 $id1 = $id['1'];
                 $socio->setEmail($_POST['email']);
                 $socio->setCategoria($modeloCat->getById($id1));
-                if($modelo->save($socio)) {
+                if($modelo->save($socio, Session::get('usuario')->idusuario)) {
                     $this->_view->mensaje = "Registro guardado";
                 }
 
@@ -165,7 +165,7 @@ class sociosController extends Controller{
                 $id1 = $id['1'];
                 $socio->setEmail($_POST['email']);
                 $socio->setCategoria($modeloCat->getById($id1));
-                if($modelo->update($socio)) {
+                if($modelo->update($socio, Session::get('usuario')->idusuario)) {
                     $this->_view->mensaje = "Registro guardado";
                 }
             }
@@ -190,7 +190,7 @@ class sociosController extends Controller{
         }
         $modelo  = $this->loadModel('socios');
         $socio = $modelo->getById($id);
-        if($modelo->delete($socio)) {
+        if($modelo->delete($socio, Session::get('usuario')->idusuario)) {
             $this->_view->mensaje = "Registro eliminado con &eacute;xito";
         } else {
             $this->_view->mensaje = "No se pudo eliminar el socio intente m&aacute;s tarde";
@@ -293,7 +293,7 @@ class sociosController extends Controller{
         }
         $modelo  = $this->loadModel('socios');
         $socio = $modelo->getById($id);
-        if($modelo->activar($socio)) {
+        if($modelo->activar($socio, Session::get('usuario')->idusuario)) {
             $this->_view->mensaje = "Socio activado con &eacute;xito";
         } else {
             $this->_view->mensaje = "No se pudo activar el socio intente m&aacute;s tarde";
