@@ -27,7 +27,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
-          <input type="number" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
+          <input type="text" <input type="text" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
         </div>
 
       </div>

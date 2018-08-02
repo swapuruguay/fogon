@@ -24,7 +24,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
-          <input type="text" pattern="[0-9]" name='documento' id='documento'  class="form-control">
+          <input type="text" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;" name='documento' id='documento'  class="form-control">
         </div>
 
       </div>
