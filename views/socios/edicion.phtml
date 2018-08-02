@@ -27,7 +27,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
-          <input type="text" <input type="text" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
+          <input type="text" <input type="text" onKeypress="justNumbers(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
         </div>
 
       </div>
@@ -152,4 +152,13 @@ function mostrarImagen(input) {
 $("#foto").change(function(){
  mostrarImagen(this);
 });
+
+function justNumbers(e)
+{
+  var keynum = window.event ? window.event.keyCode : e.which;
+  if ((keynum == 8) || (keynum == 46))
+  return true;
+
+  return /\d/.test(String.fromCharCode(keynum));
+}
 </script>
