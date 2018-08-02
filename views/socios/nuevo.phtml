@@ -24,7 +24,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
-          <input type="text" onkeypress="soloNumeros(event);" name='documento' id='documento'  class="form-control">
+          <input type="text" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control">
         </div>
 
       </div>
@@ -125,18 +125,20 @@ $("#foto").change(function(){
 
 function soloNumeros(e)
 {
+
   key = e.keyCode || e.which
   let numeros = "0123456789"
   let teclado = String.fromCharCode(key)
-  let especiales = "8-37-38-46"
+  let especiales = [8,37,39,46]
   let teclado_especial = false
   for(let i in especiales) {
+
     if(key == especiales[i]) {
       teclado_especial = true
     }
   }
 
-  if(numeros.indexOf(teclado) < 0 && !teclado_especial) {
+  if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
     return false
   }
 }
