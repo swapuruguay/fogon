@@ -27,7 +27,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
-          <input type="text" <input type="text" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
+          <input type="text" <input type="text" data-doc="<?php echo $this->socio->getDocumento() ?>" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
         <span id="alerta" style="color:red; font-weight:bold;"></span>
         </div>
 
@@ -170,8 +170,8 @@ frm.addEventListener('submit', async (evt) => {
     body: formData
   })
   let resultado = await res.json()
-  console.log(resultado)
-  if(resultado.documento != frm.documento.value) {
+  //console.log(resultado)
+  if(frm.documento.dataset.doc != frm.documento.value) {
     if(resultado.documento != 0) {
       let alerta = document.getElementById('alerta')
       alerta.innerHTML = 'Socio existente en la base de datos, revise'
@@ -180,15 +180,15 @@ frm.addEventListener('submit', async (evt) => {
     }
 
     if(digitoCedula(frm.documento.value)) {
-      console.log('aca')
-    //  frm.submit()
+
+      frm.submit()
     } else {
       alert('Cédula erronea, verifique')
       frm.documento.focus()
     }
   } else {
-    console.log('noaca')
-    //frm.submit()
+
+    frm.submit()
   }
 })
 
