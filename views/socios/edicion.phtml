@@ -27,7 +27,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
-          <input type="text" <input type="text" data-doc="<?php echo $this->socio->getDocumento() ?>" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
+          <input type="text" <input type="text" data-doc="<?php echo $this->socio->getDocumento() ?>" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
         <span id="alerta" style="color:red; font-weight:bold;"></span>
         </div>
 
@@ -221,16 +221,16 @@ function soloNumeros(e)
 {
 
  key = e.keyCode || e.which
+ //console.log(key)
  let numeros = "0123456789"
  let teclado = String.fromCharCode(key)
- let especiales = [8,9,37,39,46]
- if(teclado == '.') {
-   return false
- }
- let teclado_especial = false
- for(let i in especiales) {
 
+ let especiales = [8,9,37,39,46]
+
+ let teclado_especial = false
+ for(let i = 0; i< especiales.length; i++) {
    if(key == especiales[i]) {
+
      teclado_especial = true
    }
  }
@@ -238,5 +238,10 @@ function soloNumeros(e)
  if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
    return false
  }
+}
+
+function quitaPuntos() {
+  let valor = document.getElementById('documento').value
+  document.getElementById('documento').value = valor.replace(/\./g, '')
 }
 </script>
