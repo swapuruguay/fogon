@@ -139,6 +139,18 @@ class sociosModel extends Model{
         return $socio;
     }
 
+    public function getByDocumento($id){
+        $listado = $this->_db->query("SELECT * FROM socios WHERE documento = " .$id);
+        $listado = $listado->fetch(PDO::FETCH_OBJ);
+        $socio = null;
+        if($listado) {
+          $socio = new Socio($listado->id_socio, $listado->nombre, $listado->apellido);
+          $socio->setDocumento($listado->documento);
+
+        }
+        return $socio;
+    }
+
     public function getByApellido($texto){
         $listado = $this->_db->query("SELECT id_socio,nombre, apellido FROM socios "
                 . "WHERE (nombre LIKE '" .$texto . "%' OR apellido LIKE '" .$texto . "%')  AND estado='A'");

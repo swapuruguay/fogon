@@ -28,6 +28,7 @@
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
           <input type="text" <input type="text" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
+        <span id="alerta" style="color:red; font-weight:bold;"></span>
         </div>
 
       </div>
@@ -139,6 +140,7 @@ $("#movs").on('click', '.eliminar', function(event) {
 });
 
 
+
 function mostrarImagen(input) {
  if (input.files && input.files[0]) {
   var reader = new FileReader();
@@ -153,23 +155,81 @@ $("#foto").change(function(){
  mostrarImagen(this);
 });
 
+const frm = document.getElementById('form1')
+
+frm.addEventListener('submit', async (evt) => {
+  evt.preventDefault()
+  if(frm.apellido.value == '') {
+    alert('Debe ingresar nombre y apellido por serparado')
+    return
+  }
+  let formData = new FormData()
+  formData.append('documento', frm.documento.value)
+  let res = await fetch('/socios/getByDocumento', {
+    method: 'post',
+    body: formData
+  })
+  let resultado = await res.json()
+  console.log(resultado)
+  if(resultado.documento != 0) {
+    let alerta = document.getElementById('alerta')
+    alerta.innerHTML = 'Socio existente en la base de datos, revise'
+    frm.documento.focus()
+    return
+  }
+  if(digitoCedula(frm.documento.value)) {
+    frm.submit()
+  } else {
+    alert('Cédula erronea, verifique')
+    frm.documento.focus()
+  }
+})
+
+function digitoCedula(ci) {
+ let digitoIngresado = ci.substring(ci.length -1)
+ let cedula = ci.substring(0, ci.length - 1)
+
+ let arrayCedula = cedula.split('')
+ if(arrayCedula.length < 6) {
+   return false
+ } else if (arrayCedula.length == 6) {
+   arrayCedula.unshift(0)
+ }
+ let testigo = [2,9,8,7,6,3,4]
+ let sumatoria = 0
+ for(let i in testigo) {
+   sumatoria+= testigo[i] * arrayCedula[i]
+ }
+
+ let modulo = sumatoria % 10
+ if(modulo == 0) {
+   modulo = 10
+ }
+
+ return 10-(modulo) == digitoIngresado
+
+}
+
 function soloNumeros(e)
 {
 
-  key = e.keyCode || e.which
-  let numeros = "0123456789"
-  let teclado = String.fromCharCode(key)
-  let especiales = [8,37,39,46]
-  let teclado_especial = false
-  for(let i in especiales) {
+ key = e.keyCode || e.which
+ let numeros = "0123456789"
+ let teclado = String.fromCharCode(key)
+ let especiales = [8,9,37,39,46]
+ if(teclado == '.') {
+   return false
+ }
+ let teclado_especial = false
+ for(let i in especiales) {
 
-    if(key == especiales[i]) {
-      teclado_especial = true
-    }
-  }
+   if(key == especiales[i]) {
+     teclado_especial = true
+   }
+ }
 
-  if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
-    return false
-  }
+ if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
+   return false
+ }
 }
 </script>
