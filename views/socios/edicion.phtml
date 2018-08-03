@@ -171,17 +171,24 @@ frm.addEventListener('submit', async (evt) => {
   })
   let resultado = await res.json()
   console.log(resultado)
-  if(resultado.documento != 0) {
-    let alerta = document.getElementById('alerta')
-    alerta.innerHTML = 'Socio existente en la base de datos, revise'
-    frm.documento.focus()
-    return
-  }
-  if(digitoCedula(frm.documento.value)) {
-    frm.submit()
+  if(resultado.documento != frm.documento.value) {
+    if(resultado.documento != 0) {
+      let alerta = document.getElementById('alerta')
+      alerta.innerHTML = 'Socio existente en la base de datos, revise'
+      frm.documento.focus()
+      return
+    }
+
+    if(digitoCedula(frm.documento.value)) {
+      console.log('aca')
+    //  frm.submit()
+    } else {
+      alert('Cédula erronea, verifique')
+      frm.documento.focus()
+    }
   } else {
-    alert('Cédula erronea, verifique')
-    frm.documento.focus()
+    console.log('noaca')
+    //frm.submit()
   }
 })
 
