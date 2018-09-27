@@ -114,7 +114,7 @@
      body: formData
    })
    let resultado = await res.json()
-   console.log(resultado)
+   //console.log(resultado)
    if(resultado.documento != 0) {
      let alerta = document.getElementById('alerta')
      alerta.innerHTML = 'Socio existente en la base de datos, revise'
@@ -145,7 +145,13 @@ function digitoCedula(ci) {
     sumatoria+= testigo[i] * arrayCedula[i]
   }
 
-  return 10-(sumatoria % 10) == digitoIngresado
+  if((sumatoria % 10) == 0) {
+    return 0 == digitoIngresado
+  }
+  else {
+    return 10-(sumatoria % 10) == digitoIngresado
+  }
+
 
 }
 
