@@ -24,6 +24,8 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Documento</label>
         <div class="col-sm-4">
+          <label for="check">Deshabilitar para extranjero</label>
+          <input type="checkbox" name="check" id="check">
           <input type="text" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control">
           <span id="alerta" style="color:red; font-weight:bold;"></span>
         </div>
@@ -130,6 +132,9 @@
  })
 
 function digitoCedula(ci) {
+  if(document.getElementById('check').checked) {
+    return true
+  }
   let digitoIngresado = ci.substring(ci.length -1)
   let cedula = ci.substring(0, ci.length - 1)
 
