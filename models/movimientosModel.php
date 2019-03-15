@@ -116,8 +116,11 @@ class movimientosModel extends Model{
 
     }
 
-    public function getMes($anio, $mes) {
-        $listado = $this->_db->query("SELECT * FROM cuotas WHERE fecha_computo='$anio-".$mes."-01' AND importe > 0");
+    public function getMes($anio, $mes, $dire) {
+        $fogon = ($dire == 1)? ' LIKE ': ' NOT LIKE ';
+        $sql = "SELECT c.mes, c.anio, c.importe, s.nombre, s.apellido, s.id_socio, c.id_socio_fk FROM cuotas c JOIN socios s ON 
+                s.id_socio = c.id_socio_fk WHERE s.domicilio $fogon '%fogon%' AND fecha_computo= '$anio-".$mes."-01' AND importe > 0";
+        $listado = $this->_db->query($sql);
         return  $listado->fetchall(PDO::FETCH_OBJ);
     }
 

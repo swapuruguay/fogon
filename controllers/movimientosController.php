@@ -164,10 +164,10 @@ class movimientosController extends Controller{
    public function imprimir140() {
         $mes = filter_input(INPUT_POST, 'mes', FILTER_SANITIZE_NUMBER_INT);
         $anio = filter_input(INPUT_POST, 'anio', FILTER_SANITIZE_NUMBER_INT);
-
+        $dire = filter_input(INPUT_POST, 'dire', FILTER_SANITIZE_NUMBER_INT);
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
-        $row = $modelo->getMes($anio, $mes);
+        $row = $modelo->getMes($anio, $mes, $dire);
         $registros = count($row);
         $paginas = $registros / 4;
         //echo $paginas . ' ' . $registros;
