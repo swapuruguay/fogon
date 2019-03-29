@@ -116,10 +116,17 @@ class movimientosModel extends Model{
 
     }
 
-    public function getMes($anio, $mes, $dire) {
-        $fogon = ($dire == 1)? ' LIKE ': ' NOT LIKE ';
+    public function getMes($anio, $mes, $dire=3) {
+        //$fogon = ($dire == 1)? ' LIKE ': ' NOT LIKE ';
+        $fogon = '';
+        if($dire == 1) {
+            $fogon = " AND LIKE '%fogon%'";
+        } elseif(!$dire) {
+            $fogon = " AND NOT LIKE '%fogon%'";
+        }
+
         $sql = "SELECT c.mes, c.anio, c.importe, s.nombre, s.apellido, s.id_socio, c.id_socio_fk FROM cuotas c JOIN socios s ON 
-                s.id_socio = c.id_socio_fk WHERE s.domicilio $fogon '%fogon%' AND fecha_computo= '$anio-".$mes."-01' AND importe > 0";
+                s.id_socio = c.id_socio_fk WHERE s.domicilio fecha_computo= '$anio-".$mes."-01' $fogon  AND importe > 0";
         $listado = $this->_db->query($sql);
         return  $listado->fetchall(PDO::FETCH_OBJ);
     }
