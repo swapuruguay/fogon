@@ -121,7 +121,7 @@ class movimientosModel extends Model{
         $fogon = '';
         if($dire == 1) {
             $fogon = " AND s.domicilio LIKE '%fogon%'";
-        } elseif(!$dire) {
+        } elseif($dire == 2) {
             $fogon = " AND s.domicilio NOT LIKE '%fogon%'";
         }
 
