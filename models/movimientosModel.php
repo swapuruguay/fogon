@@ -120,9 +120,9 @@ class movimientosModel extends Model{
         //$fogon = ($dire == 1)? ' LIKE ': ' NOT LIKE ';
         $fogon = '';
         if($dire == 1) {
-            $fogon = " AND LIKE '%fogon%'";
+            $fogon = " AND s.domicilio LIKE '%fogon%'";
         } elseif(!$dire) {
-            $fogon = " AND NOT LIKE '%fogon%'";
+            $fogon = " AND s.domicilio NOT LIKE '%fogon%'";
         }
 
         $sql = "SELECT c.mes, c.anio, c.importe, s.nombre, s.apellido, s.id_socio, c.id_socio_fk FROM cuotas c JOIN socios s ON 
