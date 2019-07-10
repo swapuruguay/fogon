@@ -212,7 +212,7 @@ class movimientosController extends Controller{
                     $pdf->SetXY(83,$pos_y + 34);
 
                     //$pos_y+=73;
-                    $pos_y+= 74;
+                    $pos_y+= 73;
                     $pdf->SetY($pos_y);
 
                     $it++;
