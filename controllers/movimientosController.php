@@ -93,6 +93,13 @@ class movimientosController extends Controller{
         $this->_view->titulo = 'Titulo';
         $this->_view->renderizar('formprint');
     }
+    public function choose() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        $this->_view->titulo = 'Titulo';
+        $this->_view->renderizar('frmchoose');
+    }
 
     public function imprimir() {
         $mes = filter_input(INPUT_POST, 'mes', FILTER_SANITIZE_NUMBER_INT);
