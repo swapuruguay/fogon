@@ -5,6 +5,7 @@
         <title></title>
 
         <link rel="stylesheet" type="text/css" href="<?php echo $_layoutParams['ruta_css']?>digg.css">
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="<?php echo BASE_URL . 'public/js/menu/'?>styles.css">
         <link rel="stylesheet" href="<?php echo BASE_URL ?>public/css/bootstrap.css">
         <script type="text/javascript" src="<?php echo BASE_URL . 'public/js/jquery.js'; ?>"></script>

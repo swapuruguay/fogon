@@ -92,6 +92,58 @@
         </div>
 
       </div>
+      <fieldset id="campos">
+      <legend>Agregar Familiar</legend>
+      <div class="form-group">
+        <div class="col-sm-11">
+          <div class="input-group">
+            <div class="input-group-addon">
+              <i class="fa fa-user" aria-hidden="true"></i>
+            </div>
+            <input type="text" class="form-control" id="name-parent" placeholder="Nombre">
+            <div class="input-group-addon">
+              <i class="fa fa-user" aria-hidden="true"></i>
+            </div>
+            <input type="text" class="form-control" id="apellido-parent" placeholder="Apellido">
+            <div class="input-group-addon">
+              <i class="fa fa-users" aria-hidden="true"></i>
+            </div>
+            <select type="text" class="form-control" id="parentezco" placeholder="Parentezco">
+              <option value="c">Cónyuge</option>
+              <option value="h">Hijo/a</option>
+            </select>
+            <div class="input-group-addon">
+              <i class="fa fa-id-card" aria-hidden="true"></i>
+            </div>
+            <input type="text" class="form-control" id="document" placeholder="Documento">
+            <div class="input-group-addon">
+              <i class="fa fa-id-card" aria-hidden="true"></i>
+            </div>
+            <select type="text" class="form-control" id="sex" placeholder="Sexo">
+              <option value="f">F</option>
+              <option value="m">M</option>
+            </select>
+            <div class="input-group-addon">
+              <i class="fa fa-mobile" aria-hidden="true"></i>
+            </div>
+            <input type="text" class="form-control" id="fecha" placeholder="Fecha N.">
+          </div>
+        </div>
+        <div class="col-sm-1">
+          <button type="button" id="add" class="btn"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      <table id="respo" class="table table-condensed table-striped">
+        <tr>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Parentezco</th>
+          <th>Documento</th>
+        </tr>
+      </table>
+      <button type="button" class="btn" id="remover"><i class="fa fa-minus-circle" aria-hidden="true"></i></button>
+    </fieldset>
+      <div class="parientes"></div>
 
 
 
@@ -100,7 +152,8 @@
   </form>
 </div>
 <script type="text/javascript">
-
+ const $parents = document.querySelector("parientes")
+ let cuerpo = ``
  const frm = document.getElementById('form1')
 
  frm.addEventListener('submit', async (evt) => {
