@@ -1,5 +1,5 @@
 <br>
-<div class="container">
+<div class="container-fluid">
   <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/0'?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
       <div class="form-group">
         <label class="control-label col-sm-2">Nro de Socio</label>
@@ -109,6 +109,7 @@
               <i class="fa fa-users" aria-hidden="true"></i>
             </div>
             <select type="text" class="form-control" id="parentezco" placeholder="Parentezco">
+              <option disabled selected value="a">Parentezco</option>
               <option value="c">Cónyuge</option>
               <option value="h">Hijo/a</option>
             </select>
@@ -117,16 +118,17 @@
             </div>
             <input type="text" class="form-control" id="document" placeholder="Documento">
             <div class="input-group-addon">
-              <i class="fa fa-id-card" aria-hidden="true"></i>
+              <i class="fa fa-venus-mars" aria-hidden="true"></i>
             </div>
-            <select type="text" class="form-control" id="sex" placeholder="Sexo">
+            <select type="text" class="form-control" id="sex">
+              <option disabled selected value="a">Sexo</option>
               <option value="f">F</option>
               <option value="m">M</option>
             </select>
             <div class="input-group-addon">
-              <i class="fa fa-mobile" aria-hidden="true"></i>
+              <i class="fa fa-calendar" aria-hidden="true"></i>
             </div>
-            <input type="text" class="form-control" id="fecha" placeholder="Fecha N.">
+            <input type="date" class="form-control" id="fecha" placeholder="Fecha N.">
           </div>
         </div>
         <div class="col-sm-1">
@@ -139,6 +141,8 @@
           <th>Apellido</th>
           <th>Parentezco</th>
           <th>Documento</th>
+          <th>Sexo</th>
+          <th>F.Nacim.</th>
         </tr>
       </table>
       <button type="button" class="btn" id="remover"><i class="fa fa-minus-circle" aria-hidden="true"></i></button>
@@ -177,7 +181,7 @@
      return
    }
    if(digitoCedula(frm.documento.value)) {
-     frm.submit()
+     //frm.submit()
    } else {
      alert('Cédula erronea, verifique')
      frm.documento.focus()

@@ -12,7 +12,7 @@
         <script type="text/javascript" src="<?php echo BASE_URL . 'views/layout/default/js/funciones2.js'; ?>"></script>
         <script type="text/javascript" src="<?php echo BASE_URL . 'public/js/menu/script.js'; ?>"></script>
         <script type="text/javascript" src="<?php echo BASE_URL . 'public/js/bootstrap.min.js'; ?>"></script>
-        <script type="text/javascript" src="<?php echo BASE_URL . 'views/layout/default/js/md5.min.js'?>"></script>
+        <script type="text/javascript" src="<?php echo BASE_URL . 'views/layout/default/js/md5.min.js'?>"></script>      
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     </head>
     <body>

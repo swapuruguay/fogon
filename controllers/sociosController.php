@@ -95,42 +95,43 @@ class sociosController extends Controller{
         if(isset($_POST['idsoc'])) {
             $id = filter_input(INPUT_POST ,'idsoc', FILTER_SANITIZE_NUMBER_INT);
             if($id == 0) {
-                $socio = $modelo->buildSocio();
-                $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
-                $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
-                $socio->setDomicilio(utf8_encode(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING)));
-                $socio->setTelefono(filter_input(INPUT_POST ,'telefono', FILTER_SANITIZE_STRING));
-                $nro = $modelo->getNroNuevo('socios');
-                if(isset($_FILES['foto'])) {
-                    $dir_subida = dirname(APP_PATH) . '/views/socios/img/';
-                    $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                    $fichero_subido = $dir_subida . $nro.'.'.$ext;
+                // $socio = $modelo->buildSocio();
+                // $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
+                // $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
+                // $socio->setDomicilio(utf8_encode(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING)));
+                // $socio->setTelefono(filter_input(INPUT_POST ,'telefono', FILTER_SANITIZE_STRING));
+                // $nro = $modelo->getNroNuevo('socios');
+                // if(isset($_FILES['foto'])) {
+                //     $dir_subida = dirname(APP_PATH) . '/views/socios/img/';
+                //     $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+                //     $fichero_subido = $dir_subida . $nro.'.'.$ext;
 
-                    if (move_uploaded_file($_FILES['foto']['tmp_name'], $fichero_subido)) {
-                        $socio->setFoto($nro.'.'.$ext);
-                    } else {
-                        $socio->setFoto('socio.png');
-                    }
-                }
+                //     if (move_uploaded_file($_FILES['foto']['tmp_name'], $fichero_subido)) {
+                //         $socio->setFoto($nro.'.'.$ext);
+                //     } else {
+                //         $socio->setFoto('socio.png');
+                //     }
+                // }
 
-                $socio->setExento(isset($_POST['exento'])? 1 : 0);
-                $ingreso = filter_input(INPUT_POST ,'fecha_ingreso', FILTER_SANITIZE_STRING);
-                $ingreso = $this->cambiarfecha_mysql($ingreso);
-                $socio->setFechaIngreso($ingreso);
-                $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
-                $nacimiento = $this->cambiarfecha_mysql($nacimiento);
-                $socio->setFechaNacimiento($nacimiento);
-                $socio->setDocumento($_POST['documento']);
-                $idcat = filter_input(INPUT_POST ,'categorias', FILTER_SANITIZE_STRING);
-                $id = explode("_", $idcat);
-                $id1 = $id['1'];
-                $socio->setEmail($_POST['email']);
-                $socio->setCategoria($modeloCat->getById($id1));
-                if($modelo->save($socio, Session::get('usuario')->idusuario)) {
-                    $this->_view->mensaje = "Registro guardado";
-                }
+                // $socio->setExento(isset($_POST['exento'])? 1 : 0);
+                // $ingreso = filter_input(INPUT_POST ,'fecha_ingreso', FILTER_SANITIZE_STRING);
+                // $ingreso = $this->cambiarfecha_mysql($ingreso);
+                // $socio->setFechaIngreso($ingreso);
+                // $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
+                // $nacimiento = $this->cambiarfecha_mysql($nacimiento);
+                // $socio->setFechaNacimiento($nacimiento);
+                // $socio->setDocumento($_POST['documento']);
+                // $idcat = filter_input(INPUT_POST ,'categorias', FILTER_SANITIZE_STRING);
+                // $id = explode("_", $idcat);
+                // $id1 = $id['1'];
+                // $socio->setEmail($_POST['email']);
+                // $socio->setCategoria($modeloCat->getById($id1));
+                // if($modelo->save($socio, Session::get('usuario')->idusuario)) {
+                //     $this->_view->mensaje = "Registro guardado";
+                // }
 
-                $this->_view->renderizar('resultado');
+                // $this->_view->renderizar('resultado');
+                print_r($_POST);
 
             } else {
                 $socio = $modelo->buildSocio();
