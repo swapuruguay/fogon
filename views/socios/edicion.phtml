@@ -8,6 +8,7 @@
               <?php endif ?>
         <div class="col-sm-1">
           <input type="text" name='id' id='id' readonly value="<?php echo $this->socio->getId(); ?>" class="form-control">
+          <a class="btn btn-primary" href="<?php echo BASE_URL . 'socios/listarParientes/'. $this->socio->getId(); ?>">Ver Parientes</a>
         </div>
       </div>
       <input type="hidden" name="idsoc" id="idsoc" value="<?php echo $this->socio->getId(); ?>">

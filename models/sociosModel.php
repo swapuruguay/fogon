@@ -40,6 +40,23 @@ class sociosModel extends Model{
         return $arreglo;
 
     }
+    public function getAllParents($id, $orden = 'parentezco') {
+
+        $listado = $this->_db->query("SELECT nombre, apellido, parentezco, documento, sexo, fecha_nacimiento from parientes where id_socio= $id order by ".$orden);
+        $listado = $listado->fetchall(PDO::FETCH_OBJ);
+        $arreglo = array();
+        foreach($listado as $valor) {
+            $socio = new Pariente($valor->id_socio, $valor->nombre, $valor->apellido);
+            $socio->setDocumento($valor->documento);
+            $socio->setSexo($valor->sexo);
+            $socio->setParentezco($valor->parentezco);
+            $arreglo[] = $socio;
+
+
+        }
+        return $arreglo;
+
+    }
 
     public function getAdelantos($orden = 'id_socio_fk') {
         $sql = "SELECT a.*, s.nombre, s.apellido from adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk order by ".$orden;

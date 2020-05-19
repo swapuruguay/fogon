@@ -1,0 +1,29 @@
+<div class="container">
+<h2>Parientes</h2>
+<article id="formularios">
+<div class="row">
+  <div class="col-sm-12 col-md-6">
+    <table id="tabla" class="table table-striped table-condensed table-bordered">
+      <tr>
+          <th>Nro.</th><th>Nombre</th><th>Apellido</th><th>Parentezco</th><th>Documento</th><th>Sexo</th><th>F.Nac.</th>
+      </tr>
+      <?php $contador = 1; ?>
+      <?php foreach($this->parientes as $soc): ?>
+
+      <tr>
+          <td><?php echo $soc->getId(); ?></td>
+          <td><?php echo utf8_decode($soc->getNombre()); ?></td>
+          <td><?php echo utf8_decode($soc->getApellido()); ?></td>
+          <td><a href="<?php echo BASE_URL . 'socios/editar_pariente/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
+          <?php if(Session::get('usuario')->perfil > 3): ?>
+          <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
+          <?php endif ?>
+          <?php $contador++; ?>
+      </tr>
+      <?php endforeach; ?>
+    </table>
+  </div>
+</div>
+    </article>
+  </div>
+<br><br>

@@ -456,8 +456,16 @@ class sociosController extends Controller{
       $this->_view->adelanto = $adelanto;
 
       $this->_view->renderizar('editar-adelanto');
+    }
 
+    public function listarParientes($idSocio) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        $modelo  = $this->loadModel('socios');
+        $this->_view->parientes = $modelo->getAllParents($idSocio);
+        $this->_view->renderizar('parientes');
 
-}
+    }
 
 }

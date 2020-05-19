@@ -21,8 +21,7 @@
       </tr>
       <?php $contador = 1; ?>
       <?php foreach($this->socios as $soc): ?>
-
-      <tr>
+        <tr>
           <td><?php echo $soc->getId(); ?></td>
           <td><?php echo utf8_decode($soc->getNombre()); ?></td>
           <td><?php echo utf8_decode($soc->getApellido()); ?></td>
@@ -31,9 +30,7 @@
           <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
           <?php endif ?>
           <?php $contador++; ?>
-      </tr>
-
-
+        </tr>
       <?php endforeach; ?>
     </table>
   </div>

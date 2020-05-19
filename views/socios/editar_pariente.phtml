@@ -1,0 +1,148 @@
+<div class="container">
+    <form id="form1" action="<?php echo BASE_URL . 'socios/guardarparientes/0'?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nro de Socio</label>
+        <div class="col-sm-1">
+          <input type="text" name='id' id='id' value="<?php echo $this->nroSocio ?>" readonly class="form-control">
+        </div>
+      </div>
+      <input type="hidden" name="idsoc" id="idsoc" value=0>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nombre</label>
+        <div class="col-sm-4">
+          <input type="text" name='nombre' id='nombre'  class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Apellido</label>
+        <div class="col-sm-4">
+          <input type="text" name='apellido' id='apellido'  class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Documento</label>
+        <div class="col-sm-4">
+          <label for="check">Deshabilitar para extranjero</label>
+          <input type="checkbox" name="check" id="check">
+          <input type="text" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control">
+          <span id="alerta" style="color:red; font-weight:bold;"></span>
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Parentezco</label>
+        <div class="col-sm-4">
+          <select name="parentezco" id="parentezco">
+            <option value="a">--Parentezco--</option>
+            <option value="c">Cónyuge</option>
+            <option value="h">Hijo/a</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Sexo</label>
+        <div class="col-sm-4">
+          <select name="categorias" class="form-control">
+            <option value="F">Femenino</option>
+            <option value="M">Masculino</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Fecha Nacimiento</label>
+        <div class="col-sm-3">
+          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' class="form-control">
+        </div>
+
+      </div>
+      <input type="submit" value="Guardar" class="btn btn-success"/>
+  </form>
+</div>
+
+<script type="text/javascript">
+ const $parents = document.querySelector("parientes")
+ let cuerpo = ``
+ const frm = document.getElementById('form1')
+
+ frm.addEventListener('submit', async (evt) => {
+   evt.preventDefault()
+   if(frm.apellido.value == '') {
+     alert('Debe ingresar nombre y apellido por serparado')
+     return
+   }
+   let formData = new FormData()
+   formData.append('documento', frm.documento.value)
+   let res = await fetch('/socios/getParentByDocumento', {
+     method: 'post',
+     body: formData
+   })
+   let resultado = await res.json()
+   //console.log(resultado)
+   if(resultado.documento != 0) {
+     let alerta = document.getElementById('alerta')
+     alerta.innerHTML = 'Pariente existente en la base de datos, revise'
+     frm.documento.focus()
+     return
+   }
+   if(digitoCedula(frm.documento.value)) {
+     //frm.submit()
+   } else {
+     alert('Cédula erronea, verifique')
+     frm.documento.focus()
+   }
+ })
+
+function digitoCedula(ci) {
+  if(document.getElementById('check').checked) {
+    return true
+  }
+  let digitoIngresado = ci.substring(ci.length -1)
+  let cedula = ci.substring(0, ci.length - 1)
+
+  let arrayCedula = cedula.split('')
+  if(arrayCedula.length < 6) {
+    return false
+  } else if (arrayCedula.length == 6) {
+    arrayCedula.unshift(0)
+  }
+  let testigo = [2,9,8,7,6,3,4]
+  let sumatoria = 0
+  for(let i in testigo) {
+    sumatoria+= testigo[i] * arrayCedula[i]
+  }
+
+  if((sumatoria % 10) == 0) {
+    return 0 == digitoIngresado
+  }
+  else {
+    return 10-(sumatoria % 10) == digitoIngresado
+  }
+
+
+}
+
+function soloNumeros(e)
+{
+
+  key = e.keyCode || e.which
+  let numeros = "0123456789"
+  let teclado = String.fromCharCode(key)
+  let especiales = [8,9,37,39,46]
+  if(teclado == '.') {
+    return false
+  }
+  let teclado_especial = false
+  for(let i in especiales) {
+
+    if(key == especiales[i]) {
+      teclado_especial = true
+    }
+  }
+
+  if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
+    return false
+  }
+}
+
+</script>
