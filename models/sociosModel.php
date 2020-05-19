@@ -12,6 +12,7 @@
  * @author walter
  */
 require_once 'Socio.php';
+require_once 'Pariente.php';
 require_once 'categoriasModel.php';
 
 class sociosModel extends Model{
@@ -149,6 +150,18 @@ class sociosModel extends Model{
 
         }
         return $socio;
+    }
+
+    public function getParentByDocumento($id){
+        $listado = $this->_db->query("SELECT * FROM parientes WHERE documento = " .$id);
+        $listado = $listado->fetch(PDO::FETCH_OBJ);
+        $pariente = null;
+        if($listado) {
+          $pariente = new Parent($listado->id_pariente, $listado->nombre, $listado->apellido);
+          $pariente->setDocumento($listado->documento);
+
+        }
+        return $pariente;
     }
 
     public function getByApellido($texto){

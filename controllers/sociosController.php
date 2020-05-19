@@ -264,6 +264,27 @@ class sociosController extends Controller{
         echo json_encode($objeto);
     }
 
+    public function getParentByDocumento() {
+        $documento = filter_input(INPUT_POST, 'documento', FILTER_SANITIZE_NUMBER_INT);
+        if($documento) {
+            $retorno = $this->_ajax->getParentByDocumento($documento);
+            if($retorno) {
+              $objeto = array(
+                'id'        => $retorno->getId(),
+                'nombre'    => $retorno->getNombre(). ' ' . $retorno->getApellido(),
+                'documento' => $retorno->getDocumento()
+              );
+
+            } else {
+              $objeto = array('documento' => 0);
+            }
+        } else {
+
+            $objeto = array( 'documento' => 0);
+        }
+        echo json_encode($objeto);
+    }
+
     public function eliminados($pag=0) {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
