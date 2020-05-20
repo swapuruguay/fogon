@@ -42,11 +42,12 @@ class sociosModel extends Model{
     }
     public function getAllParents($id, $orden = 'parentezco') {
 
-        $listado = $this->_db->query("SELECT nombre, apellido, parentezco, documento, sexo, fecha_nacimiento from parientes where id_socio= $id order by ".$orden);
+        $listado = $this->_db->query("SELECT id_socio, nombre, apellido, parentezco, documento, sexo, fecha_nacimiento from parientes where id_socio= $id order by ".$orden);
         $listado = $listado->fetchall(PDO::FETCH_OBJ);
         $arreglo = array();
         foreach($listado as $valor) {
             $socio = new Pariente($valor->id_socio, $valor->nombre, $valor->apellido);
+            $socio->setIdSocio($valor->id_socio);
             $socio->setDocumento($valor->documento);
             $socio->setSexo($valor->sexo);
             $socio->setParentezco($valor->parentezco);
@@ -219,6 +220,23 @@ class sociosModel extends Model{
         return $this->_db->query($sql);
     }
 
+    public function savePariente(Pariente $socio, $usuario) {
+        $datos = array(
+
+            'nombre'            => $socio->getNombre(),
+            'apellido'          => $socio->getApellido(),
+            'documento'         => $socio->getDocumento(),
+            'parentezco'        => $socio->getParentezco(),
+            'sexo'              => $socio->getSexo(),
+            'fecha_nacimiento'  => $socio->getFechaNacimiento(),
+            'id_socio'          => $socio->getIdSocio(),
+            'usuario'           => $usuario
+        );
+        $sql = 'INSERT INTO parientes ' . $this->preparaInsert($datos);
+
+        return $this->_db->query($sql);
+    }
+
     public function update(Socio $socio, $usuario) {
         $datos = array(
 
@@ -245,6 +263,10 @@ class sociosModel extends Model{
 
     public function buildSocio() {
         return new Socio(0, 'Nuevo', 'nuevo');
+    }
+
+    public function buildPariente() {
+        return new Pariente(0, 'Nuevo', 'nuevo');
     }
 
     public function delete(Socio $socio, $usuario) {

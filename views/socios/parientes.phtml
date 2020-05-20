@@ -1,19 +1,31 @@
 <div class="container">
 <h2>Parientes</h2>
 <article id="formularios">
+<br><br>
+<div class="row">
+  <a class="btn btn-primary" href="<?php echo BASE_URL . 'socios/nuevoPariente/' . $this->idSocio; ?>">Agregar Pariente</a>
+</div>
+<br><br>
 <div class="row">
   <div class="col-sm-12 col-md-6">
     <table id="tabla" class="table table-striped table-condensed table-bordered">
       <tr>
-          <th>Nro.</th><th>Nombre</th><th>Apellido</th><th>Parentezco</th><th>Documento</th><th>Sexo</th><th>F.Nac.</th>
+          <th>Parentezco</th><th>Nombre</th><th>Apellido</th><th>Documento</th><th>Sexo</th><th>F.Nac.</th>
       </tr>
       <?php $contador = 1; ?>
       <?php foreach($this->parientes as $soc): ?>
 
       <tr>
-          <td><?php echo $soc->getId(); ?></td>
+          <?php
+            $parentezco = ($soc->getParentezco() == 'C') ? 'Cónyuge' : 'Hijo/a';
+          ?>
+          <td><?php echo $parentezco; ?></td>
           <td><?php echo utf8_decode($soc->getNombre()); ?></td>
           <td><?php echo utf8_decode($soc->getApellido()); ?></td>
+          <td><?php echo $soc->getDocumento(); ?></td>
+          <?php $sexo = 'F'; ?>
+          <td><?php echo ($soc->getSexo() == 'F') ? 'Femenino' : 'Masculino'; ?></td>
+          <td><?php echo $soc->getFechaNacimiento(); ?></td>
           <td><a href="<?php echo BASE_URL . 'socios/editar_pariente/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
           <?php if(Session::get('usuario')->perfil > 3): ?>
           <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
