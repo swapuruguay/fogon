@@ -96,6 +96,20 @@ class sociosController extends Controller{
 
     }
 
+    public function editarPariente($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        $modelo  = $this->loadModel('socios');
+        $pariente = $modelo->getParienteById($id);
+        $socio = $modelo->getById($pariente->getIdSocio());
+        $this->_view->pariente = $pariente;
+        $this->_view->socio = $socio;
+        $this->_view->renderizar('editar-pariente');
+
+
+    }
+
     public function guardar() {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
@@ -506,39 +520,17 @@ class sociosController extends Controller{
                 $this->_view->renderizar('resultado');
 
             } else {
-                $socio = $modelo->buildSocio();
+                $socio = $modelo->buildPariente();
                 $socio->setId($id);
                 $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
                 $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
-                $socio->setDocumento($_POST['documento']);
-                $socio->setDomicilio(utf8_encode(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING)));
-                $socio->setTelefono(filter_input(INPUT_POST ,'telefono', FILTER_SANITIZE_STRING));
-                $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                if($_FILES['foto']['name'] != '') {
-                    $dir_subida = dirname(APP_PATH) . '/views/socios/img/';
-                    $fichero_subido = $dir_subida . $id.'.'.$ext;
-
-                    if (move_uploaded_file($_FILES['foto']['tmp_name'], $fichero_subido)) {
-                        $socio->setFoto($id.'.'.$ext);
-                    } else {
-                        $socio->setFoto('socio.png');
-                    }
-                } else {
-
-                }
-                $socio->setExento(isset($_POST['exento'])? 1 : 0);
-                $ingreso = filter_input(INPUT_POST ,'fecha_ingreso', FILTER_SANITIZE_STRING);
-                $ingreso = $this->cambiarfecha_mysql($ingreso);
-                $socio->setFechaIngreso($ingreso);
+                $socio->setDocumento(filter_input(INPUT_POST ,'documento', FILTER_SANITIZE_NUMBER_INT));
+                $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
+                $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
                 $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
                 $nacimiento = $this->cambiarfecha_mysql($nacimiento);
                 $socio->setFechaNacimiento($nacimiento);
-                $idcat = filter_input(INPUT_POST ,'categorias', FILTER_SANITIZE_STRING);
-                $id = explode("_", $idcat);
-                $id1 = $id['1'];
-                $socio->setEmail($_POST['email']);
-                $socio->setCategoria($modeloCat->getById($id1));
-                if($modelo->update($socio, Session::get('usuario')->idusuario)) {
+                if($modelo->updatePariente($socio, Session::get('usuario')->idusuario)) {
                     $this->_view->mensaje = "Registro guardado";
                 }
             }

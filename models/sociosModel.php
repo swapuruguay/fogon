@@ -42,15 +42,16 @@ class sociosModel extends Model{
     }
     public function getAllParents($id, $orden = 'parentezco') {
 
-        $listado = $this->_db->query("SELECT id_socio, nombre, apellido, parentezco, documento, sexo, fecha_nacimiento from parientes where id_socio= $id order by ".$orden);
+        $listado = $this->_db->query("SELECT * FROM parientes WHERE id_socio= $id order by ".$orden);
         $listado = $listado->fetchall(PDO::FETCH_OBJ);
         $arreglo = array();
         foreach($listado as $valor) {
-            $socio = new Pariente($valor->id_socio, $valor->nombre, $valor->apellido);
+            $socio = new Pariente($valor->id_pariente, $valor->nombre, $valor->apellido);
             $socio->setIdSocio($valor->id_socio);
             $socio->setDocumento($valor->documento);
             $socio->setSexo($valor->sexo);
             $socio->setParentezco($valor->parentezco);
+            $socio->setFechaNacimiento($valor->fecha_nacimiento);
             $arreglo[] = $socio;
 
 
@@ -158,6 +159,18 @@ class sociosModel extends Model{
         return $socio;
     }
 
+    public function getParienteById($id){
+        $listado = $this->_db->query("SELECT * FROM parientes WHERE id_pariente = " .$id);
+        $listado = $listado->fetch(PDO::FETCH_OBJ);
+        $socio = new Pariente($listado->id_pariente, $listado->nombre, $listado->apellido);
+        $socio->setDocumento($listado->documento);
+        $socio->setFechaNacimiento($listado->fecha_nacimiento);
+        $socio->setParentezco($listado->parentezco);
+        $socio->setSexo($listado->sexo);
+        $socio->setIdSocio($listado->id_socio);
+        return $socio;
+    }
+
     public function getByDocumento($id){
         $listado = $this->_db->query("SELECT * FROM socios WHERE documento = " .$id);
         $listado = $listado->fetch(PDO::FETCH_OBJ);
@@ -175,7 +188,7 @@ class sociosModel extends Model{
         $listado = $listado->fetch(PDO::FETCH_OBJ);
         $pariente = null;
         if($listado) {
-          $pariente = new Parent($listado->id_pariente, $listado->nombre, $listado->apellido);
+          $pariente = new Pariente($listado->id_pariente, $listado->nombre, $listado->apellido);
           $pariente->setDocumento($listado->documento);
 
         }
@@ -258,6 +271,22 @@ class sociosModel extends Model{
 
         $sql = 'UPDATE socios SET ' . $this->preparaUpdate($datos) . ' WHERE id_socio=' . $socio->getId();
 
+        return $this->_db->query($sql);
+    }
+
+    public function updatePariente(Pariente $socio, $usuario) {
+        $datos = array(
+
+            'nombre'            => $socio->getNombre(),
+            'apellido'          => $socio->getApellido(),
+            'documento'         => $socio->getDocumento(),
+            'fecha_nacimiento'  => $socio->getFechaNacimiento(),
+            'parentezco'        => $socio->getParentezco(),
+            'sexo'              => $socio->getSexo(),
+            'usuario'           => $usuario
+        );
+        $sql = 'UPDATE parientes SET ' . $this->preparaUpdate($datos) . ' WHERE id_pariente =' . $socio->getId();
+        //echo $sql;
         return $this->_db->query($sql);
     }
 

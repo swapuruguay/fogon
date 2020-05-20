@@ -25,9 +25,9 @@
           <td><?php echo $soc->getDocumento(); ?></td>
           <?php $sexo = 'F'; ?>
           <td><?php echo ($soc->getSexo() == 'F') ? 'Femenino' : 'Masculino'; ?></td>
-          <td><?php echo $soc->getFechaNacimiento(); ?></td>
-          <td><a href="<?php echo BASE_URL . 'socios/editar_pariente/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
-          <?php if(Session::get('usuario')->perfil > 3): ?>
+          <td><?php echo date('d/m/Y',  strtotime($soc->getFechaNacimiento())); ?></td>
+          <td><a href="<?php echo BASE_URL . 'socios/editarPariente/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
+          <?php if(!Session::get('usuario')->perfil > 2): ?>
           <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
           <?php endif ?>
           <?php $contador++; ?>

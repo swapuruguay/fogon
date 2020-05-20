@@ -1,0 +1,153 @@
+<div class="container">
+    <form id="form1" action="<?php echo BASE_URL . 'socios/guardarParientes/'?>" method="POST" class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nro de Socio</label>
+        <div class="col-sm-3">
+          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getIdSocio(); ?>" readonly class="form-control"> <span><?php echo $this->socio; ?></span>
+        </div>
+      </div>
+      <input type="hidden" name="id" id="id" value="<?php echo $this->pariente->getId(); ?>">
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nombre</label>
+        <div class="col-sm-4">
+          <input type="text" name='nombre' id='nombre' value="<?php echo $this->pariente->getNombre(); ?>"  class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Apellido</label>
+        <div class="col-sm-4">
+          <input type="text" name='apellido' id='apellido' value="<?php echo $this->pariente->getApellido(); ?>"  class="form-control">
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Documento</label>
+        <div class="col-sm-4">
+          <label for="check">Deshabilitar para extranjero</label>
+          <input type="checkbox" name="check" id="check">
+          <input type="text" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento' value="<?php echo $this->pariente->getDocumento(); ?>"  class="form-control">
+          <span id="alerta" style="color:red; font-weight:bold;"></span>
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Parentezco</label>
+        <div class="col-sm-4">
+          <select name="parentezco" id="parentezco">
+            <option  value="A">--Parentezco--</option>
+            <option <?php echo ($this->pariente->getParentezco() == 'C')? 'SELECTED' : '' ?> value="C">Cónyuge</option>
+            <option <?php echo ($this->pariente->getParentezco() == 'H')? 'SELECTED' : '' ?> value="H">Hijo/a</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Sexo</label>
+        <div class="col-sm-4">
+          <select name="sexo" class="form-control">
+            <option <?php echo ($this->pariente->getSexo() == 'F')? 'SELECTED' : '' ?> value="F">Femenino</option>
+            <option <?php echo ($this->pariente->getSexo() == 'M')? 'SELECTED' : '' ?>  value="M">Masculino</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2">Fecha Nacimiento</label>
+        <div class="col-sm-3">
+          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('d/m/Y',  strtotime($this->pariente->getFechaNacimiento())); ?>" class="form-control">
+        </div>
+
+      </div>
+      <input type="submit" value="Guardar" class="btn btn-success"/>
+  </form>
+</div>
+
+<script type="text/javascript">
+ const frm = document.getElementById('form1')
+
+frm.addEventListener('submit', async (evt) => {
+  evt.preventDefault()
+  if(frm.apellido.value == '') {
+    alert('Debe ingresar nombre y apellido por separado')
+    return
+  }
+  let formData = new FormData()
+  formData.append('documento', frm.documento.value)
+  let res = await fetch('/socios/getByDocumento', {
+    method: 'post',
+    body: formData
+  })
+  let resultado = await res.json()
+  //console.log(resultado)
+  if(frm.documento.dataset.doc != frm.documento.value) {
+    if(resultado.documento != 0) {
+      let alerta = document.getElementById('alerta')
+      alerta.innerHTML = 'Socio existente en la base de datos, revise'
+      frm.documento.focus()
+      return
+    }
+
+    if(digitoCedula(frm.documento.value)) {
+
+      frm.submit()
+    } else {
+      alert('Cédula erronea, verifique')
+      frm.documento.focus()
+    }
+  } else {
+
+    frm.submit()
+  }
+})
+
+function digitoCedula(ci) {
+ let digitoIngresado = ci.substring(ci.length -1)
+ let cedula = ci.substring(0, ci.length - 1)
+
+ let arrayCedula = cedula.split('')
+ if(arrayCedula.length < 6) {
+   return false
+ } else if (arrayCedula.length == 6) {
+   arrayCedula.unshift(0)
+ }
+ let testigo = [2,9,8,7,6,3,4]
+ let sumatoria = 0
+ for(let i in testigo) {
+   sumatoria+= testigo[i] * arrayCedula[i]
+ }
+
+ let modulo = sumatoria % 10
+ if(modulo == 0) {
+   modulo = 10
+ }
+
+ return 10-(modulo) == digitoIngresado
+
+}
+
+function soloNumeros(e)
+{
+
+ key = e.keyCode || e.which
+ //console.log(key)
+ let numeros = "0123456789"
+ let teclado = String.fromCharCode(key)
+
+ let especiales = [8,9,37,39,46]
+
+ let teclado_especial = false
+ for(let i = 0; i< especiales.length; i++) {
+   if(key == especiales[i]) {
+
+     teclado_especial = true
+   }
+ }
+
+ if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
+   return false
+ }
+}
+
+function quitaPuntos() {
+  let valor = document.getElementById('documento').value
+  document.getElementById('documento').value = valor.replace(/\./g, '')
+}
+</script>
