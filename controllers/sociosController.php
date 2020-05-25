@@ -511,7 +511,7 @@ class sociosController extends Controller{
                 //$nro = $modelo->getNroNuevo('socios');
 
                 $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
-                $nacimiento = $this->cambiarfecha_mysql($nacimiento);
+                //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
                 $socio->setFechaNacimiento($nacimiento);
                 if($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
                     $this->_view->mensaje = "Registro guardado";
@@ -528,7 +528,7 @@ class sociosController extends Controller{
                 $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
                 $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
                 $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
-                $nacimiento = $this->cambiarfecha_mysql($nacimiento);
+                //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
                 $socio->setFechaNacimiento($nacimiento);
                 if($modelo->updatePariente($socio, Session::get('usuario')->idusuario)) {
                     $this->_view->mensaje = "Registro guardado";
