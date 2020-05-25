@@ -96,16 +96,17 @@
         </div>
 
       </div>
-
-
-
+      
+      <?php if(Session::get('usuario')->perfil < 3): ?>
       <input type="submit" value="Guardar" class="btn btn-success"/>
-
+      <?php endif ?>
   </form>
     <br>
+    <?php if(Session::get('usuario')->perfil < 3): ?>
   <div>
       <a href="" id="ver" data-perfil="<?php echo Session::get('usuario')->perfil ?>">Ver Saldo >>></a>
   </div>
+  <?php endif ?>
   <div id="saldos" style=" display: none; width: 30%;">
       <div class='col-md-6'>
       <table id="movs" class="table table-condensed table-bordered table-striped">
