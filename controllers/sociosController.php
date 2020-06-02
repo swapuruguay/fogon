@@ -502,8 +502,22 @@ class sociosController extends Controller{
             $id      = filter_input(INPUT_POST ,'id', FILTER_SANITIZE_NUMBER_INT);
             if($id == 0) {
                 $socio = $modelo->buildPariente();
-                $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
-                $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
+                $nombre = utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING));
+                $arreglo = explode(" ",$nombre);
+                $nombreCap = '';
+                foreach($arreglo as $valor) {
+                    $nombreCap.= ucfirst($valor) . " ";
+                }
+                $nombreCap = trim($nombreCap);
+                $socio->setNombre($nombreCap);
+                $apellido = utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING));
+                $arregloApellido = explode(" ", $apellido);
+                $apellidoCap = '';
+                foreach($arregloApellido as $valor) {
+                    $apellidoCap.= ucfirst($valor) . " ";
+                }
+                $apellidoCap = trim($apellidoCap);
+                $socio->setApellido($apellidoCap);
                 $socio->setDocumento(filter_input(INPUT_POST ,'documento', FILTER_SANITIZE_NUMBER_INT));
                 $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
                 $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
@@ -522,8 +536,22 @@ class sociosController extends Controller{
             } else {
                 $socio = $modelo->buildPariente();
                 $socio->setId($id);
-                $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
-                $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
+                $nombre = utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING));
+                $arreglo = explode(" ",$nombre);
+                $nombreCap = '';
+                foreach($arreglo as $valor) {
+                    $nombreCap.= ucfirst($valor) . " ";
+                }
+                $nombreCap = trim($nombreCap);
+                $socio->setNombre($nombreCap);
+                $apellido = utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING));
+                $arregloApellido = explode(" ", $apellido);
+                $apellidoCap = '';
+                foreach($arregloApellido as $valor) {
+                    $apellidoCap.= ucfirst($valor) . " ";
+                }
+                $apellidoCap = trim($apellidoCap);
+                $socio->setApellido($apellidoCap);
                 $socio->setDocumento(filter_input(INPUT_POST ,'documento', FILTER_SANITIZE_NUMBER_INT));
                 $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
                 $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
