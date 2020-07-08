@@ -59,6 +59,19 @@ class sociosModel extends Model{
         return $arreglo;
 
     }
+    
+    public function getByParent() {
+        $listado = $this->_db->query("SELECT sexo,parentezco ,COUNT(parentezco) as conteo FROM parientes GROUP BY parentezco, sexo");
+        $listado = $listado->fetchall(PDO::FETCH_ASSOC);
+        $arreglo = array();
+        foreach($listado as $valor) {
+            $arreglo[] = $valor;
+        }
+        if (count($arreglo) < 4) {
+            $arreglo[] = ["sexo" => 'M', "parentezco" => 'C', "conteo" => 0];
+        }
+    return $arreglo;
+    }
 
     public function getAdelantos($orden = 'id_socio_fk') {
         $sql = "SELECT a.*, s.nombre, s.apellido from adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk order by ".$orden;

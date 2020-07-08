@@ -382,6 +382,21 @@ class sociosController extends Controller{
         }
         $modelSocios = $this->loadModel('socios');
         $row = $modelSocios->getAll('apel');
+        $parientes = $modelSocios->getByParent();
+        $conyuges = 0;
+        $varones = 0;
+        $mujeres = 0;
+        foreach($parientes as $p) {
+            if($p["parentezco"] == 'C') {
+                $conyuges+= $p["conteo"];
+            } else {
+                if($p['sexo'] == 'F') {
+                    $mujeres+= $p['conteo'];
+                } else {
+                    $varones+= $p['conteo'];
+                }
+            }
+        }
         $registros = count($row);
         $paginas = $registros / 45;
         //echo $paginas . ' ' . $registros;
@@ -440,8 +455,18 @@ class sociosController extends Controller{
                 } else {
                     $pdf->SetY($pos_y + 10);
                     $pdf->SetFont('Arial','B',12);
-                    $pdf->Cell(0,10,'Cantidad de socios: '.$registros, 0,0,'C');
+                    $pdf->SetX(20);
+                    $pdf->Cell(0,10,'Cantidad de socios: '.$registros, 0,0,'L');
+                    $pdf->SetY($pos_y + 15);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0,10, 'Cantidad '. utf8_decode('cónyuges').': ' .$conyuges, 0, 0, 'L');
                     $pdf->SetY($pos_y + 20);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0,10, 'Cantidad hijos varones: '.$varones, 0, 0, 'L');
+                    $pdf->SetY($pos_y + 25);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0,10, 'Cantidad hijas: '.$mujeres, 0, 0, 'L');
+                    $pdf->SetY($pos_y + 35);
                     $pdf->SetFont('Arial','I',8);
                     $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
                     $pos_y = 25;
