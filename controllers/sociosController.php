@@ -487,7 +487,7 @@ class sociosController extends Controller{
             $this->redireccionar('login');
         }
         $modelSocios = $this->loadModel('socios');
-        $row = $modelSocios->getAllParents('parentezco');
+        $row = $modelSocios->getAllParents('parentezco, p.apellido, p.nombre');
         $registros = count($row);
         $paginas = $registros / 45;
         //echo $paginas . ' ' . $registros;
