@@ -40,14 +40,34 @@ class sociosModel extends Model{
         return $arreglo;
 
     }
-    public function getAllParents($id, $orden = 'parentezco') {
+    
+    public function getAllParents($orden = 'id_socio') {
+
+        $sql = $this->_db->query("SELECT parentezco, id_pariente,p.nombre, p.apellido, s.telefono, p.documento, p.id_socio "
+                . "FROM parientes p JOIN socios s ON p.id_socio = s.id_socio WHERE s.estado = 'a' ORDER BY ".$orden);
+        $listado = $sql->fetchall(PDO::FETCH_OBJ);
+        $arreglo = array();
+        foreach($listado as $valor) {
+            $socio = new Pariente($valor->id_pariente, $valor->nombre, $valor->apellido);
+            $socio->setDocumento($valor->documento);
+            $socio->setParentezco($valor->parentezco);
+            $socio->setSocio($this->getById($valor->id_socio));
+            $arreglo[] = $socio;
+
+
+        }
+        return $arreglo;
+
+    }
+    
+    public function getAllParentsBySocio($id, $orden = 'parentezco') {
 
         $listado = $this->_db->query("SELECT * FROM parientes WHERE id_socio= $id order by ".$orden);
         $listado = $listado->fetchall(PDO::FETCH_OBJ);
         $arreglo = array();
         foreach($listado as $valor) {
             $socio = new Pariente($valor->id_pariente, $valor->nombre, $valor->apellido);
-            $socio->setIdSocio($valor->id_socio);
+            $socio->setSocio($this->getById($valor->id_socio));
             $socio->setDocumento($valor->documento);
             $socio->setSexo($valor->sexo);
             $socio->setParentezco($valor->parentezco);
@@ -59,6 +79,8 @@ class sociosModel extends Model{
         return $arreglo;
 
     }
+    
+    
     
     public function getByParent() {
         $listado = $this->_db->query("SELECT sexo,parentezco ,COUNT(parentezco) as conteo FROM parientes GROUP BY parentezco, sexo");
@@ -180,7 +202,7 @@ class sociosModel extends Model{
         $socio->setFechaNacimiento($listado->fecha_nacimiento);
         $socio->setParentezco($listado->parentezco);
         $socio->setSexo($listado->sexo);
-        $socio->setIdSocio($listado->id_socio);
+        $socio->setSocio($this->getById($listado->id_socio));
         return $socio;
     }
 

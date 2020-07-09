@@ -3,7 +3,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Nro de Socio</label>
         <div class="col-sm-3">
-          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getIdSocio(); ?>" readonly class="form-control"> <span><?php echo $this->socio; ?></span>
+          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getSocio()->getId(); ?>" readonly class="form-control"> <span><?php echo $this->pariente->getSocio(); ?></span>
         </div>
       </div>
       <input type="hidden" name="id" id="id" value="<?php echo $this->pariente->getId(); ?>">

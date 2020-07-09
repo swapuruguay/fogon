@@ -15,7 +15,7 @@
 class Pariente {
 
     private $_id;
-    private $_idSocio;
+    private $_socio;
     private $_nombre;
     private $_apellido;
     private $_documento;
@@ -37,12 +37,12 @@ class Pariente {
         $this->_id = $id;
     }
 
-    public function getIdSocio(){
-        return $this->_idSocio;
+    public function getSocio(){
+        return $this->_socio;
     }
 
-    public function setIdSocio($idSocio) {
-        $this->_idSocio = $idSocio;
+    public function setSocio(Socio $socio) {
+        $this->_socio = $socio;
     }
 
     public function getNombre() {

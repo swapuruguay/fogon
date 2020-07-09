@@ -102,9 +102,7 @@ class sociosController extends Controller{
         }
         $modelo  = $this->loadModel('socios');
         $pariente = $modelo->getParienteById($id);
-        $socio = $modelo->getById($pariente->getIdSocio());
         $this->_view->pariente = $pariente;
-        $this->_view->socio = $socio;
         $this->_view->renderizar('editar-pariente');
 
 
@@ -483,6 +481,94 @@ class sociosController extends Controller{
             $pdf->Output();
 
     }
+    
+    public function imprimirparientes() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        $modelSocios = $this->loadModel('socios');
+        $row = $modelSocios->getAllParents('parentezco');
+        $registros = count($row);
+        $paginas = $registros / 45;
+        //echo $paginas . ' ' . $registros;
+        $this->getLibrary('fpdf');
+        $pdf=new FPDF();
+        $pdf->AliasNbPages();
+        $pdf->SetTopMargin(5);
+        $pdf->SetFont('Arial','B',14);
+        $pos_y  =   13;
+        $pdf->AddPage();
+        $pdf->SetXY(20,$pos_y);
+        $pdf->Cell(0,8,utf8_decode('Listado de Familiares'),0,0,'C');
+
+        $pos_y = 25;
+
+        $it = 0;
+        for($i = 0; $i < $paginas; $i++) {
+            $pdf->SetFont('Arial','B',10);
+            $pdf->SetXY(20,$pos_y);
+            $pdf->Cell(10,4,'Nro.',0,0);
+            $pdf->SetXY(30,$pos_y);
+            $pdf->Cell(10,4,'Parent.',0,0);
+            $pdf->SetXY(45,$pos_y);
+            $pdf->Cell(50,4,'Nombre',0,0);
+            $pdf->SetXY(90,$pos_y);
+            $pdf->Cell(65,4,'Apellido',0,0);
+            $pdf->SetXY(160,$pos_y);
+            $pdf->Cell(10,4,'Documento',0,0);
+
+            //$pos_y+=5;
+            $pdf->SetFont('Arial','',10);
+            $pos_y = 30;
+            $pdf->SetY($pos_y);
+            for($j = 0; $j < 45; $j++) {
+                    if(!($it < $registros))
+                        break;
+                        $pdf->SetXY(20,$pos_y);
+                        $pdf->Cell(10,4,$row[$it]->getId(),0,0);
+                        $pdf->SetXY(30,$pos_y);
+                        $pdf->Cell(10,4,$row[$it]->getParentezco(),0,0);
+                        $pdf->SetXY(45,$pos_y);
+                        $pdf->Cell(50,4,utf8_decode(utf8_decode($row[$it]->getNombre())),0,0);
+                        $pdf->SetXY(90,$pos_y);
+                        $pdf->Cell(50,4,utf8_decode(utf8_decode($row[$it]->getApellido())),0,0);
+                        $pdf->SetXY(160,$pos_y);
+                        $pdf->Cell(10,4,$row[$it]->getDocumento(),0,1);
+                        $pos_y+=5;
+                        $pdf->SetY($pos_y);
+
+                        $it++;
+
+                }
+
+                if($pdf->PageNo() < $paginas) {
+                    $pdf->SetY($pos_y + 10);
+                    $pdf->SetFont('Arial','I',8);
+                    $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
+                    $pos_y = 25;
+                    $pdf->AddPage();
+                } else {
+                    $pdf->SetY($pos_y + 10);
+                    $pdf->SetFont('Arial','B',12);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0,10,'Cantidad de familiares: '.$registros, 0,0,'L');
+                    $pdf->SetY($pos_y + 30);
+                    $pdf->SetFont('Arial','I',8);
+                    $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
+                    $pos_y = 25;
+                }
+
+
+
+            //$pdf->SetFillColor(236,235,236);
+
+
+
+            }
+
+            $pdf->Output();
+
+    }
 
     public function nuevoAdelanto() {
 
@@ -512,7 +598,7 @@ class sociosController extends Controller{
         }
         $modelo  = $this->loadModel('socios');
         $this->_view->idSocio = $idSocio;
-        $this->_view->parientes = $modelo->getAllParents($idSocio);
+        $this->_view->parientes = $modelo->getAllParentsBySocio($idSocio);
         $this->_view->renderizar('parientes');
 
     }
