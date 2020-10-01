@@ -238,13 +238,13 @@ class movimientosController extends Controller{
 
     }
 
-    public function listarec($mes, $anio) {
+    public function listarec($mes, $anio, $dire) {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
         }
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
-        $row = $modelo->getMes($anio, $mes);
+        $row = $modelo->getMes($anio, $mes, $dire);
         $registros = count($row);
         $paginas = $registros / 45;
         //echo $paginas . ' ' . $registros;
@@ -306,16 +306,16 @@ class movimientosController extends Controller{
                         $pdf->AddPage();
                 } else {
                     $pdf->SetY($pos_y + 20);
-                    $tot = json_decode($this->getTotalesE($mes, $anio));
+                    $tot = json_decode($this->getTotalesE($mes, $anio, $dire));
                     $totales = $tot[0]->importe+$tot[1]->importe+$tot[2]->importe;
 
-                    $pdf->Cell(0,10, utf8_decode('Total Activos: ').$tot[0]->importe, 0, 0, 'C');
+                    $pdf->Cell(0,10, utf8_decode('Total Activos: $').$tot[0]->importe, 0, 0, 'C');
                     $pdf->SetY($pos_y + 25);
-                    $pdf->Cell(0,10, utf8_decode('Total Cadetes: ').$tot[1]->importe, 0, 0, 'C');
+                    $pdf->Cell(0,10, utf8_decode('Total Cadetes: $').$tot[1]->importe, 0, 0, 'C');
                     $pdf->SetY($pos_y + 30);
-                    $pdf->Cell(0,10, utf8_decode('Total Jubilados: ').$tot[2]->importe, 0, 0, 'C');
+                    $pdf->Cell(0,10, utf8_decode('Total Jubilados: $').$tot[2]->importe, 0, 0, 'C');
                     $pdf->SetY($pos_y + 35);
-                    $pdf->Cell(0,10, utf8_decode('Total General: ').$totales, 0, 0, 'C');
+                    $pdf->Cell(0,10, utf8_decode('Total General: $').$totales, 0, 0, 'C');
 
                 }
 
@@ -404,9 +404,9 @@ class movimientosController extends Controller{
         echo json_encode($retorno);
     }
 
-    private function getTotalesE($mes, $anio) {
+    private function getTotalesE($mes, $anio, $dire) {
 
-        $retorno = $this->_ajax->getTotales($anio.'-'.$mes.'-01');
+        $retorno = $this->_ajax->getTotales($anio.'-'.$mes.'-01', $dire);
         return json_encode($retorno);
     }
 }

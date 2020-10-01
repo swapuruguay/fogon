@@ -172,9 +172,16 @@ class movimientosModel extends Model{
 
     }
 
-    public function getTotales($fecha) {
-        $sql = "SELECT COUNT(*) as cantidad,ABS(SUM(cuotas.importe)) AS importe, categorias.nombre as cat FROM cuotas,socios,categorias WHERE id_categoria=id_categoria_fk
-                  and id_socio=id_socio_fk and fecha_computo='$fecha' GROUP BY id_categoria_fk";
+    public function getTotales($fecha, $dire=3) {
+        $fogon = '';
+        if($dire == 1) {
+            $fogon = " AND socios.domicilio LIKE '%fog%'";
+        } elseif($dire == 2) {
+            $fogon = " AND socios.domicilio NOT LIKE '%fog%'";
+        }
+        $sql = "SELECT COUNT(*) as cantidad,ABS(SUM(cuotas.importe)) AS importe, categorias.nombre as cat FROM cuotas 
+                JOIN socios ON id_socio=id_socio_fk JOIN categorias ON id_categoria=id_categoria_fk WHERE 
+                fecha_computo='$fecha' $fogon GROUP BY id_categoria_fk";
         $listado = $this->_db->query($sql);
         return  $listado->fetchall(PDO::FETCH_OBJ);
     }
