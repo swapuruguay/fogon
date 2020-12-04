@@ -10,6 +10,8 @@
   </li>
   <li><a href="<?php echo BASE_URL . 'movimientos#' ?>">Movimientos</a>
     <ul>
+      <li><a href="<?php echo BASE_URL . 'movimientos/adelantos' ?>">Pagos Adelantados</a></li></li>
+      <li><a href="<?php echo BASE_URL . 'movimientos/manual' ?>">Pagos Manuales</a></li></li>
       <li><a href="<?php echo BASE_URL . 'movimientos/totales' ?>">Totales</a></li></li>
     </ul>
   </li>

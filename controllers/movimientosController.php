@@ -28,6 +28,15 @@ class movimientosController extends Controller{
         $this->_view->renderizar('index');
     }
 
+    public function adelantos() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        //$modelo->loadModel('socios');
+        $this->_view->titulo = "Ingresar pagos adelantados";
+        $this->_view->renderizar('nuevo-adelanto');
+    }
+
     public function getSaldo() {
         $socioModel = $this->loadModel('socios');
         $socio = $socioModel->getById($_POST['id']);
@@ -54,6 +63,14 @@ class movimientosController extends Controller{
         $this->_view->renderizar('pagar');
     }
 
+    public function manual() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        $this->_view->titulo = 'Cobros manuales';
+        $this->_view->renderizar('manual');
+    }
+
     public function ingresarPago() {
 
         $mov = $this->_ajax->buildMovimiento();
@@ -67,8 +84,8 @@ class movimientosController extends Controller{
         $mov->setFecha($ingreso);
         $mov->setMes($mes);
         $mov->setAnio($anio);
-        $this->_ajax->save($mov);
         $retorno = array();
+        $this->_ajax->save($mov);
         $consulta = $this->_ajax->getLasts($mov->getFecha(),6);
 
         if(!$consulta) {
@@ -408,5 +425,43 @@ class movimientosController extends Controller{
 
         $retorno = $this->_ajax->getTotales($anio.'-'.$mes.'-01', $dire);
         return json_encode($retorno);
+    }
+
+    public function guardarAdelanto($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        $modelo  = $this->loadModel('socios');
+        if(isset($_POST['idsoc'])) {
+            $idSocio = filter_input(INPUT_POST ,'idsoc', FILTER_SANITIZE_NUMBER_INT);
+            $id      = filter_input(INPUT_POST ,'id', FILTER_SANITIZE_NUMBER_INT);
+            if($id == 0) {
+                
+                //$nro = $modelo->getNroNuevo('socios');
+
+                $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
+                //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
+                $socio->setFechaNacimiento($nacimiento);
+                if($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
+                    $this->_view->mensaje = "Registro guardado";
+                }
+
+                $this->_view->renderizar('resultado');
+
+            } else {
+                
+                $socio->setDocumento(filter_input(INPUT_POST ,'documento', FILTER_SANITIZE_NUMBER_INT));
+                $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
+                $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
+                $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
+                //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
+                $socio->setFechaNacimiento($nacimiento);
+                if($modelo->updatePariente($socio, Session::get('usuario')->idusuario)) {
+                    $this->_view->mensaje = "Registro guardado";
+                }
+            }
+
+            $this->_view->renderizar('resultado');
+        }
     }
 }

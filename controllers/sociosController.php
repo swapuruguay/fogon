@@ -72,6 +72,8 @@ class sociosController extends Controller{
         $this->_view->renderizar('nuevo');
     }
 
+    
+
     public function nuevoPariente($idSocio) {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
