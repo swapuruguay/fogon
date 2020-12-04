@@ -68,6 +68,18 @@ class movimientosModel extends Model{
 
         return $this->_db->query($sql);
     }
+    public function saveAdelanto($adelanto) {
+        $datos = array(
+
+            'id_socio_fk'      => $adelanto['id'],
+            'desde'            => $adelanto['desde'],
+            'hasta'            => $adelanto['hasta']
+
+        );
+        $sql = 'INSERT INTO adelantos ' . $this->preparaInsert($datos);
+
+        return $this->_db->query($sql);
+    }
 
     /**
      * Actualiza en la base de datos el Socio

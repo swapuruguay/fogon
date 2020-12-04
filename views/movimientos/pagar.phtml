@@ -1,6 +1,6 @@
 <p>&nbsp;</p>
 <div id="divpago" class="container">
-    <form id="form_pago" action="<?php echo BASE_URL . 'socios/guardar/0' ?>" method="POST" class="form-horizontal">
+    <form id="form_pago" class="form-horizontal">
         <div class="form-group">
             <label class="control-label col-md-2">Fecha</label>
             <div class="col-md-2">
@@ -34,7 +34,7 @@
 <script>
 
     $('#id').change(function() {
-        $.post('/socios/loadSocioAjax', 'id='+$(this).val(), function(resp) {
+        $.post('/socios/loadSocioAjax', `id=${$(this).val()}`, function(resp) {
             $('#nombre').html(resp.nombre)
         }, 'json')
     })

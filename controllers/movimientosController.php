@@ -102,6 +102,35 @@ class movimientosController extends Controller{
         echo json_encode($retorno);
 
     }
+    public function ingresarAdelanto() {
+
+        // $mov = $this->_ajax->buildMovimiento();
+        $modeloSocio = $this->loadModel('socios');
+        $adelanto = [];
+        $adelanto['id'] = filter_input(INPUT_POST ,'id', FILTER_SANITIZE_NUMBER_INT);
+        $desde = filter_input(INPUT_POST ,'desde', FILTER_SANITIZE_STRING);
+        //$desde = $this->cambiarfecha_mysql($desde);
+        $adelanto['desde'] = $desde;
+        $hasta = filter_input(INPUT_POST ,'hasta', FILTER_SANITIZE_STRING);
+        //$hasta = $this->cambiarfecha_mysql($hasta);
+        $adelanto['hasta'] =  $hasta;
+        $this->_ajax->saveAdelanto($adelanto);
+        //$consulta = $this->_ajax->getLasts($mov->getFecha(),6);
+
+        // if(!$consulta) {
+        $retorno = array('texto' => 'Registro Ingresado');
+        // } else {
+        //     foreach($consulta as $valor) {
+        //         $socio = $modeloSocio->getById($valor->id_socio_fk);
+        //         $retorno[] = array('id' => $socio->getId()  , 'nombre' => $socio->__toString(),
+        //             'importe' => abs($valor->importe));
+        //     }
+
+
+        // }
+        echo json_encode($retorno);
+
+    }
 
     public function preprint() {
         if(!Session::get('autenticado')) {

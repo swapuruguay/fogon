@@ -1,16 +1,17 @@
 <div class="container">
+<br>
   <div class="row">
     <div class="col-md-6">
-      <form id="form1" action="<?php echo BASE_URL . 'movimientos/guardarAdelanto/0' ?>" method="POST">
-
+      <form id="form1">
         <label class="etiquetas">Nro de Socio</label><input type="text" name='id' id='id' class="form-control"><label id="nombre" style="display: inline-block;"></label><br>
-        <label class="etiquetas">Desde</label><input type="date" name='nombre' id='desde' class="form-control"><br>
+        <label class="etiquetas">Desde</label><input type="date" name='desde' id='desde' class="form-control"><br>
         <label class="etiquetas">Hasta</label><input type="date" name='hasta' id='hasta' class="form-control"><br>
         <input type="submit" value="Guardar" />
 
       </form>
 
     </div>
+    <div id="resultado"></div>
   </div>
 
 </div>
@@ -19,7 +20,7 @@
   let form = document.getElementById('form1')
   let nombre = document.getElementById('nombre')
   let ids = document.getElementById('id')
-
+  const $div = document.querySelector('#resultado')
   ids.addEventListener('change', async (evt) => {
     let formData = new FormData()
     formData.append('id', ids.value)
@@ -30,4 +31,19 @@
     let res = await respuesta.json()
     nombre.innerHTML = res.nombre
   })
+
+  form.addEventListener('submit', async evt => {
+    evt.preventDefault();
+    let formData = new FormData(form)
+    let res = await fetch('/movimientos/ingresarAdelanto', {
+      method: 'post',
+      body: formData
+    })
+    let resp = await res.json()
+    $div.innerHTML = resp.texto
+    form.id = ""
+    form.desde = ""
+    form.hasta = ""
+  })
+
 </script>
