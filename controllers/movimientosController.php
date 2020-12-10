@@ -71,7 +71,7 @@ class movimientosController extends Controller{
         $this->_view->renderizar('manual');
     }
 
-    public function ingresarPago() {
+    public function ingresarPago($tipo = 'S') {
 
         $mov = $this->_ajax->buildMovimiento();
         $modeloSocio = $this->loadModel('socios');
@@ -85,7 +85,7 @@ class movimientosController extends Controller{
         $mov->setMes($mes);
         $mov->setAnio($anio);
         $retorno = array();
-        $this->_ajax->save($mov);
+        $this->_ajax->save($mov, $tipo);
         $consulta = $this->_ajax->getLasts($mov->getFecha(),6);
 
         if(!$consulta) {

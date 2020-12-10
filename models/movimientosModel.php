@@ -54,14 +54,15 @@ class movimientosModel extends Model{
      * Guarda un Socio en la base de datos
      * @param Socio $socio
      */
-    public function save(Movimiento $movimiento) {
+    public function save(Movimiento $movimiento, $tipo = 'S') {
         $datos = array(
 
             'id_socio_fk'      => $movimiento->getSocio()->getId(),
             'mes'              => $movimiento->getMes(),
             'anio'             => $movimiento->getAnio(),
             'fecha_computo'    => $movimiento->getFecha(),
-            'importe'          => $movimiento->getImporte()
+            'importe'          => $movimiento->getImporte(),
+            'tipo'             => $tipo
 
         );
         $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);

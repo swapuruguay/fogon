@@ -48,7 +48,7 @@
         if(e.keyCode == 13) {
             obj = $('#id');
             var data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
-            $.post('/movimientos/ingresarPago', data, function(resp) {
+            $.post('/movimientos/ingresarPago/P', data, function(resp) {
 
               var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped">'
               contenido += '<tr><th>Id</th><th>Nombre</th><th>Importe</th></tr>'

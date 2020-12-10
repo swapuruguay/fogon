@@ -90,13 +90,13 @@
         
     })
 
-    $print.addEventListener('click', evt => {
+    $print.addEventListener('click', async evt => {
         evt.preventDefault()
         let lista = document.querySelectorAll(".filas")
         let listPrint = [...lista]
         listFinal = listPrint.map( l => {
             return {id: l.children[0].innerHTML, mes: l.children[2].innerHTML, anio: l.children[3].innerHTML}
         })
-        console.log(listFinal)
+        
     })
 </script>
