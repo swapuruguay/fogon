@@ -493,4 +493,8 @@ class movimientosController extends Controller{
             $this->_view->renderizar('resultado');
         }
     }
-}
+
+    function prueba() {
+        echo json_decode($_POST);
+    }
+} 
