@@ -2,7 +2,7 @@
 <div class="container">
     <h3>Ingrese mes y a&ntilde;o a imprimir</h3>
     <div id="divpago">
-        <form id="frmchoose"  class="form-horizontal" sytle="position: relative;">
+        <form id="frmchoose" enctype="multipart/form-data" method="POST" action="/movimientos/prueba" class="form-horizontal" sytle="position: relative;">
             <div class="row">
 
                 <div class="form-group">
@@ -14,28 +14,7 @@
                         <strong><span id="nombre">Name</span></strong>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <div class="col-md-1">
-                        <label class="control-label">Mes</label>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" name='mes' id='mes' class="form-control">
-                    </div>
-                </div>
-    
-                <div class="form-group">
-                    <div class="col-md-1">
-                        <label class="control-label col-md-1">A&ntilde;o</label>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" name='anio' id='anio' class="form-control">
-                        
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button id="agregar" class="form-control">Agregar</button>
-                </div>
+                <div class="tabla"></div>
                 <div class="col-md-2">
                     <input id="imprimir" type="button" value="Imprimir" class="btn btn-primary"/>
                 </div>
@@ -50,14 +29,15 @@
                     <th>Nombre</th>
                     <th>Mes</th>
                     <th>Año</th>
+                    <th>Importe</th>
                 </tr>
             </table>
         </div>
     </div>
 </div>
 <script>
-    const $agregar = document.querySelector("#agregar")
     const $frm = document.querySelector("#frmchoose")
+    const $tabla = document.querySelector(".tabla")
     const $items = document.querySelector("#items")
     const $nombre = document.querySelector("#nombre")
     const $socio = document.querySelector("#socio")
@@ -71,22 +51,36 @@
         })
         let response = await res.json()
         $nombre.innerHTML = response.nombre
+        formData.append('limit', 6)
+        let req = await fetch('/movimientos/getSaldo', {
+            method: 'post',
+            body: formData
+        })
+        let respuesta = await req.json()
+        let html = '<table class="table table-striped table-condensed"><tr><th>Mes</th><th>Año</th><th>Importe</th><th></th></tr>'
+        let textoRes = respuesta.forEach(({mes, anio, importe}) => {
+            html += `<tr><td>${mes}</td><td>${anio}</td><td>${importe}</td><td><a href="#" class="agregar">Agregar</a></td></tr>`
+        })
+        html += '</table>'
+        document.querySelector('.tabla').innerHTML = html
     })
-    $agregar.addEventListener('click', evt => {
-        evt.preventDefault()
-        const tr = document.createElement('tr')
-        tr.setAttribute("class", "filas")
-        let texto = `<td>${$frm.socio.value}</td>
-                    <td>${document.querySelector("#nombre").innerHTML}</td>
-                    <td>${$frm.mes.value}</td><td>${$frm.anio.value}</td>
-        `
-        tr.innerHTML = texto
-        $items.children[0].appendChild(tr)
-        //document.querySelector("#nombre").innerHTML = ""
-        $frm.socio.value = ""
-        $frm.mes.value = ""
-        $frm.anio.value = ""
-        $frm.socio.focus()
+
+    $tabla.addEventListener('click', evt => {
+        if(evt.target.nodeName === 'A') {
+            const fila = evt.target.parentNode.parentNode
+            const tr = document.createElement('tr')
+            tr.setAttribute("class", "filas")
+            let texto = `<td>${$frm.socio.value}</td>
+                        <td>${document.querySelector("#nombre").innerHTML}</td>
+                        <td>${fila.children[0].innerHTML}</td>
+                        <td>${fila.children[1].innerHTML}</td>
+                        <td>${fila.children[2].innerHTML}</td>
+            `
+            tr.innerHTML = texto
+            $items.children[0].appendChild(tr)
+
+            fila.parentNode.removeChild(fila)
+        }
         
     })
 
@@ -97,6 +91,13 @@
         listFinal = listPrint.map( l => {
             return {id: l.children[0].innerHTML, mes: l.children[2].innerHTML, anio: l.children[3].innerHTML}
         })
+        const str = JSON.stringify(listFinal)
+        const elm = document.createElement('input')
+        elm.setAttribute('type', 'hidden')
+        elm.setAttribute('name', 'datos')
+        elm.setAttribute('value', str)
+        $frm.appendChild(elm)
+        $frm.submit()
         
     })
 </script>

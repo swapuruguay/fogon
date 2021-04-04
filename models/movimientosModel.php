@@ -177,8 +177,14 @@ class movimientosModel extends Model{
 
     }
 
-    public function getMovimientosSocio(Socio $s) {
-        $sql = "SELECT * FROM cuotas WHERE id_socio_fk=".$s->getId()." ORDER BY fecha_computo";
+    public function getMovimientosSocio(Socio $s, $limit = 0) {
+        $sql = '';
+        if(!$limit) {
+            $sql = "SELECT * FROM cuotas WHERE id_socio_fk=".$s->getId()." ORDER BY fecha_computo";
+        }
+        else {
+            $sql = "SELECT * FROM cuotas WHERE id_socio_fk=".$s->getId()." AND DAY(fecha_computo)= '01' ORDER BY fecha_computo DESC LIMIT $limit";
+        }
         $listado = $this->_db->query($sql);
         $result = $listado->fetchall(PDO::FETCH_OBJ);
         return $result;

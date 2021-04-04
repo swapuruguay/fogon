@@ -40,7 +40,11 @@ class movimientosController extends Controller{
     public function getSaldo() {
         $socioModel = $this->loadModel('socios');
         $socio = $socioModel->getById($_POST['id']);
-        $retorno = $this->_ajax->getMovimientosSocio($socio);
+        $limit = 0;
+        if(isset($_POST['limit'])) {
+            $limit = $_POST['limit'];
+        }
+        $retorno = $this->_ajax->getMovimientosSocio($socio, $limit);
         foreach($retorno as $valor) {
             $valor->fecha_computo = date('d/m/Y', strtotime($valor->fecha_computo));
         }
@@ -119,15 +123,7 @@ class movimientosController extends Controller{
 
         // if(!$consulta) {
         $retorno = array('texto' => 'Registro Ingresado');
-        // } else {
-        //     foreach($consulta as $valor) {
-        //         $socio = $modeloSocio->getById($valor->id_socio_fk);
-        //         $retorno[] = array('id' => $socio->getId()  , 'nombre' => $socio->__toString(),
-        //             'importe' => abs($valor->importe));
-        //     }
-
-
-        // }
+        
         echo json_encode($retorno);
 
     }
@@ -214,14 +210,14 @@ class movimientosController extends Controller{
 
     }
 
-   public function imprimir140() {
+   public function imprimir140($lista = []) {
         $mes = filter_input(INPUT_POST, 'mes', FILTER_SANITIZE_NUMBER_INT);
         $anio = filter_input(INPUT_POST, 'anio', FILTER_SANITIZE_NUMBER_INT);
         $dire = filter_input(INPUT_POST, 'dire', FILTER_SANITIZE_NUMBER_INT);
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
         $row = $modelo->getMes($anio, $mes, $dire);
-        $registros = count($row);
+        $registros = count($lista) > 0 ? count($lista) : count($row);
         $paginas = $registros / 4;
         //echo $paginas . ' ' . $registros;
         $this->getLibrary('fpdf');
@@ -237,15 +233,28 @@ class movimientosController extends Controller{
             for($j = 0; $j < 4; $j++) {
                     if(!($it < $registros))
                         break;
-                    $socio = $modelSocios->getById($row[$it]->id_socio_fk);
+                    if(count($lista) === 0) {
+                        $socio = $modelSocios->getById($row[$it]->id_socio_fk);
+                    } else {
+                        $socio = $modelSocios->getById($lista[$it]->id);
+                    }
                     $pdf->SetXY(21,$pos_y);
                     $pdf->Cell(50,4,$socio->getId(),0,0);
                     $pdf->SetXY(53,$pos_y);
-                    $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
+                    if(count($lista) === 0) {
+                        $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
+                    }
+                    else {
+                        $pdf->Cell(50,4,$lista[$it]->mes.'/'.$lista[$it]->anio,0,0);    
+                    }
                     $pdf->SetXY(83,$pos_y);
                     $pdf->Cell(50,4,$socio->getId(),0,0);
                     $pdf->SetXY(115,$pos_y);
-                    $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
+                    if(count($lista) === 0) {
+                        $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
+                    } else {
+                        $pdf->Cell(50,4,$lista[$it]->mes.'/'.$lista[$it]->anio,0,0);
+                    }
                     $pdf->SetXY(5,$pos_y + 9);
                     $pdf->Cell(80,4,  utf8_decode(utf8_decode($socio->__toString())),0,0,'C');
                     $pdf->SetXY(80,$pos_y + 9);
@@ -259,11 +268,17 @@ class movimientosController extends Controller{
                     $pdf->SetXY(21,$pos_y + 27);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
                     $pdf->SetXY(53,$pos_y + 27);
-                    $pdf->Cell(50,4, $row[$it]->importe, 0,0);
-                    $pdf->SetXY(103,$pos_y + 27);
-                    $pdf->Cell(50,4, $row[$it]->importe, 0,0);
-                    $pdf->SetXY(83,$pos_y + 34);
-
+                    if(count($lista) === 0) {
+                        $pdf->Cell(50,4, $row[$it]->importe, 0,0);
+                        $pdf->SetXY(103,$pos_y + 27);
+                        $pdf->Cell(50,4, $row[$it]->importe, 0,0);
+                        $pdf->SetXY(83,$pos_y + 34);
+                    } else {
+                        $pdf->Cell(50,4, $socio->getCategoria()->getImporte(), 0,0);
+                        $pdf->SetXY(103,$pos_y + 27);
+                        $pdf->Cell(50,4, $socio->getCategoria()->getImporte(), 0,0);
+                        $pdf->SetXY(83,$pos_y + 34);  
+                    }
                     //$pos_y+=73;
                     $pos_y+= 73;
                     $pdf->SetY($pos_y);
@@ -495,6 +510,7 @@ class movimientosController extends Controller{
     }
 
     function prueba() {
-        echo json_decode($_POST);
+        $datos = json_decode($_POST['datos']);
+        $this->imprimir140($datos);
     }
 } 
