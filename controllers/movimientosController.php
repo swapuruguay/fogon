@@ -227,7 +227,7 @@ class movimientosController extends Controller{
         $pdf->SetFont('Arial','',8);
 
         //$pos_y  =   11;
-        $pos_y  =   15;
+        $pos_y  =   13;
         $it = 0;
         for($i = 0; $i < $paginas; $i++) {
             $pdf->AddPage();
@@ -288,7 +288,7 @@ class movimientosController extends Controller{
 
             }
             //$pos_y = 11;
-            $pos_y = 15;
+            $pos_y = 13;
 
         //$pdf->SetFillColor(236,235,236);
 
