@@ -615,6 +615,7 @@ class sociosController extends Controller{
             $id      = filter_input(INPUT_POST ,'id', FILTER_SANITIZE_NUMBER_INT);
             if($id == 0) {
                 $socio = $modelo->buildPariente();
+                $socioRef = $modelo->getById($idSocio);
                 $nombre = utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING));
                 $arreglo = explode(" ",$nombre);
                 $nombreCap = '';
@@ -634,7 +635,7 @@ class sociosController extends Controller{
                 $socio->setDocumento(filter_input(INPUT_POST ,'documento', FILTER_SANITIZE_NUMBER_INT));
                 $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
                 $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
-                $socio->setIdSocio($idSocio);
+                $socio->setSocio($socioRef);
                 //$nro = $modelo->getNroNuevo('socios');
 
                 $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);

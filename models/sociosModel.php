@@ -277,7 +277,7 @@ class sociosModel extends Model{
             'parentezco'        => $socio->getParentezco(),
             'sexo'              => $socio->getSexo(),
             'fecha_nacimiento'  => $socio->getFechaNacimiento(),
-            'id_socio'          => $socio->getIdSocio(),
+            'id_socio'          => $socio->getSocio()->getId(),
             'usuario'           => $usuario
         );
         $sql = 'INSERT INTO parientes ' . $this->preparaInsert($datos);
