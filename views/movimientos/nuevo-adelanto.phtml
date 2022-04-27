@@ -41,9 +41,10 @@
     })
     let resp = await res.json()
     $div.innerHTML = resp.texto
-    form.id = ""
-    form.desde = ""
-    form.hasta = ""
+    form.id.value = ""
+    form.desde.value = ""
+    form.hasta.value = ""
+    form.id.focus();
   })
 
 </script>

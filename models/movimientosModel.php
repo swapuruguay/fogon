@@ -41,6 +41,11 @@ class movimientosModel extends Model{
         return $movimiento;
 
     }
+    
+    private function fechaHasta($mes, $anio) {
+        $L = new DateTime("$anio-$mes-01");
+        return $L->format('Y-m-t');
+    }
 
     /**
      * Devuelve un arreglo con todos los movimientos
@@ -124,9 +129,15 @@ class movimientosModel extends Model{
     }
 
     public function getLasts($fecha, $limit) {
-        $listado = $this->_db->query("SELECT * FROM cuotas WHERE fecha_computo='$fecha' ORDER BY id_cuota DESC LIMIT 0,$limit");
+        $limite = $limit > 0 ? "LIMIT $limit" : "";
+        $listado = $this->_db->query("SELECT * FROM cuotas WHERE fecha_computo='$fecha' ORDER BY id_cuota DESC $limite");
         return  $listado->fetchall(PDO::FETCH_OBJ);
 
+    }
+    
+    public function getUltimaCuota() {
+      $linea = $this->_db->query("SELECT * FROM cuotas WHERE importe < 0 ORDER BY id_cuota DESC LIMIT 1");
+      return  $linea->fetch(PDO::FETCH_OBJ);
     }
 
     public function getMes($anio, $mes, $dire=3) {
@@ -153,11 +164,18 @@ class movimientosModel extends Model{
             return true;
          }
     }
+    
+    public function lastEmision() {
+        $result = $this->_db->query("SELECT * FROM mesesgenerados ORDER BY idmes DESC LIMIT 1");
+        return $result->fetch(PDO::FETCH_OBJ);
+         
+    }
 
     public function generarMes($socios, $mes, $anio) {
         foreach($socios as $s) {
             $result = $this->_db->query("SELECT * FROM adelantos WHERE id_socio_fk"
-                    . " = ".$s->getId()." AND desde <= '".$anio."-".$mes."-01' AND hasta >='".$anio."-".$mes."-31'");
+                    . " = ".$s->getId()." AND desde <= '".$anio."-".$mes."-01' AND hasta >='". $this->fechaHasta($mes, $anio)."'");
+    
             if(!$result->fetchall(PDO::FETCH_OBJ)) {
 
                 $datos = array(

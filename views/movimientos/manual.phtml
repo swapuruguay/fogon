@@ -52,20 +52,22 @@
     const frm = document.querySelector('#form_pago')
     frm.addEventListener('submit', evt => {
         evt.preventDefault();
-        hacerSubmit()
+        hacerSubmit();
     })
 
     function hacerSubmit() {
          obj = $('#id');
-            var data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
+            let data = `id=${obj.value}&importe=${$('#importe').value}&fecha=${$('#fecha').value}`;
+
             $.post('/movimientos/ingresarPago/M', data, function(resp) {
       
-                $("#ultimos").html('<p>Pago guardado</p>');
+                $("#ultimos").innerHTML = '<p>Pago guardado</p>';
             }, 'json')
 
-            obj.val('');
+            document.querySelector('#form_pago').clear();
             obj.focus();
     }
 
+    
 
 </script>

@@ -74,6 +74,28 @@ class movimientosController extends Controller{
         $this->_view->titulo = 'Cobros manuales';
         $this->_view->renderizar('manual');
     }
+    
+    public function getLasts() {
+         if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        
+        $modelo = $this->loadModel('movimientos');
+        $modelSocios = $this->loadModel('socios');
+        $row = $modelo->getUltimaCuota();
+        $fecha = $row->fecha_computo;
+        $result = $modelo->getLasts($fecha, 0);
+        $listado;
+        for($i = 0; $i < count($result); $i++) {
+            $socio = $modelSocios->getById($result[$i]->id_socio_fk);
+            $listado[$i] = $result[$i];
+            $listado[$i]->socio = $socio;
+        }
+     
+        $this->_view->fecha = $fecha;
+        $this->_view->pagos = $listado;
+        $this->_view->renderizar('lista-pagos');
+    }
 
     public function ingresarPago($tipo = 'S') {
 
@@ -127,11 +149,25 @@ class movimientosController extends Controller{
         echo json_encode($retorno);
 
     }
+    
+    public function getLastEmitido() {
+        $model = $this->loadModel('movimientos');
+        $row = $model->lastEmision();
+        echo json_encode($row);
+    }
 
     public function preprint() {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
         }
+        
+        $model = $this->loadModel('movimientos');
+        $row = $model->lastEmision();
+        $mes = $row->mes;
+        $anio = $row->anio;
+        
+        $this->_view->mes = $mes;
+        $this->_view->anio = $anio;
         $this->_view->titulo = 'Titulo';
         $this->_view->renderizar('formprint');
     }
@@ -226,8 +262,8 @@ class movimientosController extends Controller{
         $pdf->SetTopMargin(5);
         $pdf->SetFont('Arial','',8);
 
-        //$pos_y  =   11;
-        $pos_y  =   13;
+        $pos_y  =   8;
+       // $pos_y  =   13;
         $it = 0;
         for($i = 0; $i < $paginas; $i++) {
             $pdf->AddPage();
@@ -281,14 +317,14 @@ class movimientosController extends Controller{
                         $pdf->SetXY(83,$pos_y + 34);  
                     }
                     //$pos_y+=73;
-                    $pos_y+= 73;
+                    $pos_y+= 75;
                     $pdf->SetY($pos_y);
 
                     $it++;
 
             }
-            //$pos_y = 11;
-            $pos_y = 13;
+            $pos_y = 8;
+            //$pos_y = 13;
 
         //$pdf->SetFillColor(236,235,236);
 
@@ -427,8 +463,22 @@ class movimientosController extends Controller{
         if($result) {
             $modelSocios = $this->loadModel('socios');
             $listado = $modelSocios->getHabilitados();
-            $model->generarMes($listado, $mes, $anio);
-            $this->_view->mensaje('Mes generado con &eacute;xito');
+            $listadoAux = [];
+            foreach ($listado as $s) {
+                $res = $model->getSaldo($s);
+                $saldo = (int) $res[0]->saldo;
+                $s->setSaldo($saldo);
+                $aux = $saldo / (int) $s->getCategoria()->getImporte();
+                $deuda = ceil($aux);
+                if($deuda >= 6) {
+                  // $listadoAux[] = $s->getId(). ' - '. $deuda;
+                   $modelSocios->delete($s, Session::get('usuario')->idusuario);
+                }
+                
+            }
+            var_dump($listadoAux);
+            //$model->generarMes($listado, $mes, $anio);
+            $this->_view->mensaje = 'Mes generado con &eacute;xito';
             $this->_view->renderizar('generado');
         } else {
             $this->_view->mensaje = 'El mes ya est&aacute; generado';
