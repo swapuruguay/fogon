@@ -36,6 +36,7 @@ class sociosController extends Controller{
 
     }
 
+
     public function listar($pag=0) {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
