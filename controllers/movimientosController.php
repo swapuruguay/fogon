@@ -471,13 +471,11 @@ class movimientosController extends Controller{
                 $aux = $saldo / (int) $s->getCategoria()->getImporte();
                 $deuda = ceil($aux);
                 if($deuda >= 6) {
-                  // $listadoAux[] = $s->getId(). ' - '. $deuda;
                    $modelSocios->delete($s, Session::get('usuario')->idusuario);
                 }
                 
             }
-            var_dump($listadoAux);
-            //$model->generarMes($listado, $mes, $anio);
+            $model->generarMes($listado, $mes, $anio);
             $this->_view->mensaje = 'Mes generado con &eacute;xito';
             $this->_view->renderizar('generado');
         } else {
@@ -501,6 +499,30 @@ class movimientosController extends Controller{
            $retorno = array('fecha_computo' => '', 'importe' => 0);
         }
         echo json_encode($retorno);
+    }
+    
+    public function eliminarPago($id) {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        
+        $modelo = $this->loadModel('movimientos');
+        $modelSocios = $this->loadModel('socios');
+        $mov = $modelo->getById($id);
+        $modelo->delete($mov);
+        $row = $modelo->getUltimaCuota();
+        $fecha = $row->fecha_computo;
+        $result = $modelo->getLasts($fecha, 0);
+        $listado;
+        for($i = 0; $i < count($result); $i++) {
+            $socio = $modelSocios->getById($result[$i]->id_socio_fk);
+            $listado[$i] = $result[$i];
+            $listado[$i]->socio = $socio;
+        }
+     
+        $this->_view->fecha = $fecha;
+        $this->_view->pagos = $listado;
+        $this->_view->renderizar('lista-pagos');
     }
 
     public function totales() {
