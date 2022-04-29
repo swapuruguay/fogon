@@ -130,7 +130,6 @@ class movimientosModel extends Model{
 
     public function getLasts($fecha, $limit=0) {
         $limite = $limit > 0 ? "LIMIT $limit" : "";
-        $
         $listado = $this->_db->query("SELECT * FROM cuotas WHERE fecha_computo='$fecha' ORDER BY id_cuota DESC $limite");
         return  $listado->fetchall(PDO::FETCH_OBJ);
 
