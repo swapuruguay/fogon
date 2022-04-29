@@ -5,9 +5,12 @@
             <label class="control-label col-md-2">Fecha</label>
             <div class="col-md-2">
 
-                <input type="text" name='fecha' id='fecha' class="form-control">
+                <input type="date" name='fecha' id='fecha' class="form-control">
+                 
             </div>
+            <div class="col-md-2"><a id="enlace" href="<?php echo BASE_URL. 'movimientos/getLasts/'?>" class="btn btn-info" disabled>Pagos de la fecha</a></div>
         </div>
+       
         <div class="form-group">
 
             <label class="control-label col-md-2">Nro de Socio</label>
@@ -32,6 +35,16 @@
     <div id="ultimos" style ="width: 100%; display: inline;" ></div>
 </div>
 <script>
+    
+    $enlace = document.querySelector("#enlace")
+    $enlace.addEventListener('click', evt => {
+        evt.preventDefault();
+        const frm = document.querySelector("#form_pago");
+        let url = $enlace.href;
+        url+= frm.fecha.value;
+        window.location.href = url
+    })
+    
 
     $('#id').change(function() {
         $.post('/socios/loadSocioAjax', `id=${$(this).val()}`, function(resp) {

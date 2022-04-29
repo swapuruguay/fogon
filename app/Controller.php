@@ -25,6 +25,13 @@ abstract class Controller
         $fecha="$ano-$mes-$dia";
         return $fecha;
     }
+    
+    protected function cambiarfecha_vista($fecha)
+    {
+        list($anio,$mes,$dia)=explode("-",$fecha);
+        $fecha="$dia/$mes/$anio";
+        return $fecha;
+    }
 
     protected function loadModel($modelo)
     {

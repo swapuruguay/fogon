@@ -75,15 +75,19 @@ class movimientosController extends Controller{
         $this->_view->renderizar('manual');
     }
     
-    public function getLasts() {
+    public function getLasts($fecha) {
          if(!Session::get('autenticado')) {
             $this->redireccionar('login');
         }
         
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
-        $row = $modelo->getUltimaCuota();
+        /*$row = $modelo->getUltimaCuota();
         $fecha = $row->fecha_computo;
+        $arrayFecha = explode('-', $fecha);
+        [$anio, $mes] = $arrayFecha;
+        $fecha = $anio . "-" . $mes . "-";
+        $fecha .= $tipo == 1 ? '25': '26';*/
         $result = $modelo->getLasts($fecha, 0);
         $listado;
         for($i = 0; $i < count($result); $i++) {
@@ -92,7 +96,7 @@ class movimientosController extends Controller{
             $listado[$i]->socio = $socio;
         }
      
-        $this->_view->fecha = $fecha;
+        $this->_view->fecha = $this->cambiarfecha_vista($fecha);
         $this->_view->pagos = $listado;
         $this->_view->renderizar('lista-pagos');
     }
@@ -104,7 +108,7 @@ class movimientosController extends Controller{
         $mov->setSocio($modeloSocio->getById(filter_input(INPUT_POST ,'id', FILTER_SANITIZE_STRING)));
         $mov->setImporte(-filter_input(INPUT_POST ,'importe', FILTER_SANITIZE_NUMBER_FLOAT));
         $ingreso = filter_input(INPUT_POST ,'fecha', FILTER_SANITIZE_STRING);
-        $ingreso = $this->cambiarfecha_mysql($ingreso);
+        //$ingreso = $this->cambiarfecha_mysql($ingreso);
         $mes = date('m',  strtotime($ingreso));
         $anio = date('Y', strtotime($ingreso));
         $mov->setFecha($ingreso);
@@ -354,7 +358,7 @@ class movimientosController extends Controller{
         $pos_y  =   13;
         $pdf->AddPage();
         $pdf->SetXY(20,$pos_y);
-        $pdf->Cell(0,8,utf8_decode('Listado de emisión de recibos'),0,0,'C');
+        $pdf->Cell(0,8,utf8_decode('Listado de emisión de recibos ' .$mes . '/' . $anio),0,0,'C');
 
         $pos_y = 25;
 

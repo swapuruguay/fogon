@@ -128,15 +128,16 @@ class movimientosModel extends Model{
         return new Movimiento(0);
     }
 
-    public function getLasts($fecha, $limit) {
+    public function getLasts($fecha, $limit=0) {
         $limite = $limit > 0 ? "LIMIT $limit" : "";
+        $
         $listado = $this->_db->query("SELECT * FROM cuotas WHERE fecha_computo='$fecha' ORDER BY id_cuota DESC $limite");
         return  $listado->fetchall(PDO::FETCH_OBJ);
 
     }
     
     public function getUltimaCuota() {
-      $linea = $this->_db->query("SELECT * FROM cuotas WHERE importe < 0 ORDER BY id_cuota DESC LIMIT 1");
+      $linea = $this->_db->query("SELECT * FROM cuotas WHERE importe < 0 and DAY(fecha_computo) > 24 ORDER BY id_cuota DESC LIMIT 1");
       return  $linea->fetch(PDO::FETCH_OBJ);
     }
 
