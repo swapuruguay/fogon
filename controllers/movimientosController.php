@@ -472,9 +472,12 @@ class movimientosController extends Controller{
                 $deuda = ceil($aux);
                 if($deuda >= 6) {
                    $modelSocios->delete($s, Session::get('usuario')->idusuario);
+                   $clave = array_search($s, $listado);
+                   unset($listado[$clave]);
                 }
                 
             }
+            
             $model->generarMes($listado, $mes, $anio);
             $this->_view->mensaje = 'Mes generado con &eacute;xito';
             $this->_view->renderizar('generado');

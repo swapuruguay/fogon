@@ -44,12 +44,12 @@
         }
     })
 
-    $('#form_pago').delegate('#importe','keypress', function(e) {
+    /*$('#form_pago').delegate('#importe','keypress', function(e) {
         if(e.keyCode == 13) {
            hacerSubmit()
         }
-    })
-    const frm = document.querySelector('#form_pago')
+    })*/
+   const frm = document.querySelector('#form_pago')
     frm.addEventListener('submit', evt => {
         evt.preventDefault();
         hacerSubmit();
@@ -57,14 +57,14 @@
 
     function hacerSubmit() {
          obj = $('#id');
-            let data = `id=${obj.value}&importe=${$('#importe').value}&fecha=${$('#fecha').value}`;
+            let data = `id=${obj.val()}&importe=${$('#importe').val()}&fecha=${$('#fecha').val()}`;
 
             $.post('/movimientos/ingresarPago/M', data, function(resp) {
       
                 $("#ultimos").innerHTML = '<p>Pago guardado</p>';
             }, 'json')
-
-            document.querySelector('#form_pago').clear();
+            frm.importe.value = ""
+            frm.id.value= "";
             obj.focus();
     }
 
