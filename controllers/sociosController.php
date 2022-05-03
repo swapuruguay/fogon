@@ -334,6 +334,21 @@ class sociosController extends Controller{
         $this->_view->renderizar('eliminados');
 
     }
+    
+    public function eliminadosAuto() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        $modelo  = $this->loadModel('socios');
+        $modelMov = $this->loadModel('movimientos');
+        $res = $modelMov->lastEmision();
+        $emision = $res->fecha_generado;
+        $this->_view->socios = $modelo->getEliminadosAuto($emision);
+        $this->_view->renderizar('bajas-auto');
+
+    }
+    
+    
 
     public function listarAdelantos() {
       if(!Session::get('autenticado')) {

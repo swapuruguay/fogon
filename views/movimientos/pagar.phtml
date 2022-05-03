@@ -8,7 +8,7 @@
                 <input type="date" name='fecha' id='fecha' class="form-control">
                  
             </div>
-            <div class="col-md-2"><a id="enlace" href="<?php echo BASE_URL. 'movimientos/getLasts/'?>" class="btn btn-info" disabled>Pagos de la fecha</a></div>
+            <div class="col-md-2"><a id="enlace" href="<?php echo BASE_URL. 'movimientos/getLasts/'?>" class="btn btn-info" style="pointer-events: none;">Pagos de la fecha</a></div>
         </div>
        
         <div class="form-group">
@@ -37,12 +37,21 @@
 <script>
     
     $enlace = document.querySelector("#enlace")
+    $date = document.querySelector("#fecha")
+    
+    $date.addEventListener('change', evt => {
+       if(evt.target.value) {
+           $enlace.style.pointerEvents = 'auto'
+       }
+    })
+    
     $enlace.addEventListener('click', evt => {
         evt.preventDefault();
         const frm = document.querySelector("#form_pago");
         let url = $enlace.href;
         url+= frm.fecha.value;
         window.location.href = url
+        
     })
     
 
@@ -60,11 +69,15 @@
     $('#form_pago').delegate('#importe','keypress', function(e) {
         if(e.keyCode == 13) {
             obj = $('#id');
-            var data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
-            $.post('/movimientos/ingresarPago/P', data, function(resp) {
+            if($date.value < '1970-01-01') {
+                alert("El año debe ser de 4 dígitos, por favor revise")
+                return;
+            }
+                const data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
+                $.post('/movimientos/ingresarPago/P', data, function(resp) {
 
-              var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped">'
-              contenido += '<tr><th>Id</th><th>Nombre</th><th>Importe</th></tr>'
+                var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped">'
+                contenido += '<tr><th>Id</th><th>Nombre</th><th>Importe</th></tr>'
                 for(var i = 0; i < resp.length; i++) {
                     contenido+= '<tr>'
 
@@ -73,9 +86,8 @@
                 contenido += '</table>'
                 $("#ultimos").html('<p></p>');
                 $("#ultimos").append(contenido);
-                console.log(resp[0].nombre);
             }, 'json')
-
+            
             obj.val('');
             obj.focus();
         }

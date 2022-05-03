@@ -150,6 +150,18 @@ class sociosModel extends Model{
         return $arreglo;
 
     }
+    
+    public function getEliminadosAuto($emision) {
+        $listado = $this->_db->query("SELECT * FROM socios s JOIN bajas b ON s.id_socio = b.id_socio_fk WHERE estado='B' AND b.fecha_baja = '$emision'  order by nombre");
+        $listado = $listado->fetchall(PDO::FETCH_OBJ);
+        $arreglo = array();
+        foreach($listado as $valor) {
+            $arreglo[] = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
+
+        }
+        return $arreglo;
+
+    }
 
     public function getPaginados($desde) {
 

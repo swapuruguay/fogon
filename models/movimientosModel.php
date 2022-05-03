@@ -160,7 +160,7 @@ class movimientosModel extends Model{
         if($result->fetchall(PDO::FETCH_OBJ)) {
              return false;
          } else {
-            $this->_db->query("INSERT INTO mesesgenerados (mes, anio) VALUES($mes, $anio)");
+            $this->_db->query("INSERT INTO mesesgenerados (mes, anio, fecha_generado) VALUES($mes, $anio, DATE(NOW()))");
             return true;
          }
     }

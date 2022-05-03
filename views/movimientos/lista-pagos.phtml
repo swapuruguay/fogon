@@ -14,7 +14,7 @@
             <td><?php echo utf8_decode($p->socio->getNombre()); ?></td>
             <td><?php echo utf8_decode($p->socio->getApellido()); ?></td>
             <td><?php echo $p->importe ?></td>
-            <td><a href="<?php echo BASE_URL . 'movimientos/eliminarPago/' . $p->id_cuota; ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
+            <td><a href="<?php echo BASE_URL . 'movimientos/eliminarPago/' . $p->id_cuota . "/" . $this->fechaMy; ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
 
         </tr>
 

@@ -31,9 +31,14 @@
     let res = await respuesta.json()
     nombre.innerHTML = res.nombre
   })
-
+  
+  
   form.addEventListener('submit', async evt => {
     evt.preventDefault();
+    if(form.desde.value < '1970-01-01' || form.hasta.value < '1970-01-01') {
+      alert("El año debe tener 4 dígitos, por favor revise");
+      return;
+    }
     let formData = new FormData(form)
     let res = await fetch('/movimientos/ingresarAdelanto', {
       method: 'post',

@@ -95,7 +95,7 @@ class movimientosController extends Controller{
             $listado[$i] = $result[$i];
             $listado[$i]->socio = $socio;
         }
-     
+        $this->_view->fechaMy = $fecha;
         $this->_view->fecha = $this->cambiarfecha_vista($fecha);
         $this->_view->pagos = $listado;
         $this->_view->renderizar('lista-pagos');
@@ -475,7 +475,7 @@ class movimientosController extends Controller{
                 $aux = $saldo / (int) $s->getCategoria()->getImporte();
                 $deuda = ceil($aux);
                 if($deuda >= 6) {
-                   $modelSocios->delete($s, Session::get('usuario')->idusuario);
+                   $modelSocios->delete($s, Session::get('usuario')->idusuario, 'A');
                    $clave = array_search($s, $listado);
                    unset($listado[$clave]);
                 }
@@ -508,7 +508,7 @@ class movimientosController extends Controller{
         echo json_encode($retorno);
     }
     
-    public function eliminarPago($id) {
+    public function eliminarPago($id, $fecha) {
         if(!Session::get('autenticado')) {
             $this->redireccionar('login');
         }
@@ -517,17 +517,18 @@ class movimientosController extends Controller{
         $modelSocios = $this->loadModel('socios');
         $mov = $modelo->getById($id);
         $modelo->delete($mov);
-        $row = $modelo->getUltimaCuota();
-        $fecha = $row->fecha_computo;
+        //$row = $modelo->getUltimaCuota();
+        //$fecha = $row->fecha_computo;
         $result = $modelo->getLasts($fecha, 0);
-        $listado;
+        $listado = [];
         for($i = 0; $i < count($result); $i++) {
             $socio = $modelSocios->getById($result[$i]->id_socio_fk);
             $listado[$i] = $result[$i];
             $listado[$i]->socio = $socio;
         }
      
-        $this->_view->fecha = $fecha;
+        $this->_view->fechaMy = $fecha;
+        $this->_view->fecha = $this->cambiarfecha_vista($fecha);
         $this->_view->pagos = $listado;
         $this->_view->renderizar('lista-pagos');
     }
