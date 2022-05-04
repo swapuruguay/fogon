@@ -345,9 +345,15 @@ class sociosModel extends Model{
         return new Pariente(0, 'Nuevo', 'nuevo');
     }
 
-    public function delete(Socio $socio, $usuario) {
-        $sql = "UPDATE socios SET estado='B', usuario=$usuario WHERE id_socio = ".$socio->getId();
+    public function delete(Socio $socio, $usuario, $tipo = 'M') {
+    $sql = "INSERT INTO bajas (id_socio_fk, fecha_baja, tipo) VALUES (" .$socio->getId(). ", DATE(NOW()), '$tipo')";
+        $flag = $this->_db->query($sql);
+        if($flag) {
+            $sql = "UPDATE socios SET estado='B', usuario=$usuario WHERE id_socio = ".$socio->getId();
         return $this->_db->query($sql);
+        }
+        return false;
+        
     }
 
     public function getAtrasados() {
