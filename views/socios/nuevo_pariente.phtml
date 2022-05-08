@@ -1,5 +1,6 @@
 <div class="container">
-    <form id="form1" action="<?php echo BASE_URL . 'socios/guardarParientes/'?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
+    <div id="mensaje"></div>
+    <form id="form1"  method="POST" class="form-horizontal" enctype="multipart/form-data">
       <div class="form-group">
         <label class="control-label col-sm-2">Nro de Socio</label>
         <div class="col-sm-3">
@@ -92,7 +93,30 @@
      alert('Cédula erronea, verifique')
      frm.documento.focus()
    }
-   frm.submit()
+   
+   formData.append('nombre', frm.nombre.value)
+   formData.append('apellido', frm.apellido.value)
+   formData.append('parentezco', frm.parentezco.value)
+   formData.append('sexo', frm.sexo.value)
+   formData.append('fecha_nacimiento', frm.fecha_nacimiento.value)
+   formData.append('idsoc', frm.idsoc.value)
+   formData.append('id', frm.id.value)
+   let result = await fetch('/socios/guardarParientes', {
+     method: 'post',
+     body: formData
+   })
+   let resultado2 = await result.json()
+   $div = document.querySelector('#mensaje')
+   $div.innerHTML = resultado2.mensaje
+   $div.style.color = resultado2.color
+   frm.nombre.value = ""
+   frm.apellido.value = ""
+   frm.parentezco.value = 'a'
+   frm.sexo.value = 'A'
+   frm.documento.value = ""
+   frm.fecha_nacimiento.value = ""
+   frm.nombre.focus()
+   
  })
 
 function digitoCedula(ci) {

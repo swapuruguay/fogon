@@ -25,6 +25,11 @@
       <li><a href="<?php echo BASE_URL . 'movimientos/totales' ?>">Totales</a></li></li>
     </ul>
   </li>
+  <li><a href="<?php echo BASE_URL . 'usuarios#' ?>">Ajustes impresión</a>
+    <ul>
+      <li><a href="<?php echo BASE_URL . 'ajustes/getajustes'?>" >Ajustar espacios</a></li>
+    </ul>
+  </li>
   <li><a href="<?php echo BASE_URL . 'usuarios#' ?>">Usuario</a>
     <ul>
       <li><a href="<?php echo BASE_URL . 'usuarios/cambiar'?>" >Cambiar contraseña</a></li>

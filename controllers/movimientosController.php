@@ -82,12 +82,6 @@ class movimientosController extends Controller{
         
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
-        /*$row = $modelo->getUltimaCuota();
-        $fecha = $row->fecha_computo;
-        $arrayFecha = explode('-', $fecha);
-        [$anio, $mes] = $arrayFecha;
-        $fecha = $anio . "-" . $mes . "-";
-        $fecha .= $tipo == 1 ? '25': '26';*/
         $result = $modelo->getLasts($fecha, 0);
         $listado;
         for($i = 0; $i < count($result); $i++) {
@@ -256,6 +250,8 @@ class movimientosController extends Controller{
         $dire = filter_input(INPUT_POST, 'dire', FILTER_SANITIZE_NUMBER_INT);
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
+        $modelAjustes = $this->loadModel('ajustes');
+        $ajustes = $modelAjustes->get();
         $row = $modelo->getMes($anio, $mes, $dire);
         $registros = count($lista) > 0 ? count($lista) : count($row);
         $paginas = $registros / 4;
@@ -266,7 +262,8 @@ class movimientosController extends Controller{
         $pdf->SetTopMargin(5);
         $pdf->SetFont('Arial','',8);
 
-        $pos_y  =   8;
+        $pos_y  =   $ajustes->getMargen();
+        //$pos_y  = 8;
        // $pos_y  =   13;
         $it = 0;
         for($i = 0; $i < $paginas; $i++) {
@@ -321,15 +318,16 @@ class movimientosController extends Controller{
                         $pdf->SetXY(83,$pos_y + 34);  
                     }
                     //$pos_y+=73;
-                    $pos_y+= 75;
+                    //$pos_y+=75;
+                    $pos_y+= $ajustes->getEspacio();
                     $pdf->SetY($pos_y);
 
                     $it++;
 
             }
-            $pos_y = 8;
+            //$pos_y = 8;
             //$pos_y = 13;
-
+            $pos_y  =   $ajustes->getMargen();
         //$pdf->SetFillColor(236,235,236);
 
 

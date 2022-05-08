@@ -1,0 +1,26 @@
+<p>&nbsp;</p>
+<div id="divpago" class="container">
+    <h3 class="etiquetas">Cambio de valores para imprimir</h3>
+    <form id="form_pago" class="form-horizontal">
+        <div class="form-group">
+
+            <label class="control-label col-md-2">Margen</label>
+            <div class="col-md-4">
+
+                <input type="number" name='margen' id='margen' value="<?php echo $this->margen ?>" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Espacios entre recibos</label>
+            <div class="col-md-4">
+                <input type="number" name='espacio' id='espacio' value="<?php echo $this->espacio ?>" class="form-control">
+
+            </div>
+
+        </div>
+
+        <input type="submit" value="Guardar" class="btn btn-primary"/>
+
+    </form>
+
+</div>

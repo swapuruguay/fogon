@@ -622,10 +622,10 @@ class sociosController extends Controller{
     }
 
      public function guardarParientes() {
-        if(!Session::get('autenticado')) {
+        /*if(!Session::get('autenticado')) {
             $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
+        }*/
+       $modelo  = $this->loadModel('socios');
         if(isset($_POST['idsoc'])) {
             $idSocio = filter_input(INPUT_POST ,'idsoc', FILTER_SANITIZE_NUMBER_INT);
             $id      = filter_input(INPUT_POST ,'id', FILTER_SANITIZE_NUMBER_INT);
@@ -657,11 +657,14 @@ class sociosController extends Controller{
                 $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
                 //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
                 $socio->setFechaNacimiento($nacimiento);
-                if($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
-                    $this->_view->mensaje = "Registro guardado";
+                if($modelo->savePariente($socio, Session::get('usuario')->idusuario)) { 
+                    // Session::get('usuario')->idusuario)) {
+                    echo json_encode(array('mensaje' => "Registro guardado", 'color' => 'green'));
+                } else {
+                    echo json_encode(array('mensaje' => "Ocurrió un error al guardar, verifique", 'color' => 'red'));
                 }
-
-                $this->_view->renderizar('resultado');
+                
+                //$this->_view->renderizar('resultado');
 
             } else {
                 $socio = $modelo->buildPariente();
@@ -688,13 +691,17 @@ class sociosController extends Controller{
                 $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
                 //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
                 $socio->setFechaNacimiento($nacimiento);
-                if($modelo->updatePariente($socio, Session::get('usuario')->idusuario)) {
-                    $this->_view->mensaje = "Registro guardado";
+                if($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
+                    echo json_encode(array('mensaje' => "Registro guardado", 'color' => 'green'));
+                } else {
+                    echo json_encode(array('mensaje' => "Ocurrió un error al guardar, verifique", 'color' => 'red'));
                 }
+                
             }
 
-            $this->_view->renderizar('resultado');
+           // $this->_view->renderizar('resultado');
         }
-    }
+         //echo json_encode(array('mensaje' => "Ocurrió un error al guardar, verifique", 'color' => 'red'));
+    }   
 
 }
