@@ -33,8 +33,8 @@ class ajustesModel extends Model{
     public function set(Ajuste $ajuste, $usuario) {
         $datos = array(
 
-            'margen'            => $socio->getNombre(),
-            'espacio'          => $socio->getApellido()
+            'margen'            => $ajuste->getMargen(),
+            'espacio'          => $ajuste->getEspacio()
         );
 
         $sql = 'UPDATE ajustes SET ' . $this->preparaUpdate($datos);

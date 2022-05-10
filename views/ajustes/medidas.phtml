@@ -1,7 +1,10 @@
 <p>&nbsp;</p>
 <div id="divpago" class="container">
     <h3 class="etiquetas">Cambio de valores para imprimir</h3>
-    <form id="form_pago" class="form-horizontal">
+    <form id="form_medidas" class="form-horizontal">
+        <div class="row">
+            <div class="col-md-4"><span class="message" id="message"></span></div>
+        </div>
         <div class="form-group">
 
             <label class="control-label col-md-2">Margen</label>
@@ -24,3 +27,24 @@
     </form>
 
 </div>
+<script>
+    //send form fetch without jquery to ajustes/setajustes
+    $form = document.querySelector('#form_medidas');
+    $form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = new FormData($form);
+        const res = await fetch('/ajustes/setajustes', {
+            method: 'POST',
+            body: data
+        });
+        const json = await res.json();
+        const span = document.querySelector('#message')
+        span.innerHTML = json.mensaje;
+        span.style.color = json.color
+    }
+    );
+
+            
+
+
+</script>

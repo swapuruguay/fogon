@@ -41,9 +41,9 @@ class ajustesController extends Controller {
     public function setajustes() {
         $modelo  = $this->loadModel('ajustes');
         $ajuste = $modelo->get();
-        $ajuste->setMargen(filter_input(INPUT_POST ,'margen', FILTER_SANITIZE_INT));
-        $socio->setEspacio(filter_input(INPUT_POST ,'espacio', FILTER_SANITIZE_INT));
-        if($modelo->set($ajuste)) {
+        $ajuste->setMargen(filter_input(INPUT_POST ,'margen', FILTER_SANITIZE_NUMBER_INT));
+        $ajuste->setEspacio(filter_input(INPUT_POST ,'espacio', FILTER_SANITIZE_NUMBER_INT));
+        if($modelo->set($ajuste, Session::get('usuario')->idusuario)) {
             echo json_encode(array("mensaje" => "Ajustes guardados con éxito", "color" => "green"));
         } else {
             echo json_encode(array("mensaje" => "Ocurrió un error, intente nuevamente", "color" => "red"));
