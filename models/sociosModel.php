@@ -250,6 +250,7 @@ class sociosModel extends Model{
 
     }
 
+
     public function getByApellidoE($texto){
         $listado = $this->_db->query("SELECT id_socio,nombre, apellido FROM socios "
                 . "WHERE (nombre LIKE '" .$texto . "%' OR apellido LIKE '" .$texto . "%')  AND estado='B'");

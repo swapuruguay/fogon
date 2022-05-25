@@ -1,4 +1,4 @@
 <div class="container">
-<h3>Seguro que desea eliminar a <?php echo $this->socio; ?>?</h3>
+<h3>Seguro que desea eliminar a <?php echo utf8_decode($this->socio); ?>?</h3>
 <a class="btn btn-success" href="<?php echo BASE_URL .'socios/eliminar/'.$this->socio->getId(); ?>">S&iacute;</a>&nbsp;<a class="btn btn-danger" href="<?php echo BASE_URL .'socios/listar/'; ?>">No</a><br><br>
 </div>

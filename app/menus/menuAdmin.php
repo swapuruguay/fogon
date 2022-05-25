@@ -4,6 +4,7 @@
     <ul>
       <li><a href="<?php echo BASE_URL . 'socios/nuevo' ?>" >Nuevo</a></li>
       <li><a href="<?php echo BASE_URL . 'socios/listar' ?>">Listar</a></li>
+      <li><a href="<?php echo BASE_URL . 'socios/busqueda' ?>">Buscar por documento</a></li>
       <li><a href="<?php echo BASE_URL . 'socios/atrasados' ?>">Atrasados</a></li>
       <li><a href="<?php echo BASE_URL . 'socios/eliminados' ?>">Eliminados</a></li>
       <li><a href="<?php echo BASE_URL . 'socios/eliminadosAuto' ?>">Eliminados automáticos</a></li>

@@ -36,6 +36,29 @@ class sociosController extends Controller{
 
     }
 
+    public function busqueda() {
+        if(!Session::get('autenticado')) {
+            $this->redireccionar('login');
+        }
+        //$modelo  = $this->loadModel('socios');
+        //$modelo->getNroNuevo('socios');
+        $this->_view->renderizar('busqueda');
+
+    }
+
+    //create function getByDocumento
+    public function getByDoc() {
+        $documento = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_NUMBER_INT);
+        $modelo  = $this->loadModel('socios');
+        $socio = $modelo->getByDocumento($documento);
+        $objeto = array(
+            'id'        => $socio->getId(),
+            'nombre'    => utf8_decode($socio->getNombre(). ' ' . $socio->getApellido()),
+            'documento' => $socio->getDocumento()
+          );
+        echo json_encode($objeto);
+    }
+
 
     public function listar($pag=0) {
         if(!Session::get('autenticado')) {

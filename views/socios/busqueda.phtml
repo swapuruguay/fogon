@@ -1,0 +1,77 @@
+<div class="container">
+  <br>
+    <div id="mensaje"></div>
+    <form id="form1" class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-2">Nro de documento</label>
+        <div class="col-sm-3">
+          <input type="text" name='search' id='search' onkeypress="return soloNumeros(event);">
+        </div>
+      </div>
+      
+
+      <input type="submit" value="Buscar" class="btn btn-success" >
+  </form>
+</div>
+<br><br>
+<div class="container" id="resultado"></div>
+
+<script type="text/javascript">
+ 
+ const frm = document.getElementById('form1')
+
+ frm.addEventListener('submit', async (evt) => {
+   evt.preventDefault()
+   let formData = new FormData(frm)
+   let res = await fetch('/socios/getByDoc', {
+     method: 'post',
+     body: formData
+     
+    })
+    let resultado = await res.json()
+    console.log(resultado)
+    let html = `<table class="table"> 
+     <tr>
+       <th>Nro Socio</th>
+       <th>Nombre</th>
+       <th>Documento</th>
+       <th>Acciones</th>
+     </tr>
+     <tr>
+       <td>${resultado.id}</td>
+       <td>${resultado.nombre}</td>
+       <td>${resultado.documento}</td>
+       <td>
+         <a href="/socios/editar/${resultado.id}" class="btn btn-primary">Editar</a>
+         <a href="/socios/confirmar/${resultado.id}" class="btn btn-danger">Eliminar</a>
+       </td>
+       </tr>
+       </table>`
+     document.getElementById('resultado').innerHTML = html
+  })
+
+
+function soloNumeros(e)
+{
+
+  key = e.keyCode || e.which
+  let numeros = "0123456789"
+  let teclado = String.fromCharCode(key)
+  let especiales = [8,9,37,39,46]
+  if(teclado == '.') {
+    return false
+  }
+  let teclado_especial = false
+  for(let i in especiales) {
+
+    if(key == especiales[i]) {
+      teclado_especial = true
+    }
+  }
+
+  if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
+    return false
+  }
+}
+
+</script>
