@@ -302,7 +302,7 @@ class movimientosController extends Controller{
                     $pdf->Cell(80,4, utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
                     $pdf->SetXY($posX + 80,$pos_y + 18);
                     $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
-                    $pdf->SetXY($posX + 170,$pos_y + 18);
+                    $pdf->SetXY($posX + 10 + 170,$pos_y + 18);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
                     $pdf->SetXY($posX + 21,$pos_y + 27);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
