@@ -265,6 +265,7 @@ class movimientosController extends Controller{
         $pos_y  =   $ajustes->getMargen();
         //$pos_y  = 8;
        // $pos_y  =   13;
+       $posX = 10;
         $it = 0;
         for($i = 0; $i < $paginas; $i++) {
             $pdf->AddPage();
@@ -276,46 +277,46 @@ class movimientosController extends Controller{
                     } else {
                         $socio = $modelSocios->getById($lista[$it]->id);
                     }
-                    $pdf->SetXY(21,$pos_y);
+                    $pdf->SetXY($posX + 21,$pos_y);
                     $pdf->Cell(50,4,$socio->getId(),0,0);
-                    $pdf->SetXY(53,$pos_y);
+                    $pdf->SetXY($posX + 53,$pos_y);
                     if(count($lista) === 0) {
                         $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
                     }
                     else {
                         $pdf->Cell(50,4,$lista[$it]->mes.'/'.$lista[$it]->anio,0,0);    
                     }
-                    $pdf->SetXY(83,$pos_y);
+                    $pdf->SetXY($posX + 83,$pos_y);
                     $pdf->Cell(50,4,$socio->getId(),0,0);
-                    $pdf->SetXY(115,$pos_y);
+                    $pdf->SetXY($posX + 115,$pos_y);
                     if(count($lista) === 0) {
                         $pdf->Cell(50,4,$row[$it]->mes.'/'.$row[$it]->anio,0,0);
                     } else {
                         $pdf->Cell(50,4,$lista[$it]->mes.'/'.$lista[$it]->anio,0,0);
                     }
-                    $pdf->SetXY(5,$pos_y + 9);
+                    $pdf->SetXY($posX + 5,$pos_y + 9);
                     $pdf->Cell(80,4,  utf8_decode(utf8_decode($socio->__toString())),0,0,'C');
-                    $pdf->SetXY(80,$pos_y + 9);
+                    $pdf->SetXY($posX + 80,$pos_y + 9);
                     $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->__toString())),0,0,'C');
-                    $pdf->SetXY(5,$pos_y + 18);
+                    $pdf->SetXY($posX + 5,$pos_y + 18);
                     $pdf->Cell(80,4, utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
-                    $pdf->SetXY(80,$pos_y + 18);
+                    $pdf->SetXY($posX + 80,$pos_y + 18);
                     $pdf->Cell(90,4,  utf8_decode(utf8_decode($socio->getDomicilio())),0,0,'C');
-                    $pdf->SetXY(170,$pos_y + 18);
+                    $pdf->SetXY($posX + 170,$pos_y + 18);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
-                    $pdf->SetXY(21,$pos_y + 27);
+                    $pdf->SetXY($posX + 21,$pos_y + 27);
                     $pdf->Cell(50,4,  substr($socio->getCategoria()->getNombre(),0,1),0,0);
-                    $pdf->SetXY(53,$pos_y + 27);
+                    $pdf->SetXY($posX + 53,$pos_y + 27);
                     if(count($lista) === 0) {
                         $pdf->Cell(50,4, $row[$it]->importe, 0,0);
-                        $pdf->SetXY(103,$pos_y + 27);
+                        $pdf->SetXY($posX + 103,$pos_y + 27);
                         $pdf->Cell(50,4, $row[$it]->importe, 0,0);
-                        $pdf->SetXY(83,$pos_y + 34);
+                        $pdf->SetXY($posX + 83,$pos_y + 34);
                     } else {
                         $pdf->Cell(50,4, $socio->getCategoria()->getImporte(), 0,0);
-                        $pdf->SetXY(103,$pos_y + 27);
+                        $pdf->SetXY($posX + 103,$pos_y + 27);
                         $pdf->Cell(50,4, $socio->getCategoria()->getImporte(), 0,0);
-                        $pdf->SetXY(83,$pos_y + 34);  
+                        $pdf->SetXY($posX + 83,$pos_y + 34);  
                     }
                     //$pos_y+=73;
                     //$pos_y+=75;
