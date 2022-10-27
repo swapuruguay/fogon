@@ -265,7 +265,7 @@ class movimientosController extends Controller{
         $pos_y  =   $ajustes->getMargen();
         //$pos_y  = 8;
        // $pos_y  =   13;
-       $posX = 10;
+       $posX = 0;
         $it = 0;
         for($i = 0; $i < $paginas; $i++) {
             $pdf->AddPage();
