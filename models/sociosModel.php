@@ -346,7 +346,7 @@ class sociosModel extends Model{
         return new Pariente(0, 'Nuevo', 'nuevo');
     }
 
-    public function delete(Socio $socio, $usuario, $tipo = 'M') {
+    public function delete(Socio $socio, $usuario, $tipo = 'C') {
     $sql = "INSERT INTO bajas (id_socio_fk, fecha_baja, tipo) VALUES (" .$socio->getId(). ", DATE(NOW()), '$tipo')";
         $flag = $this->_db->query($sql);
         if($flag) {
