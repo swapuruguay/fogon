@@ -312,12 +312,18 @@ class movimientosController extends Controller{
                         $pdf->SetXY($posX + 103,$pos_y + 27);
                         $pdf->Cell(50,4, $row[$it]->importe, 0,0);
                         $pdf->SetXY($posX + 83,$pos_y + 34);
+                        $pdf->SetFont('Arial','B',14);
+                        $pdf->Cell(50,4, $row[$it]->estado, 0, 0);  
                     } else {
                         $pdf->Cell(50,4, $socio->getCategoria()->getImporte(), 0,0);
                         $pdf->SetXY($posX + 103,$pos_y + 27);
                         $pdf->Cell(50,4, $socio->getCategoria()->getImporte(), 0,0);
                         $pdf->SetXY($posX + 83,$pos_y + 34);  
+                        $pdf->SetFont('Arial','B',14);
+                        $pdf->Cell(50,4, $row[$it]->estado, 0, 0);
                     }
+                    
+                    $pdf->SetFont('Arial','',8);
                     //$pos_y+=73;
                     //$pos_y+=75;
                     $pos_y+= $ajustes->getEspacio();

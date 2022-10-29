@@ -176,18 +176,19 @@ class movimientosModel extends Model{
             $result = $this->_db->query("SELECT * FROM adelantos WHERE id_socio_fk"
                     . " = ".$s->getId()." AND desde <= '".$anio."-".$mes."-01' AND hasta >='". $this->fechaHasta($mes, $anio)."'");
     
-            if(!$result->fetchall(PDO::FETCH_OBJ)) {
+            //if(!$result->fetchall(PDO::FETCH_OBJ)) {
 
                 $datos = array(
                 'id_socio_fk'      => $s->getId(),
                 'mes'              => $mes,
                 'anio'             => $anio,
                 'fecha_computo'    => $anio.'-'.$mes.'-01',
-                'importe'          => $s->getCategoria()->getImporte()
+                'importe'          => $s->getCategoria()->getImporte(),
+                'estado'            => $result->fetchall(PDO::FETCH_OBJ) ? 'P' : 'NULL'
                  );
                 $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);
                 $this->_db->query($sql);
-            }
+            //}
         }
         return true;
 
