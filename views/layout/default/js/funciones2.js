@@ -76,7 +76,7 @@ function escribeMov(respuesta) {
     for(var i = 0; i < respuesta.length; i++){
         saldo +=  parseInt(respuesta[i].importe);
         var txt = 'Pago';
-        if(parseInt(respuesta[i].importe) > 0) {
+        if(parseInt(respuesta[i].importe) >= 0) {
             txt = 'Cuota';
         }
         texto+='<tr>';

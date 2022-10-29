@@ -149,7 +149,7 @@ class movimientosModel extends Model{
             $fogon = " AND s.domicilio NOT LIKE '%fog%'";
         }
 
-        $sql = "SELECT c.mes, c.anio, c.importe, s.nombre, s.apellido, s.id_socio, c.id_socio_fk FROM cuotas c JOIN socios s ON 
+        $sql = "SELECT c.mes, c.anio, c.importe, c.estado, s.nombre, s.apellido, s.id_socio, c.id_socio_fk FROM cuotas c JOIN socios s ON 
                 s.id_socio = c.id_socio_fk WHERE fecha_computo= '$anio-".$mes."-01' $fogon  AND importe > 0";
         $listado = $this->_db->query($sql);
         return  $listado->fetchall(PDO::FETCH_OBJ);
@@ -176,19 +176,30 @@ class movimientosModel extends Model{
             $result = $this->_db->query("SELECT * FROM adelantos WHERE id_socio_fk"
                     . " = ".$s->getId()." AND desde <= '".$anio."-".$mes."-01' AND hasta >='". $this->fechaHasta($mes, $anio)."'");
     
-            //if(!$result->fetchall(PDO::FETCH_OBJ)) {
+            if(!$result->fetchall(PDO::FETCH_OBJ)) {
 
                 $datos = array(
                 'id_socio_fk'      => $s->getId(),
                 'mes'              => $mes,
                 'anio'             => $anio,
                 'fecha_computo'    => $anio.'-'.$mes.'-01',
-                'importe'          => $s->getCategoria()->getImporte(),
-                'estado'            => $result->fetchall(PDO::FETCH_OBJ) ? 'P' : 'NULL'
-                 );
+                'importe'          => $s->getCategoria()->getImporte()
+                );
+                 $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);
+                 $this->_db->query($sql);
+                } else {
+                $datos = array(
+                    'id_socio_fk'      => $s->getId(),
+                    'mes'              => $mes,
+                    'anio'             => $anio,
+                    'fecha_computo'    => $anio.'-'.$mes.'-01',
+                    'importe'          => 0,
+                    'estado'            => 'P'
+                );
                 $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);
-                $this->_db->query($sql);
-            //}
+                 $this->_db->query($sql);
+            }
+        
         }
         return true;
 

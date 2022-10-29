@@ -3,7 +3,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">Nro de Socio</label>
         <div class="col-sm-3">
-          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getSocio()->getId(); ?>" readonly class="form-control"> <span><?php echo $this->pariente->getSocio(); ?></span>
+          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getSocio()->getId(); ?>" readonly class="form-control"> <span><?php echo utf8_decode($this->pariente->getSocio()); ?></span>
         </div>
       </div>
       <input type="hidden" name="id" id="id" value="<?php echo $this->pariente->getId(); ?>">
@@ -57,12 +57,27 @@
 
       </div>
       <input type="submit" value="Guardar" class="btn btn-success"/>
+      <input type="button" value="Hacer Socio" class="btn btn-info">
+      <input type="button" id="btn-remove" value="Eliminar" class="btn btn-danger">
   </form>
 </div>
 
 <script type="text/javascript">
+  const remove = async (evt) => {
+    let $id = document.getElementById('id')
+    let $idsoc = document.getElementById('idsoc')
+    const formData = new FormData()
+    formData.append('id', $id.value)
+    let res = await fetch('/socios/removePariente', {
+    method: 'post',
+    body: formData
+  })
+  let result = await res.json()
+  window.location.href = `/socios/editar/${$idsoc.value}`
+}
  const frm = document.getElementById('form1')
-
+ const btnRemove = document.getElementById('btn-remove')
+ btnRemove.addEventListener('click', remove)
 frm.addEventListener('submit', async (evt) => {
   evt.preventDefault()
   if(frm.apellido.value == '') {
@@ -97,6 +112,8 @@ frm.addEventListener('submit', async (evt) => {
     frm.submit()
   }
 })
+
+
 
 function digitoCedula(ci) {
   if(document.getElementById('check').checked) {

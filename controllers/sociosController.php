@@ -721,10 +721,21 @@ class sociosController extends Controller{
                 }
                 
             }
+        
 
            // $this->_view->renderizar('resultado');
         }
          //echo json_encode(array('mensaje' => "Ocurrió un error al guardar, verifique", 'color' => 'red'));
-    }   
+    }  
+    
+    public function removePariente() {
+        $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+        $modelo  = $this->loadModel('socios');
+        $result = $modelo->removePariente($id);
+        $objeto = array(
+            'id'        => $id
+          );
+        echo json_encode($objeto);
+    }
 
 }

@@ -298,6 +298,13 @@ class sociosModel extends Model{
         return $this->_db->query($sql);
     }
 
+    public function removePariente($id) {
+        
+        $sql = "DELETE FROM parientes WHERE id_pariente = '$id'";
+
+        return $this->_db->query($sql);
+    }
+
     public function update(Socio $socio, $usuario) {
         $datos = array(
 
