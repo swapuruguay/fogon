@@ -89,7 +89,7 @@
         let lista = document.querySelectorAll(".filas")
         let listPrint = [...lista]
         listFinal = listPrint.map( l => {
-            return {id: l.children[0].innerHTML, mes: l.children[2].innerHTML, anio: l.children[3].innerHTML}
+            return {id: l.children[0].innerHTML, mes: l.children[2].innerHTML, anio: l.children[3].innerHTML, importe: l.children[4].innerHTML}
         })
         const str = JSON.stringify(listFinal)
         const elm = document.createElement('input')
