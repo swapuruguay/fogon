@@ -388,6 +388,7 @@ class sociosModel extends Model{
         foreach($listado as $valor) {
             $soc = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
             $soc->setCategoria($this->_modeloCategorias->getById($valor->id_categoria_fk));
+            $soc->setDomicilio($valor->domicilio);
             $arreglo[] = $soc;
 
         }
