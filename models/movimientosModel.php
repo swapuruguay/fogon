@@ -144,9 +144,9 @@ class movimientosModel extends Model{
         //$fogon = ($dire == 1)? ' LIKE ': ' NOT LIKE ';
         $fogon = '';
         if($dire == 1) {
-            $fogon = " AND s.domicilio LIKE '%fog%'";
+            $fogon = " AND c.cobrado = 'F'";
         } elseif($dire == 2) {
-            $fogon = " AND s.domicilio NOT LIKE '%fog%'";
+            $fogon = " AND c.cobrado = 'C'";
         }
 
         $sql = "SELECT c.mes, c.anio, c.importe, c.estado, s.nombre, s.apellido, s.id_socio, c.id_socio_fk FROM cuotas c JOIN socios s ON 
@@ -175,18 +175,21 @@ class movimientosModel extends Model{
         foreach($socios as $s) {
             $result = $this->_db->query("SELECT * FROM adelantos WHERE id_socio_fk"
                     . " = ".$s->getId()." AND desde <= '".$anio."-".$mes."-01' AND hasta >='". $this->fechaHasta($mes, $anio)."'");
-    
-            if(!$result->fetchall(PDO::FETCH_OBJ)) {
+            $cobrado = mb_strtolower($s->getDomicilio(), 'UTF-8');
+            strpos($cobrado, 'fog') !== false  ? $cobrado = 'F' : $cobrado = 'C';
 
+            if(!$result->fetchall(PDO::FETCH_OBJ)) {
+                
                 $datos = array(
                 'id_socio_fk'      => $s->getId(),
                 'mes'              => $mes,
                 'anio'             => $anio,
                 'fecha_computo'    => $anio.'-'.$mes.'-01',
-                'importe'          => $s->getCategoria()->getImporte()
+                'importe'          => $s->getCategoria()->getImporte(),
+                'cobrado'          => $cobrado
                 );
                  $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);
-                 $this->_db->query($sql);
+                $this->_db->query($sql);
                 } else {
                 $datos = array(
                     'id_socio_fk'      => $s->getId(),
@@ -224,9 +227,9 @@ class movimientosModel extends Model{
     public function getTotales($fecha, $dire=3) {
         $fogon = '';
         if($dire == 1) {
-            $fogon = " AND socios.domicilio LIKE '%fog%'";
+            $fogon = " AND cuotas.cobrado = 'F'";
         } elseif($dire == 2) {
-            $fogon = " AND socios.domicilio NOT LIKE '%fog%'";
+            $fogon = " AND cuotas.cobrado = 'C'";
         }
         $sql = "SELECT COUNT(*) as cantidad,ABS(SUM(cuotas.importe)) AS importe, categorias.nombre as cat FROM cuotas 
                 JOIN socios ON id_socio=id_socio_fk JOIN categorias ON id_categoria=id_categoria_fk WHERE 

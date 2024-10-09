@@ -1,0 +1,29 @@
+<div class="container">
+    <h2>Listado de categorías</h2>
+    <article id="formularios">
+        <table class="table table-bordered table-condensed table-striped table-responsive">
+            <tr>
+                <th>Nro.</th>
+                <th>Categoría</th>
+                <th>Valor</th>
+                <th></th>
+            </tr>
+            <?php foreach ($this->categorias as $p): ?>
+
+
+                <tr>
+
+                    <td><?php echo $p->getId(); ?></td>
+                    <td><?php echo $p->getNombre(); ?></td>
+                    <td><?php echo $p->getImporte() ?></td>
+                    <td><a href="<?php echo BASE_URL . 'movimientos/editarCategoria/' . $p->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' . DEFAULT_LAYOUT . '/img/edit.png' ?>"></a></td>
+
+                </tr>
+
+            <?php endforeach; ?>
+        </table>
+    </article>
+</div>
+<br>
+
+<br><br>

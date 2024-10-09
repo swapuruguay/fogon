@@ -13,29 +13,51 @@
  */
 require_once 'Categoria.php';
 
-class categoriasModel extends Model{
-    
-    public function __construct() {
+class categoriasModel extends Model
+{
+
+    public function __construct()
+    {
         parent::__construct();
     }
-    
-    
-    public function getAll() {
+
+
+    public function getAll()
+    {
         $consulta = $this->_db->query("SELECT * FROM categorias");
         $retorno = array();
         $resultado = $consulta->fetchall(PDO::FETCH_OBJ);
-        foreach($resultado as $valor) {
-            
+        foreach ($resultado as $valor) {
+
             $aux = new Categoria($valor->id_categoria, $valor->nombre, $valor->importe);
             $retorno[] = $aux;
-            
         }
         return $retorno;
     }
-    
-    public function getById($id) {
-        $consulta = $this->_db->query("SELECT * FROM categorias WHERE id_categoria = ".$id);
+
+    public function getById($id)
+    {
+        $consulta = $this->_db->query("SELECT * FROM categorias WHERE id_categoria = " . $id);
         $resultado = $consulta->fetch(PDO::FETCH_OBJ);
         return new Categoria($resultado->id_categoria, $resultado->nombre, $resultado->importe);
+    }
+
+    public function update(Categoria $categoria)
+    {
+        $datos = array(
+
+            'nombre'   => $categoria->getNombre(),
+            'importe'  => $categoria->getImporte()
+
+        );
+        $sql = 'UPDATE categorias SET ' . $this->preparaUpdate($datos) . ' WHERE id_categoria=' . $categoria->getId();
+
+        return $this->_db->query($sql);
+    }
+
+    public function buildCategoria($datos)
+    {
+        $categoria = new Categoria($datos['id'], $datos['nombre'], $datos['importe']);
+        return $categoria;
     }
 }
