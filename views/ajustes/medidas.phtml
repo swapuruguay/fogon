@@ -37,6 +37,8 @@
             body: data
         });
         const json = await res.json();
+        /* const text = await res.text();
+        console.log(text); */
         const span = document.querySelector('#message');
         span.innerHTML = json.mensaje;
         span.style.color = json.color;

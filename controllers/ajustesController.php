@@ -13,12 +13,10 @@
  */
 class ajustesController extends Controller
 {
-    private $_ajustesModel;
 
     public function __construct()
     {
         parent::__construct();
-        $this->_ajustesModel = $this->loadModel('ajustes');
     }
 
     public function index()
@@ -26,34 +24,35 @@ class ajustesController extends Controller
         if (!Session::get('autenticado')) {
             $this->redireccionar('login');
         }
-
-        $ajustes = $this->_ajustesModel->get();
-        $this->_view->margen = $ajustes->getMargen();
-        $this->_view->espacio = $ajustes->getEspacio();
-        $this->_view->left = $ajustes->getLeft(); // Nuevo campo
-        $this->_view->renderizar('medidas');
+        $this->_view->titulo = NOMBRE;
+        $this->_view->renderizar('index');
     }
 
-    public function setajustes()
+    public function getajustes()
     {
         if (!Session::get('autenticado')) {
             $this->redireccionar('login');
         }
 
-        $margen = filter_input(INPUT_POST, 'margen', FILTER_SANITIZE_NUMBER_INT);
-        $espacio = filter_input(INPUT_POST, 'espacio', FILTER_SANITIZE_NUMBER_INT);
-        $left = filter_input(INPUT_POST, 'left', FILTER_SANITIZE_NUMBER_INT); // Nuevo campo
+        $modelo = $this->loadModel('ajustes');
+        $ajuste = $modelo->get();
+        $this->_view->margen = $ajuste->getMargen();
+        $this->_view->espacio = $ajuste->getEspacio();
+        $this->_view->left = $ajuste->getLeft();
+        $this->_view->renderizar('medidas');
+    }
 
-        $result = $this->_ajustesModel->update([
-            'margen' => $margen,
-            'espacio' => $espacio,
-            'left' => $left // Nuevo campo
-        ]);
-
-        if ($result) {
-            echo json_encode(['mensaje' => 'Ajustes guardados correctamente', 'color' => 'green']);
+    public function setajustes()
+    {
+        $modelo  = $this->loadModel('ajustes');
+        $ajuste = $modelo->get();
+        $ajuste->setMargen(filter_input(INPUT_POST, 'margen', FILTER_SANITIZE_NUMBER_INT));
+        $ajuste->setEspacio(filter_input(INPUT_POST, 'espacio', FILTER_SANITIZE_NUMBER_INT));
+        $ajuste->setLeft(filter_input(INPUT_POST, 'left', FILTER_SANITIZE_NUMBER_INT));
+        if ($modelo->set($ajuste, Session::get('usuario')->idusuario)) {
+            echo json_encode(array("mensaje" => "Ajustes guardados con éxito", "color" => "green"));
         } else {
-            echo json_encode(['mensaje' => 'Error al guardar los ajustes', 'color' => 'red']);
+            echo json_encode(array("mensaje" => "Ocurrió un error, intente nuevamente", "color" => "red"));
         }
     }
-}}
+}

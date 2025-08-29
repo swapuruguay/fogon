@@ -14,30 +14,36 @@
 
 require_once 'Ajuste.php';
 
-class ajustesModel extends Model{
-    
-    public function __construct() {
+class ajustesModel extends Model
+{
+
+    public function __construct()
+    {
         parent::__construct();
     }
-    
-    
-    public function get() {
+
+
+    public function get()
+    {
         $consulta = $this->_db->query("SELECT * FROM ajustes");
         $retorno = array();
         $resultado = $consulta->fetch(PDO::FETCH_OBJ);
-        $aux = new Ajuste($resultado->margen, $resultado->espacio);
+        $aux = new Ajuste($resultado->margen, $resultado->espacio, $resultado->izquierda);
         $retorno = $aux;
         return $retorno;
     }
-    
-    public function set(Ajuste $ajuste, $usuario) {
+
+    public function set(Ajuste $ajuste, $usuario)
+    {
         $datos = array(
 
             'margen'            => $ajuste->getMargen(),
-            'espacio'          => $ajuste->getEspacio()
+            'espacio'          => $ajuste->getEspacio(),
+            'izquierda'          => $ajuste->getLeft(), // Nuevo campo
         );
 
         $sql = 'UPDATE ajustes SET ' . $this->preparaUpdate($datos);
+
 
         return $this->_db->query($sql);
     }

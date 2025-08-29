@@ -327,13 +327,13 @@ class movimientosController extends Controller
         $pdf->SetFont('Arial', '', 8);
 
         $pos_y  =   $ajustes->getMargen();
-        $posX = 5 + $ajustes->getLeft();
         //$pos_y  = 8;
         // $pos_y  =   13;
-        $posX = 5;
+        $posX = 5 + $ajustes->getLeft();
         $it = 0;
         for ($i = 0; $i < $paginas; $i++) {
             $pdf->AddPage();
+
             for ($j = 0; $j < 4; $j++) {
                 if (!($it < $registros))
                     break;

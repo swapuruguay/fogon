@@ -12,42 +12,62 @@
  * @author walter
  */
 
-class Ajuste {
+class Ajuste
+{
     private $_id;
     private $_margen;
     private $_espacio;
-    
-    public function __construct($margen, $espacio) {
-        
+    private $_left; // Nuevo campo
+
+    public function __construct($margen, $espacio, $left = 0)
+    {
+
         $this->_margen = $margen;
         $this->_espacio = $espacio;
+        $this->_left = $left;
     }
-    
-    public function getId() {
+
+    public function getId()
+    {
         return $this->_id;
     }
-    
-    public function setId($id) {
+
+    public function setId($id)
+    {
         $this->_id = $id;
     }
-    
-    public function getEspacio() {
+
+    public function getEspacio()
+    {
         return $this->_espacio;
     }
-    
-    public function setEspacio($espacio) {
+
+    public function setEspacio($espacio)
+    {
         $this->_espacio = $espacio;
     }
-    
-    public function getMargen() {
+
+    public function getMargen()
+    {
         return $this->_margen;
     }
-    
-    public function setMargen($margen) {
+
+    public function setMargen($margen)
+    {
         $this->_margen = $margen;
     }
-    
-    public function __toString() {
+    public function getLeft()
+    {
+        return $this->_left;
+    }
+
+    public function setLeft($left)
+    {
+        $this->_left = $left;
+    }
+
+    public function __toString()
+    {
         return $this->_margen . " " . $this->_espacio;
     }
 }
