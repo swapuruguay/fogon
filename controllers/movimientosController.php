@@ -327,6 +327,7 @@ class movimientosController extends Controller
         $pdf->SetFont('Arial', '', 8);
 
         $pos_y  =   $ajustes->getMargen();
+        $posX = 5 + $ajustes->getLeft();
         //$pos_y  = 8;
         // $pos_y  =   13;
         $posX = 5;
