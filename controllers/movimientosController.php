@@ -303,6 +303,15 @@ class movimientosController extends Controller
         $mes = filter_input(INPUT_POST, 'mes', FILTER_SANITIZE_NUMBER_INT);
         $anio = filter_input(INPUT_POST, 'anio', FILTER_SANITIZE_NUMBER_INT);
         $dire = filter_input(INPUT_POST, 'dire', FILTER_SANITIZE_NUMBER_INT);
+        $message = htmlspecialchars(filter_input(INPUT_POST, 'message'), ENT_QUOTES);
+        $message = mb_convert_encoding($message, 'ISO-8859-1', 'UTF-8');
+        $saltos = explode("\n", $message);
+        if (count($saltos) > 3) {
+            $message = $saltos[0] . "\n" . $saltos[1] . "\n" . $saltos[2];
+        }
+        if (strlen($message > 150)) {
+            $message = substr($message, 0, 150);
+        }
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
         $modelAjustes = $this->loadModel('ajustes');
@@ -340,7 +349,7 @@ class movimientosController extends Controller
                 } else {
                     $pdf->Cell(50, 4, $lista[$it]->mes . '/' . $lista[$it]->anio, 0, 0);
                 }
-                $pdf->SetXY($posX + 83, $pos_y);
+                $pdf->SetXY($posX + 80, $pos_y);
                 $pdf->Cell(50, 4, $socio->getId(), 0, 0);
                 $pdf->SetXY($posX + 115, $pos_y);
                 if (count($lista) === 0) {
@@ -356,7 +365,7 @@ class movimientosController extends Controller
                 $pdf->Cell(80, 4, utf8_decode(utf8_decode($socio->getDomicilio())), 0, 0, 'C');
                 $pdf->SetXY($posX + 80, $pos_y + 18);
                 $pdf->Cell(90, 4,  utf8_decode(utf8_decode($socio->getDomicilio())), 0, 0, 'C');
-                $pdf->SetXY($posX + 10 + 170, $pos_y + 18);
+                $pdf->SetXY($posX + 10 + 150, $pos_y + 20);
                 $pdf->Cell(50, 4,  substr($socio->getCategoria()->getNombre(), 0, 1), 0, 0);
                 $pdf->SetXY($posX + 21, $pos_y + 27);
                 $pdf->Cell(50, 4,  substr($socio->getCategoria()->getNombre(), 0, 1), 0, 0);
@@ -370,6 +379,10 @@ class movimientosController extends Controller
                         $pdf->SetFont('Arial', 'B', 14);
                         $pdf->Cell(50, 4, "PAGO", 0, 0);
                         $pdf->SetFont('Arial', '', 8);
+                    }
+                    if ($message) {
+                        $pdf->SetXY($posX + 80, $pos_y + 33);
+                        $pdf->MultiCell(130, 3, $message, 0, 0);
                     }
                 } else {
                     $pdf->Cell(50, 4, $lista[$it]->importe, 0, 0);

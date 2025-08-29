@@ -1,25 +1,31 @@
 <div class="container">
-<h2>Recibos pasados del <?php echo $this->fecha ?></h2>
-<article id="formularios">
-<table class="table table-bordered table-condensed table-striped table-responsive">
-    <tr>
-        <th>Nro.</th><th>Nombre</th><th>Apellido</th><th>Importe</th><th></th>
-    </tr>
-    <?php foreach($this->pagos as $p): ?>
-        
+    <h2>Recibos pasados del <?php echo $this->fecha ?></h2>
+    <article id="formularios">
+        <table class="table table-bordered table-condensed table-striped table-responsive">
+            <tr>
+                <th>Nro.</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Importe</th>
+                <th></th>
+            </tr>
+            <?php foreach ($this->pagos as $p): ?>
 
-        <tr>
 
-            <td><?php echo $p->socio->getId(); ?></td>
-            <td><?php echo utf8_decode($p->socio->getNombre()); ?></td>
-            <td><?php echo utf8_decode($p->socio->getApellido()); ?></td>
-            <td><?php echo $p->importe ?></td>
-            <td><a href="<?php echo BASE_URL . 'movimientos/eliminarPago/' . $p->id_cuota . "/" . $this->fechaMy; ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
+                <tr>
 
-        </tr>
+                    <td><?php echo $p->socio->getId(); ?></td>
+                    <td><?php echo utf8_decode($p->socio->getNombre()); ?></td>
+                    <td><?php echo utf8_decode($p->socio->getApellido()); ?></td>
+                    <td><?php echo $p->importe ?></td>
+                    <td><a href="<?php echo BASE_URL . 'movimientos/eliminarPago/' . $p->id_cuota . "/" . $this->fechaMy; ?>"><img src="<?php echo BASE_URL . 'views/layout/' . DEFAULT_LAYOUT . '/img/delete.png' ?>"></a></td>
 
-    <?php endforeach; ?>
-</table>
+                </tr>
+
+            <?php endforeach; ?>
+            <?php echo count($this->pagos) != 0 ? "<tr><td colspan='5'>Total de pagos: " . count($this->pagos) . "</td></tr>" : "No hay pagos";
+            ?>
+        </table>
     </article>
 </div>
 <br>
