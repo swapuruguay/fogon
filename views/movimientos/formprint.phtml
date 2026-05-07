@@ -1,37 +1,27 @@
 <p>&nbsp;</p>
-<div class="container">
-    <h3>Ingrese mes y a&ntilde;o a imprimir</h3>
+<div class="max-w-7xl mx-auto px-4">
+    <h3 class="text-xl font-bold text-center mb-4">Ingrese mes y a&ntilde;o a imprimir</h3>
     <div id="divpago">
-        <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/imprimir140' ?>" method="POST" class="form-horizontal">
+        <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/imprimir140' ?>" method="POST" class="max-w-lg mx-auto space-y-4">
 
-            <div class="form-group">
-                <label class="control-label col-md-2">Mes</label>
-                <div class="col-md-4">
-                    <input type="text" name='mes' id='mes' readonly class="form-control"  value="<?php echo $this->mes ?>">
-                </div>
-
+            <div class="flex items-center gap-3">
+                <label class="font-semibold w-32">Mes</label>
+                <input type="text" name='mes' id='mes' readonly class="border border-gray-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"  value="<?php echo $this->mes ?>">
             </div>
 
-            <div class="form-group">
-                <label class="control-label col-md-2">A&ntilde;o</label>
-                <div class="col-md-4">
-                    <input type="text" name='anio' id='anio' readonly class="form-control" value="<?php echo $this->anio ?>">
-                </div>
+            <div class="flex items-center gap-3">
+                <label class="font-semibold w-32">A&ntilde;o</label>
+                <input type="text" name='anio' id='anio' readonly class="border border-gray-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" value="<?php echo $this->anio ?>">
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2">Qué Imprimo?</label>
-                <div class="col-md-4">
-                    <select type="text" name='dire' id='dire' class="form-control">
-                        <option value="1">Fogón</option>
-                        <option value="2">Cobrador</option>
-                    </select>
-                </div>
+            <div class="flex items-center gap-3">
+                <label class="font-semibold w-32">Qué Imprimo?</label>
+                <select type="text" name='dire' id='dire' class="border border-gray-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option value="1">Fogón</option>
+                    <option value="2">Cobrador</option>
+                </select>
             </div>
 
-
-            <input type="submit" value="Imprimir" class="btn btn-primary"/>
-
+            <input type="submit" value="Imprimir" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer"/>
         </form>
-
     </div>
 </div>

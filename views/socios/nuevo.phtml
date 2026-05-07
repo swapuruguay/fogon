@@ -1,46 +1,47 @@
 <br>
-<div class="container-fluid">
-  <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/0'?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nro de Socio</label>
-        <div class="col-sm-1">
-          <input type="text" name='id' id='id' value="<?php echo $this->nroSocio ?>" readonly class="form-control">
+<div class="max-w-7xl mx-auto px-4">
+  <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/0'?>" method="POST" class="space-y-4" enctype="multipart/form-data">
+      <?php echo csrf_field(); ?>
+      <div class="mb-4">
+        <label class="font-semibold">Nro de Socio</label>
+        <div class="w-16">
+          <input type="text" name='id' id='id' value="<?php echo $this->nroSocio ?>" readonly class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
       <input type="hidden" name="idsoc" id="idsoc" value=0>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nombre</label>
-        <div class="col-sm-4">
-          <input type="text" name='nombre' id='nombre'  class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Nombre</label>
+        <div class="w-full md:w-1/3">
+          <input type="text" name='nombre' id='nombre'  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Apellido</label>
-        <div class="col-sm-4">
-          <input type="text" name='apellido' id='apellido'  class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Apellido</label>
+        <div class="w-full md:w-1/3">
+          <input type="text" name='apellido' id='apellido'  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Documento</label>
-        <div class="col-sm-4">
+      <div class="mb-4">
+        <label class="font-semibold">Documento</label>
+        <div class="w-full md:w-1/3">
           <label for="check">Deshabilitar para extranjero</label>
           <input type="checkbox" name="check" id="check">
-          <input type="text" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control">
+          <input type="text" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
           <span id="alerta" style="color:red; font-weight:bold;"></span>
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Domicilio</label>
-        <div class="col-sm-4">
-          <input type="text" name='domicilio' id='domicilio'  class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Domicilio</label>
+        <div class="w-full md:w-1/3">
+          <input type="text" name='domicilio' id='domicilio'  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Categor&iacute;a</label>
-        <div class="col-sm-4">
-          <select name="categorias" class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Categor&iacute;a</label>
+        <div class="w-full md:w-1/3">
+          <select name="categorias" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
           <?php foreach($this->categorias as $cat):?>
 
               <option id="<?php echo $cat->getId(); ?>" value="<?php echo $cat->getNombre()."_" . $cat->getId(); ?>">
@@ -49,8 +50,8 @@
           </select>
         </div>
       </div>
-      <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-4">
+      <div class="mb-4">
+          <div class="md:w-1/3">
               <div class="checkbox">
                   <label>
                       <input type="checkbox" name="exento" id="exento" value="ok"> Exento
@@ -58,42 +59,42 @@
               </div>
           </div>
       </div>
-      <div class="form-group">
-        <label for="foto" class="control-label col-sm-2">Foto</label>
-        <div class="col-sm-4">
-          <input type="file" name="foto" id="foto" class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Foto</label>
+        <div class="w-full md:w-1/3">
+          <input type="file" name="foto" id="foto" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
         <img id="img-previa" src="<?php echo BASE_URL .'views/socios/img/socio.png' ?>" alt="Mi imagen" class="img-thumbnail" style="height:128px; width:96px;">
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Ingreso</label>
-        <div class="col-sm-3">
-          <input type="text" name='fecha_ingreso' id='fecha_ingreso'   class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Fecha Ingreso</label>
+        <div class="w-full md:w-1/4">
+          <input type="text" name='fecha_ingreso' id='fecha_ingreso'   class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Nacimiento</label>
-        <div class="col-sm-3">
-          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' class="form-control">
-        </div>
-
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Tel&eacute;fono</label>
-        <div class="col-sm-3">
-          <input type="text" name='telefono' id='telefono'  class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Fecha Nacimiento</label>
+        <div class="w-full md:w-1/4">
+          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">E-mail</label>
-        <div class="col-sm-3">
-          <input type="text" name='email' id='email' class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Tel&eacute;fono</label>
+        <div class="w-full md:w-1/4">
+          <input type="text" name='telefono' id='telefono'  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+
+      </div>
+      <div class="mb-4">
+        <label class="font-semibold">E-mail</label>
+        <div class="w-full md:w-1/4">
+          <input type="text" name='email' id='email' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
 
       </div>
       
-      <input type="submit" value="Guardar" class="btn btn-success"/>
+      <input type="submit" value="Guardar" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer"/>
 
   </form>
 </div>

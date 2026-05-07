@@ -1,249 +1,253 @@
-
-<div class="container">
-    <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/'. $this->socio->getId(); ?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
-      <div class="form-group">
-          <label class="control-label col-sm-2">Nro de Socio</label>
-              <?php if($this->socio->getEstado() == 'B') :  ?>
-          <strong><span class="text-danger">Socio Eliminado</span></strong>
-              <?php endif ?>
-        <div class="col-sm-1">
-          <input type="text" name='id' id='id' readonly value="<?php echo $this->socio->getId(); ?>" class="form-control">
-          <a class="btn btn-primary" href="<?php echo BASE_URL . 'socios/listarParientes/'. $this->socio->getId(); ?>">Ver Parientes</a>
-        </div>
+<div class="max-w-7xl mx-auto px-4">
+  <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/' . $this->socio->getId(); ?>" method="POST" class="space-y-4" enctype="multipart/form-data">
+    <?php echo csrf_field(); ?>
+    <div class="mb-4">
+      <div class="flex w-1/3 justify-between items-center space-x-4">
+        <label class="font-semibold">Nro de Socio</label>
+        <?php if ($this->socio->getEstado() == 'B') :  ?>
+          <strong class="inline-block ml-2"><span class="text-red-500">Socio Eliminado</span></strong>
+        <?php endif ?>
       </div>
-      <input type="hidden" name="idsoc" id="idsoc" value="<?php echo $this->socio->getId(); ?>">
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nombre</label>
-        <div class="col-sm-4">
-          <input type="text" name='nombre' id='nombre' value="<?php echo utf8_decode($this->socio->getNombre()); ?>" class="form-control">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Apellido</label>
-        <div class="col-sm-4">
-          <input type="text" name='apellido' id='apellido' value="<?php echo utf8_decode($this->socio->getApellido()); ?>" class="form-control">
-        </div>
+      <div class="w-16">
+        <input type="text" name='id' id='id' readonly value="<?php echo $this->socio->getId(); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <?php if (!($this->socio->getCategoria()->getNombre() == "Cadete")): ?>
+          <a class="inline-block w-40 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer" href="<?php echo BASE_URL . 'socios/listarParientes/' . $this->socio->getId(); ?>">Ver Parientes</a>
+        <?php endif; ?>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Documento</label>
-        <div class="col-sm-4">
-          <input type="text"  data-doc="<?php echo $this->socio->getDocumento() ?>" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
+    </div>
+    <input type="hidden" name="idsoc" id="idsoc" value="<?php echo $this->socio->getId(); ?>">
+    <div class="mb-4">
+      <label class="font-semibold">Nombre</label>
+      <div class="w-full md:w-1/3">
+        <input type="text" name='nombre' id='nombre' value="<?php echo $this->socio->getNombre(); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Apellido</label>
+      <div class="w-full md:w-1/3">
+        <input type="text" name='apellido' id='apellido' value="<?php echo $this->socio->getApellido(); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Documento</label>
+      <div class="w-full md:w-1/3">
+        <input type="text" data-doc="<?php echo $this->socio->getDocumento() ?>" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" value="<?php echo $this->socio->getDocumento(); ?>">
         <span id="alerta" style="color:red; font-weight:bold;"></span>
-        </div>
+      </div>
 
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Domicilio</label>
+      <div class="w-full md:w-1/3">
+        <input type="text" name='domicilio' id='domicilio' value="<?php echo $this->socio->getDomicilio(); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Domicilio</label>
-        <div class="col-sm-4">
-          <input type="text" name='domicilio' id='domicilio' value="<?php echo utf8_decode($this->socio->getDomicilio()); ?>" class="form-control">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Categor&iacute;a</label>
-        <div class="col-sm-4">
-          <select name="categorias" class="form-control">
-          <?php foreach($this->categorias as $cat):?>
-              <?php
-                  $selected = ($cat->getNombre() === $this->socio->getCategoria()->getNombre()?"SELECTED":"");
-              ?>
-              <option id="<?php echo $cat->getId(); ?>" value="<?php echo $cat->getNombre()."_" . $cat->getId(); ?>" <?php echo $selected ?>>
-                  <?php echo $cat->getNombre(); ?></option>
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Categor&iacute;a</label>
+      <div class="w-full md:w-1/3">
+        <select name="categorias" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <?php foreach ($this->categorias as $cat): ?>
+            <?php
+            $selected = ($cat->getNombre() === $this->socio->getCategoria()->getNombre() ? "SELECTED" : "");
+            ?>
+            <option id="<?php echo $cat->getId(); ?>" value="<?php echo $cat->getNombre() . "_" . $cat->getId(); ?>" <?php echo $selected ?>>
+              <?php echo $cat->getNombre(); ?></option>
           <?php endforeach; ?>
-          </select>
+        </select>
+      </div>
+    </div>
+    <div class="mb-4">
+      <div class="md:w-1/3">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" name="exento" id="exento" <?php echo ($this->socio->getExento()) ? 'CHECKED' : '' ?> value="ok"> Exento
+          </label>
         </div>
       </div>
-      <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-4">
-              <div class="checkbox">
-                  <label>
-                      <input type="checkbox" name="exento" id="exento" <?php echo ($this->socio->getExento())? 'CHECKED':'' ?> value="ok"> Exento
-                  </label>
-              </div>
-          </div>
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Foto</label>
+      <div class="w-full md:w-1/3">
+        <input type="file" name="foto" id="foto" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
       </div>
-      <div class="form-group">
-        <label for="foto" class="control-label col-sm-2">Foto</label>
-        <div class="col-sm-4">
-          <input type="file" name="foto" id="foto" class="form-control">
-        </div>
-        <img id="img-previa" src="<?php echo BASE_URL .'views/socios/img/' .$this->socio->getFoto() ?>" alt="Mi imagen" class="img-thumbnail" style="height:128px; width:96px;">
+      <img id="img-previa" src="<?php echo BASE_URL . 'views/socios/img/' . $this->socio->getFoto() ?>" alt="Mi imagen" class="img-thumbnail" style="height:128px; width:96px;">
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Fecha Ingreso</label>
+      <div class="w-full md:w-1/4">
+        <input type="text" name='fecha_ingreso' id='fecha_ingreso' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaIngreso())); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Ingreso</label>
-        <div class="col-sm-3">
-          <input type="text" name='fecha_ingreso' id='fecha_ingreso' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaIngreso())); ?>" class="form-control">
-        </div>
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Fecha Nacimiento</label>
+      <div class="w-full md:w-1/4">
+        <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaNacimiento())); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Nacimiento</label>
-        <div class="col-sm-3">
-          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaNacimiento())); ?>" class="form-control">
-        </div>
 
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">Tel&eacute;fono</label>
+      <div class="w-full md:w-1/4">
+        <input type="text" name='telefono' id='telefono' value="<?php echo $this->socio->getTelefono(); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Tel&eacute;fono</label>
-        <div class="col-sm-3">
-          <input type="text" name='telefono' id='telefono' value="<?php echo $this->socio->getTelefono(); ?>" class="form-control">
-        </div>
 
+    </div>
+    <div class="mb-4">
+      <label class="font-semibold">E-mail</label>
+      <div class="w-full md:w-1/4">
+        <input type="text" name='email' id='email' value="<?php echo $this->socio->getEmail(); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">E-mail</label>
-        <div class="col-sm-3">
-          <input type="text" name='email' id='email' value="<?php echo $this->socio->getEmail(); ?>" class="form-control">
-        </div>
 
-      </div>
-      
-      <?php if(Session::get('usuario')->perfil < 3): ?>
-      <input type="submit" value="Guardar" class="btn btn-success"/>
-      <?php endif ?>
+    </div>
+
+    <?php if (Session::get('usuario')->perfil < 3): ?>
+      <input type="submit" value="Guardar" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer" />
+    <?php endif ?>
   </form>
-    <br>
-    <?php if(Session::get('usuario')->perfil < 3): ?>
-  <div>
+  <br>
+  <?php if (Session::get('usuario')->perfil < 3): ?>
+    <div>
       <a href="" id="ver" data-perfil="<?php echo Session::get('usuario')->perfil ?>">Ver Saldo >>></a>
-  </div>
+    </div>
   <?php endif ?>
   <div id="saldos" style=" display: none; width: 30%;">
-      <div class='col-md-6'>
-      <table id="movs" class="table table-condensed table-bordered table-striped">
+    <div class="md:w-1/2">
+      <table id="movs" class="table table-condensed table-bordered table-striped w-full">
 
       </table>
-          <span id='total'></span>
-      </div>
+      <span id='total'></span>
+    </div>
   </div>
 
 </div>
 <script type="text/javascript">
-    $("#ver").click(function(event){
-        event.preventDefault();
-        if($("#saldos").css('display') === 'none') {
-            $("#saldos").css('display', 'table-cell');
-            var texto = $('#id').val()
-            $("#ver").html(' <<< Ocultar saldo ');
-            $.post('/movimientos/getSaldo','id='+texto,
-                    escribeMov,'json');
+  $("#ver").click(function(event) {
+    event.preventDefault();
+    if ($("#saldos").css('display') === 'none') {
+      $("#saldos").css('display', 'table-cell');
+      var texto = $('#id').val()
+      $("#ver").html(' <<< Ocultar saldo ');
+      $.post('/movimientos/getSaldo', 'id=' + texto,
+        escribeMov, 'json');
 
-        } else {
-            $("#saldos").css('display', 'none');
-            $("#ver").html('Ver saldo >>>');
-        }
+    } else {
+      $("#saldos").css('display', 'none');
+      $("#ver").html('Ver saldo >>>');
+    }
 
-    });
+  });
 
-$("#movs").on('click', '.eliminar', function(event) {
+  $("#movs").on('click', '.eliminar', function(event) {
     event.preventDefault();
     var id = this.id;
-    $.post('/movimientos/eliminar','id='+id,
-                    escribeMov,'json');
-});
+    $.post('/movimientos/eliminar', 'id=' + id,
+      escribeMov, 'json');
+  });
 
 
 
-function mostrarImagen(input) {
- if (input.files && input.files[0]) {
-  var reader = new FileReader();
-  reader.onload = function (e) {
-   $('#img-previa').attr('src', e.target.result);
-  }
-  reader.readAsDataURL(input.files[0]);
- }
-}
- 
-$("#foto").change(function(){
- mostrarImagen(this);
-});
-
-const frm = document.getElementById('form1')
-
-frm.addEventListener('submit', async (evt) => {
-  evt.preventDefault()
-  if(frm.apellido.value == '') {
-    alert('Debe ingresar nombre y apellido por serparado')
-    return
+  function mostrarImagen(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $('#img-previa').attr('src', e.target.result);
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
   }
-  let formData = new FormData()
-  formData.append('documento', frm.documento.value)
-  let res = await fetch('/socios/getByDocumento', {
-    method: 'post',
-    body: formData
-  })
-  let resultado = await res.json()
-  //console.log(resultado)
-  if(frm.documento.dataset.doc != frm.documento.value) {
-    if(resultado.documento != 0) {
-      let alerta = document.getElementById('alerta')
-      alerta.innerHTML = 'Socio existente en la base de datos, revise'
-      frm.documento.focus()
+
+  $("#foto").change(function() {
+    mostrarImagen(this);
+  });
+
+  const frm = document.getElementById('form1')
+
+  frm.addEventListener('submit', async (evt) => {
+    evt.preventDefault()
+    if (frm.apellido.value == '') {
+      alert('Debe ingresar nombre y apellido por serparado')
       return
     }
+    let formData = new FormData()
+    formData.append('documento', frm.documento.value)
+    let res = await fetch('/socios/getByDocumento', {
+      method: 'post',
+      body: formData
+    })
+    let resultado = await res.json()
+    //console.log(resultado)
+    if (frm.documento.dataset.doc != frm.documento.value) {
+      if (resultado.documento != 0) {
+        let alerta = document.getElementById('alerta')
+        alerta.innerHTML = 'Socio existente en la base de datos, revise'
+        frm.documento.focus()
+        return
+      }
 
-    if(digitoCedula(frm.documento.value)) {
+      if (digitoCedula(frm.documento.value)) {
+
+        frm.submit()
+      } else {
+        alert('Cédula erronea, verifique')
+        frm.documento.focus()
+      }
+    } else {
 
       frm.submit()
-    } else {
-      alert('Cédula erronea, verifique')
-      frm.documento.focus()
     }
-  } else {
+  })
 
-    frm.submit()
+  function digitoCedula(ci) {
+    let digitoIngresado = ci.substring(ci.length - 1)
+    let cedula = ci.substring(0, ci.length - 1)
+
+    let arrayCedula = cedula.split('')
+    if (arrayCedula.length < 6) {
+      return false
+    } else if (arrayCedula.length == 6) {
+      arrayCedula.unshift(0)
+    }
+    let testigo = [2, 9, 8, 7, 6, 3, 4]
+    let sumatoria = 0
+    for (let i in testigo) {
+      sumatoria += testigo[i] * arrayCedula[i]
+    }
+
+    let modulo = sumatoria % 10
+    if (modulo == 0) {
+      modulo = 10
+    }
+
+    return 10 - (modulo) == digitoIngresado
+
   }
-})
 
-function digitoCedula(ci) {
- let digitoIngresado = ci.substring(ci.length -1)
- let cedula = ci.substring(0, ci.length - 1)
+  function soloNumeros(e) {
 
- let arrayCedula = cedula.split('')
- if(arrayCedula.length < 6) {
-   return false
- } else if (arrayCedula.length == 6) {
-   arrayCedula.unshift(0)
- }
- let testigo = [2,9,8,7,6,3,4]
- let sumatoria = 0
- for(let i in testigo) {
-   sumatoria+= testigo[i] * arrayCedula[i]
- }
+    key = e.keyCode || e.which
+    //console.log(key)
+    let numeros = "0123456789"
+    let teclado = String.fromCharCode(key)
 
- let modulo = sumatoria % 10
- if(modulo == 0) {
-   modulo = 10
- }
+    let especiales = [8, 9, 37, 39, 46]
 
- return 10-(modulo) == digitoIngresado
+    let teclado_especial = false
+    for (let i = 0; i < especiales.length; i++) {
+      if (key == especiales[i]) {
 
-}
+        teclado_especial = true
+      }
+    }
 
-function soloNumeros(e)
-{
+    if (numeros.indexOf(teclado) == -1 && !teclado_especial) {
+      return false
+    }
+  }
 
- key = e.keyCode || e.which
- //console.log(key)
- let numeros = "0123456789"
- let teclado = String.fromCharCode(key)
-
- let especiales = [8,9,37,39,46]
-
- let teclado_especial = false
- for(let i = 0; i< especiales.length; i++) {
-   if(key == especiales[i]) {
-
-     teclado_especial = true
-   }
- }
-
- if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
-   return false
- }
-}
-
-function quitaPuntos() {
-  let valor = document.getElementById('documento').value
-  document.getElementById('documento').value = valor.replace(/\./g, '')
-}
+  function quitaPuntos() {
+    let valor = document.getElementById('documento').value
+    document.getElementById('documento').value = valor.replace(/\./g, '')
+  }
 </script>

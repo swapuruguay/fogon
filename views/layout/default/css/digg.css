@@ -18,7 +18,8 @@ ul {
   font-size: 11px;
   list-style: none;
   /* savers */
-  float: inherit;
+  float: left;
+  display: inline-block;
 }
 
 #pagination-digg a {

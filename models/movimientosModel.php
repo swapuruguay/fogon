@@ -1,23 +1,10 @@
 <?php
 
-
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- * Description of movimientosModel
- *
- * @author walter
- */
 require_once 'Movimiento.php';
 require_once 'Socio.php';
 require_once 'sociosModel.php';
 
-class movimientosModel extends Model{
+class movimientosModel extends Model {
 
     private $_modeloSocios;
 
@@ -26,217 +13,169 @@ class movimientosModel extends Model{
         $this->_modeloSocios = new sociosModel();
     }
 
-    /**
-     * Devuelve un Movimiento buscando por el parámetro id
-     * @param int $id
-     * @return Movimiento
-     */
-    public function getById($id) {
-
-        $listado = $this->_db->query("SELECT * FROM cuotas WHERE id_cuota = " .$id);
-        $listado = $listado->fetch(PDO::FETCH_OBJ);
-
-        $movimiento = new Movimiento($listado->id_cuota, $this->_modeloSocios->getById($listado->id_socio_fk), $listado->mes, $listado->anio);
-        $movimiento->setFecha($listado->fecha_computo);
-        return $movimiento;
-
-    }
-    
-    private function fechaHasta($mes, $anio) {
-        $L = new DateTime("$anio-$mes-01");
-        return $L->format('Y-m-t');
-    }
-
-    /**
-     * Devuelve un arreglo con todos los movimientos
-     * @return array Movimiento
-     */
-    public function getAll() {
-
-    }
-
-    /**
-     * Guarda un Socio en la base de datos
-     * @param Socio $socio
-     */
-    public function save(Movimiento $movimiento, $tipo = 'S') {
-        $datos = array(
-
-            'id_socio_fk'      => $movimiento->getSocio()->getId(),
-            'mes'              => $movimiento->getMes(),
-            'anio'             => $movimiento->getAnio(),
-            'fecha_computo'    => $movimiento->getFecha(),
-            'importe'          => $movimiento->getImporte(),
-            'tipo'             => $tipo
-
+    public function getById(int $id): Movimiento {
+        $sql = "SELECT * FROM cuotas WHERE id_cuota = ?";
+        $listado = $this->_db->select($sql, [$id])->fetch(PDO::FETCH_OBJ);
+        return new Movimiento(
+            $listado->id_cuota,
+            $this->_modeloSocios->getById($listado->id_socio_fk),
+            $listado->mes,
+            $listado->anio
         );
-        $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);
-
-        return $this->_db->query($sql);
-    }
-    public function saveAdelanto($adelanto) {
-        $datos = array(
-
-            'id_socio_fk'      => $adelanto['id'],
-            'desde'            => $adelanto['desde'],
-            'hasta'            => $adelanto['hasta']
-
-        );
-        $sql = 'INSERT INTO adelantos ' . $this->preparaInsert($datos);
-
-        return $this->_db->query($sql);
     }
 
-    /**
-     * Actualiza en la base de datos el Socio
-     * @param Movimiento $movimiento
-     */
-    public function update(Movimiento $movimiento) {
-        $datos = array(
-
-            'socio'            => $movimiento->getSocio()->getId(),
-            'mes'              => $movimiento->getMes(),
-            'anio'             => $movimiento->getAnio(),
-            'fecha_computo'    => $movimiento->getFecha(),
-            'importe'          => $movimiento->getImporte()
-
-        );
-        $sql = 'UPDATE cuotas SET ' . $this->preparaUpdate($datos) . ' WHERE id_cuota=' . $movimiento->getId();
-
-        return $this->_db->query($sql);
+    private function fechaHasta(int $mes, int $anio): string {
+        $date = new DateTime("$anio-$mes-01");
+        return $date->format('Y-m-t');
     }
 
-    /**
-     * Borra el Movimiento pasado por parámetro
-     * @param Movimiento $movimiento
-     */
-    public function delete(Movimiento $movimiento) {
-        $sql = 'DELETE FROM cuotas WHERE id_cuota = ' . $movimiento->getId();
-        return $this->_db->query($sql);
+    public function getAll(): void {}
+
+    public function save(Movimiento $movimiento, string $tipo = 'S'): bool {
+        $datos = [
+            'id_socio_fk' => $movimiento->getSocio()->getId(),
+            'mes' => $movimiento->getMes(),
+            'anio' => $movimiento->getAnio(),
+            'fecha_computo' => $movimiento->getFecha(),
+            'importe' => $movimiento->getImporte(),
+            'tipo' => $tipo,
+        ];
+        return $this->_db->insert('cuotas', $datos);
     }
 
-
-    public function getSaldo(Socio $socio){
-        $listado = $this->_db->query("SELECT SUM(importe) AS saldo FROM cuotas "
-                . "WHERE id_socio_fk = " .$socio->getId());
-        return $listado->fetchall(PDO::FETCH_OBJ);
-
-
+    public function saveAdelanto(array $adelanto): bool {
+        $datos = [
+            'id_socio_fk' => $adelanto['id'],
+            'desde' => $adelanto['desde'],
+            'hasta' => $adelanto['hasta'],
+        ];
+        return $this->_db->insert('adelantos', $datos);
     }
 
-    public function buildMovimiento() {
+    public function update(Movimiento $movimiento): bool {
+        $datos = [
+            'id_socio_fk' => $movimiento->getSocio()->getId(),
+            'mes' => $movimiento->getMes(),
+            'anio' => $movimiento->getAnio(),
+            'fecha_computo' => $movimiento->getFecha(),
+            'importe' => $movimiento->getImporte(),
+        ];
+        return $this->_db->update('cuotas', $datos, 'id_cuota = ?', [$movimiento->getId()]);
+    }
+
+    public function delete(Movimiento $movimiento): bool {
+        return $this->_db->delete('cuotas', 'id_cuota = ?', [$movimiento->getId()]);
+    }
+
+    public function getSaldo(Socio $socio): array {
+        $sql = "SELECT SUM(importe) AS saldo FROM cuotas WHERE id_socio_fk = ?";
+        return $this->_db->select($sql, [$socio->getId()])->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    public function buildMovimiento(): Movimiento {
         return new Movimiento(0);
     }
 
-    public function getLasts($fecha, $limit=0) {
-        $limite = $limit > 0 ? "LIMIT $limit" : "";
-        $listado = $this->_db->query("SELECT * FROM cuotas WHERE fecha_computo='$fecha' ORDER BY id_cuota DESC $limite");
-        return  $listado->fetchall(PDO::FETCH_OBJ);
-
-    }
-    
-    public function getUltimaCuota() {
-      $linea = $this->_db->query("SELECT * FROM cuotas WHERE importe < 0 and DAY(fecha_computo) > 24 ORDER BY id_cuota DESC LIMIT 1");
-      return  $linea->fetch(PDO::FETCH_OBJ);
+    public function getLasts(string $fecha, int $limit = 0): array {
+        if ($limit > 0) {
+            $sql = "SELECT * FROM cuotas WHERE fecha_computo = ? ORDER BY id_cuota DESC LIMIT ?";
+            return $this->_db->select($sql, [$fecha, $limit])->fetchAll(PDO::FETCH_OBJ);
+        }
+        $sql = "SELECT * FROM cuotas WHERE fecha_computo = ? ORDER BY id_cuota DESC";
+        return $this->_db->select($sql, [$fecha])->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getMes($anio, $mes, $dire=3) {
-        //$fogon = ($dire == 1)? ' LIKE ': ' NOT LIKE ';
+    public function getUltimaCuota(): ?object {
+        $sql = "SELECT * FROM cuotas WHERE importe < 0 AND DAY(fecha_computo) > 24 ORDER BY id_cuota DESC LIMIT 1";
+        return $this->_db->query($sql)->fetch(PDO::FETCH_OBJ);
+    }
+
+    public function getMes(int $anio, int $mes, int $dire = 3): array {
         $fogon = '';
-        if($dire == 1) {
+        if ($dire == 1) {
             $fogon = " AND c.cobrado = 'F'";
-        } elseif($dire == 2) {
+        } elseif ($dire == 2) {
             $fogon = " AND c.cobrado = 'C'";
         }
 
-        $sql = "SELECT c.mes, c.anio, c.importe, c.estado, s.nombre, s.apellido, s.id_socio, c.id_socio_fk FROM cuotas c JOIN socios s ON 
-                s.id_socio = c.id_socio_fk WHERE fecha_computo= '$anio-".$mes."-01' $fogon  AND importe > 0";
-        $listado = $this->_db->query($sql);
-        return  $listado->fetchall(PDO::FETCH_OBJ);
+        $sql = "SELECT c.mes, c.anio, c.importe, c.estado, s.nombre, s.apellido, s.id_socio, c.id_socio_fk
+                FROM cuotas c JOIN socios s ON s.id_socio = c.id_socio_fk
+                WHERE fecha_computo = ? $fogon AND importe > 0";
+        return $this->_db->select($sql, ["$anio-$mes-01"])->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function verificarMes($mes, $anio) {
-        $result = $this->_db->query("SELECT * FROM mesesgenerados WHERE mes = $mes AND anio=$anio");
-        if($result->fetchall(PDO::FETCH_OBJ)) {
-             return false;
-         } else {
-            $this->_db->query("INSERT INTO mesesgenerados (mes, anio, fecha_generado) VALUES($mes, $anio, DATE(NOW()))");
-            return true;
-         }
-    }
-    
-    public function lastEmision() {
-        $result = $this->_db->query("SELECT * FROM mesesgenerados ORDER BY idmes DESC LIMIT 1");
-        return $result->fetch(PDO::FETCH_OBJ);
-         
+    public function verificarMes(int $mes, int $anio): bool {
+        $sql = "SELECT * FROM mesesgenerados WHERE mes = ? AND anio = ?";
+        $result = $this->_db->select($sql, [$mes, $anio])->fetchAll(PDO::FETCH_OBJ);
+        if ($result) {
+            return false;
+        }
+        $sql = "INSERT INTO mesesgenerados (mes, anio, fecha_generado) VALUES (?, ?, DATE(NOW()))";
+        $this->_db->select($sql, [$mes, $anio]);
+        return true;
     }
 
-    public function generarMes($socios, $mes, $anio) {
-        foreach($socios as $s) {
-            $result = $this->_db->query("SELECT * FROM adelantos WHERE id_socio_fk"
-                    . " = ".$s->getId()." AND desde <= '".$anio."-".$mes."-01' AND hasta >='". $this->fechaHasta($mes, $anio)."'");
+    public function lastEmision(): ?object {
+        $sql = "SELECT * FROM mesesgenerados ORDER BY idmes DESC LIMIT 1";
+        return $this->_db->query($sql)->fetch(PDO::FETCH_OBJ);
+    }
+
+    public function generarMes(array $socios, int $mes, int $anio): bool {
+        foreach ($socios as $s) {
+            $sql = "SELECT * FROM adelantos WHERE id_socio_fk = ? AND desde <= ? AND hasta >= ?";
+            $result = $this->_db->select(
+                $sql,
+                [$s->getId(), "$anio-$mes-01", $this->fechaHasta($mes, $anio)]
+            )->fetchAll(PDO::FETCH_OBJ);
+
             $cobrado = mb_strtolower($s->getDomicilio(), 'UTF-8');
-            strpos($cobrado, 'fog') !== false  ? $cobrado = 'F' : $cobrado = 'C';
+            $cobrado = strpos($cobrado, 'fog') !== false ? 'F' : 'C';
 
-            if(!$result->fetchall(PDO::FETCH_OBJ)) {
-                
-                $datos = array(
-                'id_socio_fk'      => $s->getId(),
-                'mes'              => $mes,
-                'anio'             => $anio,
-                'fecha_computo'    => $anio.'-'.$mes.'-01',
-                'importe'          => $s->getCategoria()->getImporte(),
-                'cobrado'          => $cobrado
-                );
-                 $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);
-                $this->_db->query($sql);
-                } else {
-                $datos = array(
-                    'id_socio_fk'      => $s->getId(),
-                    'mes'              => $mes,
-                    'anio'             => $anio,
-                    'fecha_computo'    => $anio.'-'.$mes.'-01',
-                    'importe'          => 0,
-                    'estado'            => 'P'
-                );
-                $sql = 'INSERT INTO cuotas ' . $this->preparaInsert($datos);
-                 $this->_db->query($sql);
+            if (!$result) {
+                $datos = [
+                    'id_socio_fk' => $s->getId(),
+                    'mes' => $mes,
+                    'anio' => $anio,
+                    'fecha_computo' => "$anio-$mes-01",
+                    'importe' => $s->getCategoria()->getImporte(),
+                    'cobrado' => $cobrado,
+                ];
+                $this->_db->insert('cuotas', $datos);
+            } else {
+                $datos = [
+                    'id_socio_fk' => $s->getId(),
+                    'mes' => $mes,
+                    'anio' => $anio,
+                    'fecha_computo' => "$anio-$mes-01",
+                    'importe' => 0,
+                    'estado' => 'P',
+                ];
+                $this->_db->insert('cuotas', $datos);
             }
-        
         }
         return true;
-
-
-
     }
 
-    public function getMovimientosSocio(Socio $s, $limit = 0) {
-        $sql = '';
-        if(!$limit) {
-            $sql = "SELECT * FROM cuotas WHERE id_socio_fk=".$s->getId()." ORDER BY fecha_computo";
+    public function getMovimientosSocio(Socio $s, int $limit = 0): array {
+        if ($limit === 0) {
+            $sql = "SELECT * FROM cuotas WHERE id_socio_fk = ? ORDER BY fecha_computo";
+            return $this->_db->select($sql, [$s->getId()])->fetchAll(PDO::FETCH_OBJ);
         }
-        else {
-            $sql = "SELECT * FROM cuotas WHERE id_socio_fk=".$s->getId()." AND DAY(fecha_computo)= '01' ORDER BY fecha_computo DESC LIMIT $limit";
-        }
-        $listado = $this->_db->query($sql);
-        $result = $listado->fetchall(PDO::FETCH_OBJ);
-        return $result;
-
+        $sql = "SELECT * FROM cuotas WHERE id_socio_fk = ? AND DAY(fecha_computo) = '01' ORDER BY fecha_computo DESC LIMIT ?";
+        return $this->_db->select($sql, [$s->getId(), $limit])->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getTotales($fecha, $dire=3) {
+    public function getTotales(string $fecha, int $dire = 3): array {
         $fogon = '';
-        if($dire == 1) {
+        if ($dire == 1) {
             $fogon = " AND cuotas.cobrado = 'F'";
-        } elseif($dire == 2) {
+        } elseif ($dire == 2) {
             $fogon = " AND cuotas.cobrado = 'C'";
         }
-        $sql = "SELECT COUNT(*) as cantidad,ABS(SUM(cuotas.importe)) AS importe, categorias.nombre as cat FROM cuotas 
-                JOIN socios ON id_socio=id_socio_fk JOIN categorias ON id_categoria=id_categoria_fk WHERE 
-                fecha_computo='$fecha' $fogon GROUP BY id_categoria_fk";
-        $listado = $this->_db->query($sql);
-        return  $listado->fetchall(PDO::FETCH_OBJ);
+        $sql = "SELECT COUNT(*) as cantidad, ABS(SUM(cuotas.importe)) AS importe, categorias.nombre as cat
+                FROM cuotas JOIN socios ON id_socio = id_socio_fk
+                JOIN categorias ON id_categoria = id_categoria_fk
+                WHERE fecha_computo = ? $fogon GROUP BY id_categoria_fk";
+        return $this->_db->select($sql, [$fecha])->fetchAll(PDO::FETCH_OBJ);
     }
-
-
 }

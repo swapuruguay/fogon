@@ -4,7 +4,7 @@
 
             </aside>
         </section>
-<div class="container">
+<div class="max-w-7xl mx-auto px-4">
   <footer>Copyright &copy; 2015 <?php echo NOMBRE ?></footer>  
 </div>   
 </body>

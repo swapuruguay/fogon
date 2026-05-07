@@ -1,17 +1,12 @@
-<div class="container">
-    <form class="form-horizontal">
-        <div class="form-group">
-            <label for="fecha" class="control-label col-md-2">Fecha</label>
-            <div class="col-md-3">
-                <input type="text" name="fecha" id="fecha" class="form-control">
-            </div>
-        </div>
-        <input type="submit" id="boton" value="Consultar" name="btn" class="btn btn-primary">
-
+<div class="max-w-7xl mx-auto px-4">
+    <form class="flex flex-wrap items-center gap-3">
+        <label for="fecha" class="font-semibold">Fecha</label>
+        <input type="text" name="fecha" id="fecha" class="border border-gray-300 rounded px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <input type="submit" id="boton" value="Consultar" name="btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer">
     </form>
     <div>&nbsp;</div>
-    <div id="resultado" class="col-md-6">
-        <table id="tabla" class="table table-bordered table-condensed table-striped">
+    <div id="resultado" class="w-full overflow-x-auto">
+        <table id="tabla" class="table table-bordered table-condensed table-striped w-full">
 
         </table>
     </div>

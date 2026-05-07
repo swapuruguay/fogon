@@ -1,13 +1,14 @@
-<div class="container">
-  <div class="row">
-    <div class="col-md-6">
+<div class="max-w-7xl mx-auto px-4">
+  <div class="flex flex-wrap -mx-2">
+    <div class="w-full md:w-1/2">
       <form id="form1" action="<?php echo BASE_URL . 'socios/guardarAdelanto/0' ?>" method="POST">
+        <?php echo csrf_field(); ?>
 
-        <label class="etiquetas">Nro de Socio</label><input type="text" name='id' id='id' class="form-control" value="<?php echo $this->adelanto['id_socio_fk'] ?>">
+        <label class="etiquetas">Nro de Socio</label><input type="text" name='id' id='id' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" value="<?php echo $this->adelanto['id_socio_fk'] ?>">
         <label id="nombre" style="display: inline-block;"></label><br>
-        <label class="etiquetas">Desde</label><input type="date" name='nombre' id='desde' class="form-control" value="<?php echo $this->adelanto['desde'] ?>"><br>
-        <label class="etiquetas">Hasta</label><input type="date" name='hasta' id='hasta' class="form-control" value="<?php echo $this->adelanto['hasta'] ?>"><br>
-        <input class="btn btn-success" type="submit" value="Guardar" />
+        <label class="etiquetas">Desde</label><input type="date" name='nombre' id='desde' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" value="<?php echo $this->adelanto['desde'] ?>"><br>
+        <label class="etiquetas">Hasta</label><input type="date" name='hasta' id='hasta' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" value="<?php echo $this->adelanto['hasta'] ?>"><br>
+        <input class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" type="submit" value="Guardar" />
 
       </form>
 

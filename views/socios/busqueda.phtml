@@ -1,20 +1,20 @@
-<div class="container">
+<div class="max-w-7xl mx-auto px-4">
   <br>
     <div id="mensaje"></div>
-    <form id="form1" class="form-horizontal">
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nro de documento</label>
-        <div class="col-sm-3">
-          <input type="text" name='search' id='search' onkeypress="return soloNumeros(event);">
+    <form id="form1" class="space-y-4">
+      <div class="mb-4">
+        <label class="font-semibold">Nro de documento</label>
+        <div class="w-full md:w-1/4">
+          <input type="text" name='search' id='search' onkeypress="return soloNumeros(event);" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
       
 
-      <input type="submit" value="Buscar" class="btn btn-success" >
+      <input type="submit" value="Buscar" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" >
   </form>
 </div>
 <br><br>
-<div class="container" id="resultado"></div>
+<div class="max-w-7xl mx-auto px-4" id="resultado"></div>
 
 <script type="text/javascript">
  
@@ -30,7 +30,7 @@
     })
     let resultado = await res.json()
     console.log(resultado)
-    let html = `<table class="table"> 
+    let html = `<table class="table w-full"> 
      <tr>
        <th>Nro Socio</th>
        <th>Nombre</th>
@@ -42,13 +42,13 @@
        <td>${resultado.nombre}</td>
        <td>${resultado.documento}</td>
        <td>
-         <a href="/socios/editar/${resultado.id}" class="btn btn-primary">Editar</a>
-         <a href="/socios/confirmar/${resultado.id}" class="btn btn-danger">Eliminar</a>
+         <a href="/socios/editar/${resultado.id}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Editar</a>
+         <a href="/socios/confirmar/${resultado.id}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Eliminar</a>
        </td>
        </tr>
        </table>`
      document.getElementById('resultado').innerHTML = html
-  })
+  )
 
 
 function soloNumeros(e)

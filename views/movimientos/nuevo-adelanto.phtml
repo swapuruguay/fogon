@@ -1,21 +1,27 @@
-<div class="container">
+<div class="max-w-7xl mx-auto px-4">
 <br>
-  <div class="row">
-    <div class="col-md-6">
-      <form id="form1">
-        <label class="etiquetas">Nro de Socio</label><input type="text" name='id' id='id' class="form-control"><label id="nombre" style="display: inline-block;"></label><br>
-        <label class="etiquetas">Desde</label><input type="date" name='desde' id='desde' class="form-control"><br>
-        <label class="etiquetas">Hasta</label><input type="date" name='hasta' id='hasta' class="form-control"><br>
-        <input type="submit" value="Guardar" />
-
+  <div class="flex flex-wrap gap-4">
+    <div class="w-full max-w-md">
+      <form id="form1" class="space-y-3">
+        <div class="flex items-center gap-2">
+          <label class="etiquetas font-semibold w-32">Nro de Socio</label>
+          <input type="text" name='id' id='id' class="border border-gray-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <label id="nombre" class="font-medium"></label>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="etiquetas font-semibold w-32">Desde</label>
+          <input type="date" name='desde' id='desde' class="border border-gray-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="etiquetas font-semibold w-32">Hasta</label>
+          <input type="date" name='hasta' id='hasta' class="border border-gray-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <input type="submit" value="Guardar" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer" />
       </form>
-
     </div>
-    <div id="resultado"></div>
+    <div id="resultado" class="w-full"></div>
   </div>
-
 </div>
-
 <script>
   let form = document.getElementById('form1')
   let nombre = document.getElementById('nombre')
@@ -51,5 +57,4 @@
     form.hasta.value = ""
     form.id.focus();
   })
-
 </script>

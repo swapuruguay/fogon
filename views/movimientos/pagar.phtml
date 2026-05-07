@@ -1,36 +1,35 @@
 <p>&nbsp;</p>
-<div id="divpago" class="container">
-    <form id="form_pago" class="form-horizontal">
-        <div class="form-group">
-            <label class="control-label col-md-2">Fecha</label>
-            <div class="col-md-2">
+<div id="divpago" class="max-w-7xl mx-auto px-4">
+    <form id="form_pago" class="space-y-4">
+        <div class="mb-4">
+            <label class="font-semibold">Fecha</label>
+            <div class="w-full md:w-1/6">
 
-                <input type="date" name='fecha' id='fecha' class="form-control">
+                <input type="date" name='fecha' id='fecha' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
                  
             </div>
-            <div class="col-md-2"><a id="enlace" href="<?php echo BASE_URL. 'movimientos/getLasts/'?>" class="btn btn-info" style="pointer-events: none;">Pagos de la fecha</a></div>
+            <div class="w-full md:w-1/6"><a id="enlace" href="<?php echo BASE_URL. 'movimientos/getLasts/'?>" class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" style="pointer-events: none;">Pagos de la fecha</a></div>
         </div>
        
-        <div class="form-group">
+        <div class="mb-4">
 
-            <label class="control-label col-md-2">Nro de Socio</label>
-            <div class="col-md-1">
-                <input type="text" name='id' id='id' class="form-control">
+            <label class="font-semibold">Nro de Socio</label>
+            <div class="w-16">
+                <input type="text" name='id' id='id' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
-            <label id="nombre" name="nombre" class="control-label col-md-4">Name</label>
+            <label id="nombre" name="nombre" md:w-1/3">Name</label>
 
 
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">Importe</label>
-            <div class="col-md-2">
+        <div class="mb-4">
+            <label class="font-semibold">Importe</label>
+            <div class="w-full md:w-1/6">
 
-                <input type="text" name='importe' id='importe' class="form-control">
+                <input type="text" name='importe' id='importe' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
 
-        <input type="button" value="Guardar" class="btn btn-primary"/>
-
+        <input type="button" value="Guardar" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"/>
     </form>
     <div id="ultimos" style ="width: 100%; display: inline;" ></div>
 </div>
@@ -76,7 +75,7 @@
                 const data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
                 $.post('/movimientos/ingresarPago/P', data, function(resp) {
 
-                var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped">'
+                var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped w-full">'
                 contenido += '<tr><th>Id</th><th>Nombre</th><th>Importe</th></tr>'
                 for(var i = 0; i < resp.length; i++) {
                     contenido+= '<tr>'

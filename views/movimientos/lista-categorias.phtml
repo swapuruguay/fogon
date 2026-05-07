@@ -1,7 +1,7 @@
-<div class="container">
+<div class="max-w-7xl mx-auto px-4">
     <h2>Listado de categorías</h2>
-    <article id="formularios">
-        <table class="table table-bordered table-condensed table-striped table-responsive">
+    <article id="formularios" class="w-full">
+        <table class="table table-bordered table-condensed table-striped overflow-x-auto w-full">
             <tr>
                 <th>Nro.</th>
                 <th>Categoría</th>
@@ -19,6 +19,7 @@
                     <td><a href="<?php echo BASE_URL . 'movimientos/editarCategoria/' . $p->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' . DEFAULT_LAYOUT . '/img/edit.png' ?>"></a></td>
 
                 </tr>
+
 
             <?php endforeach; ?>
         </table>

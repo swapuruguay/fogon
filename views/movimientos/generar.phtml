@@ -1,25 +1,26 @@
 <p>&nbsp;</p>
-<div id="divpago" class="container">
+<div id="divpago" class="max-w-7xl mx-auto px-4">
     <h3 class="etiquetas">Ingrese mes y a&ntilde;o a generar</h3>
-    <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/generacuota' ?>" method="POST" class="form-horizontal">
-        <div class="form-group">
+    <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/generacuota' ?>" method="POST" class="space-y-4">
+        <?php echo csrf_field(); ?>
+        <div class="mb-4">
 
-            <label class="control-label col-md-2">Mes</label>
-            <div class="col-md-4">
+            <label class="font-semibold">Mes</label>
+            <div class="w-full md:w-1/3">
 
-                <input type="text" name='mes' id='mes' class="form-control">
+                <input type="text" name='mes' id='mes' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">A&ntilde;o</label>
-            <div class="col-md-4">
-                <input type="text" name='anio' id='anio' class="form-control">
+        <div class="mb-4">
+            <label class="font-semibold">A&ntilde;o</label>
+            <div class="w-full md:w-1/3">
+                <input type="text" name='anio' id='anio' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
 
             </div>
 
         </div>
 
-        <input type="submit" value="Generar" class="btn btn-primary"/>
+        <input type="submit" value="Generar" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"/>
 
     </form>
 

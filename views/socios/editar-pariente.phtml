@@ -1,38 +1,39 @@
-<div class="container">
-    <form id="form1" action="<?php echo BASE_URL . 'socios/guardarParientes/'?>" method="POST" class="form-horizontal">
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nro de Socio</label>
-        <div class="col-sm-3">
-          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getSocio()->getId(); ?>" readonly class="form-control"> <span><?php echo utf8_decode($this->pariente->getSocio()); ?></span>
+<div class="max-w-7xl mx-auto px-4">
+    <form id="form1" action="<?php echo BASE_URL . 'socios/guardarParientes/'?>" method="POST" class="space-y-4">
+      <?php echo csrf_field(); ?>
+      <div class="mb-4">
+        <label class="font-semibold">Nro de Socio</label>
+        <div class="w-full md:w-1/4">
+          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getSocio()->getId(); ?>" readonly class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"> <span><?php echo $this->pariente->getSocio()->getNombre() . ' ' . $this->pariente->getSocio()->getApellido(); ?></span>
         </div>
       </div>
       <input type="hidden" name="id" id="id" value="<?php echo $this->pariente->getId(); ?>">
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nombre</label>
-        <div class="col-sm-4">
-          <input type="text" name='nombre' id='nombre' value="<?php echo $this->pariente->getNombre(); ?>"  class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Nombre</label>
+        <div class="w-full md:w-1/3">
+          <input type="text" name='nombre' id='nombre' value="<?php echo $this->pariente->getNombre(); ?>"  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Apellido</label>
-        <div class="col-sm-4">
-          <input type="text" name='apellido' id='apellido' value="<?php echo $this->pariente->getApellido(); ?>"  class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Apellido</label>
+        <div class="w-full md:w-1/3">
+          <input type="text" name='apellido' id='apellido' value="<?php echo $this->pariente->getApellido(); ?>"  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Documento</label>
-        <div class="col-sm-4">
+      <div class="mb-4">
+        <label class="font-semibold">Documento</label>
+        <div class="w-full md:w-1/3">
           <label for="check">Deshabilitar para extranjero</label>
           <input type="checkbox" name="check" id="check">
-          <input type="text" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento' value="<?php echo $this->pariente->getDocumento(); ?>"  class="form-control">
+          <input type="text" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento' value="<?php echo $this->pariente->getDocumento(); ?>"  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
           <span id="alerta" style="color:red; font-weight:bold;"></span>
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Parentezco</label>
-        <div class="col-sm-4">
+      <div class="mb-4">
+        <label class="font-semibold">Parentezco</label>
+        <div class="w-full md:w-1/3">
           <select name="parentezco" id="parentezco">
             <option  value="A">--Parentezco--</option>
             <option <?php echo ($this->pariente->getParentezco() == 'C')? 'SELECTED' : '' ?> value="C">Cónyuge</option>
@@ -40,24 +41,24 @@
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Sexo</label>
-        <div class="col-sm-4">
-          <select name="sexo" class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Sexo</label>
+        <div class="w-full md:w-1/3">
+          <select name="sexo" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             <option <?php echo ($this->pariente->getSexo() == 'F')? 'SELECTED' : '' ?> value="F">Femenino</option>
             <option <?php echo ($this->pariente->getSexo() == 'M')? 'SELECTED' : '' ?>  value="M">Masculino</option>
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Nacimiento</label>
-        <div class="col-sm-3">
-          <input type="date" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('Y-m-d',  strtotime($this->pariente->getFechaNacimiento())); ?>" class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Fecha Nacimiento</label>
+        <div class="w-full md:w-1/4">
+          <input type="date" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('Y-m-d',  strtotime($this->pariente->getFechaNacimiento())); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
 
       </div>
-      <input type="submit" value="Guardar" class="btn btn-success"/>
-      <input type="button" id="btn-remove" value="Eliminar" class="btn btn-danger">
+      <input type="submit" value="Guardar" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"/>
+      <input type="button" id="btn-remove" value="Eliminar" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
   </form>
 </div>
 
@@ -79,7 +80,7 @@
  const btnRemove = document.getElementById('btn-remove')
 
 
- btnRemove.addEventListener('click', remove)
+ btnRemove.addEventListener('click', remove')
  
 frm.addEventListener('submit', async (evt) => {
   evt.preventDefault()

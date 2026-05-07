@@ -1,14 +1,14 @@
-<div class="container">
+<div class="max-w-7xl mx-auto px-4">
 <h2><?php if($this->mensaje) echo $this->mensaje; ?></h2>
 
 <p>&nbsp;</p>
 
-<a href="<?php echo BASE_URL; ?>" class="btn btn-success">Ir al Inicio</a>
-<a href="javascript:history.back(1)" class="btn btn-danger">Volver a la p&aacute;gina anterior</a>
+<a href="<?php echo BASE_URL; ?>" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Ir al Inicio</a>
+<a href="javascript:history.back(1)" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Volver a la p&aacute;gina anterior</a>
 
 <?php if(!Session::get('autenticado')): ?>
 
-<a href="<?php echo BASE_URL . 'login'; ?>" class="btn btn-primary">Iniciar Sesi&oacute;n</a>
+<a href="<?php echo BASE_URL . 'login'; ?>" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Iniciar Sesi&oacute;n</a>
 
 <?php endif; ?>
 </div>

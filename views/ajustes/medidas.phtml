@@ -1,29 +1,29 @@
 <p>&nbsp;</p>
-<div id="divpago" class="container">
+<div id="divpago" class="max-w-7xl mx-auto px-4">
     <h3 class="etiquetas">Cambio de valores para imprimir</h3>
-    <form id="form_medidas" class="form-horizontal">
-        <div class="row">
-            <div class="col-md-4"><span class="message" id="message"></span></div>
+    <form id="form_medidas" class="space-y-4">
+        <div class="flex flex-wrap -mx-2">
+            <div class="w-full md:w-1/3"><span class="message" id="message"></span></div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">Margen</label>
-            <div class="col-md-4">
-                <input type="number" name='margen' id='margen' value="<?php echo $this->margen ?>" class="form-control">
+        <div class="mb-4">
+            <label class="font-semibold">Margen</label>
+            <div class="w-full md:w-1/3">
+                <input type="number" name='margen' id='margen' value="<?php echo $this->margen ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">Espacios entre recibos</label>
-            <div class="col-md-4">
-                <input type="number" name='espacio' id='espacio' value="<?php echo $this->espacio ?>" class="form-control">
+        <div class="mb-4">
+            <label class="font-semibold">Espacios entre recibos</label>
+            <div class="w-full md:w-1/3">
+                <input type="number" name='espacio' id='espacio' value="<?php echo $this->espacio ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">Ajuste Izquierda</label> <!-- Nuevo campo -->
-            <div class="col-md-4">
-                <input type="number" name='left' id='left' value="<?php echo $this->left ?>" class="form-control">
+        <div class="mb-4">
+            <label class="font-semibold">Ajuste Izquierda</label> <!-- Nuevo campo -->
+            <div class="w-full md:w-1/3">
+                <input type="number" name='left' id='left' value="<?php echo $this->left ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
-        <input type="submit" value="Guardar" class="btn btn-primary" />
+        <input type="submit" value="Guardar" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" />
     </form>
 </div>
 <script>
