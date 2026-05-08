@@ -196,21 +196,22 @@
   async function cargarMovimientos(pagina = 1) {
     if (!tienePermisoSaldo) return;
     paginaActual = pagina;
-    el('#tabla-movimientos').innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Cargando...</td></tr>';
+    el('#tabla-movimientos').innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Cargando... (id:' + idSocio + ')</td></tr>';
     try {
       const res = await fetch('/movimientos/getMovimientosSocio', {
         method: 'POST',
         body: new URLSearchParams({
           id: idSocio,
-          limit: 0,
-          _token: csrfToken
+          limit: 0
         })
       });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       movimientosData = await res.json();
       poblarAnios();
       renderizarTabla();
     } catch (e) {
-      console.error(e);
+      console.error('Error cargarMovimientos:', e);
+      el('#tabla-movimientos').innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">Error: ' + e.message + '</td></tr>';
     }
   }
 
@@ -303,45 +304,30 @@ async function guardarPago() {
       alert('Complete todos los campos');
       return;
     }
-    await fetch('/movimientos/ingresarPago', {
-      method: 'POST',
-      body: new URLSearchParams({ id: idSocio, importe, fecha, _token: csrfToken })
-    });
-    cerrarModalPago();
-    cargarMovimientos();
-    el('#pago-importe').value = '';
+    try {
+      await fetch('/movimientos/ingresarPago', {
+        method: 'POST',
+        body: new URLSearchParams({ id: idSocio, importe, fecha })
+      });
+      cerrarModalPago();
+      cargarMovimientos();
+      el('#pago-importe').value = '';
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function eliminarMovimiento(id) {
     if (!confirm('¿Eliminar este movimiento?')) return;
-    await fetch('/movimientos/eliminar', {
-      method: 'POST',
-      body: new URLSearchParams({ id, _token: csrfToken })
-    });
-    cargarMovimientos();
-  }
-    await fetch('/movimientos/ingresarPago/P', {
-      method: 'POST',
-      body: new URLSearchParams({
-        id: idSocio,
-        importe,
-        fecha
-      })
-    });
-    cerrarModalPago();
-    cargarMovimientos();
-    el('#pago-importe').value = '';
-  }
-
-  async function eliminarMovimiento(id) {
-    if (!confirm('¿Eliminar este movimiento?')) return;
-    await fetch('/movimientos/eliminar', {
-      method: 'POST',
-      body: new URLSearchParams({
-        id
-      })
-    });
-    cargarMovimientos();
+    try {
+      await fetch('/movimientos/eliminar', {
+        method: 'POST',
+        body: new URLSearchParams({ id })
+      });
+      cargarMovimientos();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   if (tienePermisoSaldo) cargarMovimientos();
