@@ -108,146 +108,309 @@
   </form>
   <br>
   <?php if (Session::get('usuario')->perfil < 3): ?>
-    <div>
-      <a href="" id="ver" data-perfil="<?php echo Session::get('usuario')->perfil ?>">Ver Saldo >>></a>
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <h3 class="text-lg font-semibold mb-3 text-gray-700">Estado de Cuenta</h3>
+
+      <!-- Saldo Total -->
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <span class="text-sm text-gray-500">Saldo Total</span>
+          <div id="saldo-total" class="text-2xl font-bold text-gray-800">Cargando...</div>
+        </div>
+        <button type="button" onclick="abrirModalPago()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition-colors">
+          + Agregar Pago
+        </button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex gap-2 mb-4">
+        <select id="filtro-anio" onchange="cargarMovimientos()" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">Todos los años</option>
+        </select>
+        <select id="filtro-tipo" onchange="cargarMovimientos()" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">Todos los tipos</option>
+          <option value="cuota">Cuotas</option>
+          <option value="pago">Pagos</option>
+        </select>
+      </div>
+
+      <!-- Tabla de Movimientos -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 border-b">Fecha</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 border-b">Concepto</th>
+              <th class="px-4 py-2 text-right text-sm font-semibold text-gray-600 border-b">Importe</th>
+              <th class="px-4 py-2 text-center text-sm font-semibold text-gray-600 border-b">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-movimientos">
+            <tr>
+              <td colspan="4" class="px-4 py-4 text-center text-gray-500">Cargando movimientos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="flex items-center justify-between mt-4">
+        <span id="info-paginacion" class="text-sm text-gray-500"></span>
+        <div class="flex gap-1">
+          <button onclick="paginaAnterior()" id="btn-anterior" class="px-3 py-1 border rounded text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
+          <button onclick="paginaSiguiente()" id="btn-siguiente" class="px-3 py-1 border rounded text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Siguiente</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para agregar pago -->
+    <div id="modal-pago" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4">Agregar Pago</h3>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Importe</label>
+          <input type="number" id="pago-importe" step="0.01" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+          <input type="date" id="pago-fecha" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="cerrarModalPago()" class="px-4 py-2 border rounded hover:bg-gray-50">Cancelar</button>
+          <button type="button" onclick="guardarPago()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Guardar</button>
+        </div>
+      </div>
     </div>
   <?php endif ?>
-  <div id="saldos" style=" display: none; width: 30%;">
-    <div class="md:w-1/2">
-      <table id="movs" class="table table-condensed table-bordered table-striped w-full">
-
-      </table>
-      <span id='total'></span>
-    </div>
-  </div>
-
 </div>
 <script type="text/javascript">
-  $("#ver").click(function(event) {
-    event.preventDefault();
-    if ($("#saldos").css('display') === 'none') {
-      $("#saldos").css('display', 'table-cell');
-      var texto = $('#id').val()
-      $("#ver").html(' <<< Ocultar saldo ');
-      $.post('/movimientos/getSaldo', 'id=' + texto,
-        escribeMov, 'json');
+  const el = (sel) => document.querySelector(sel);
+  const tienePermisoSaldo = <?php echo Session::get('usuario')->perfil < 3 ? 'true' : 'false'; ?>;
+  const idSocio = <?php echo $this->socio->getId(); ?>;
 
+  let paginaActual = 1;
+  const porPagina = 10;
+  let movimientosData = [];
+  let aniosPoblados = false;
+
+  async function cargarMovimientos(pagina = 1) {
+    if (!tienePermisoSaldo) return;
+    paginaActual = pagina;
+    el('#tabla-movimientos').innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Cargando...</td></tr>';
+    try {
+      const res = await fetch('/movimientos/getMovimientosSocio', {
+        method: 'POST',
+        body: new URLSearchParams({
+          id: idSocio,
+          limit: 0,
+          _token: csrfToken
+        })
+      });
+      movimientosData = await res.json();
+      poblarAnios();
+      renderizarTabla();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function renderizarTabla() {
+    if (!tienePermisoSaldo) return;
+    const anio = el('#filtro-anio').value;
+    const tipo = el('#filtro-tipo').value;
+
+    let filtrado = movimientosData.filter(m => {
+      const mAnio = m.anio ? m.anio.toString() : '';
+      const mTipo = parseFloat(m.importe) >= 0 ? 'cuota' : 'pago';
+      return (!anio || mAnio === anio) && (!tipo || mTipo === tipo);
+    });
+
+    filtrado.sort((a, b) => new Date(b.fecha_iso) - new Date(a.fecha_iso));
+
+    let totalFiltrado = 0;
+    filtrado.forEach(m => totalFiltrado += parseFloat(m.importe));
+
+    const inicio = (paginaActual - 1) * porPagina;
+    const paginado = filtrado.slice(inicio, inicio + porPagina);
+
+    let html = '';
+    if (paginado.length === 0) {
+      html = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">No hay movimientos</td></tr>';
     } else {
-      $("#saldos").css('display', 'none');
-      $("#ver").html('Ver saldo >>>');
+      paginado.forEach(m => {
+        const esPago = parseFloat(m.importe) < 0;
+        const clase = esPago ? 'text-green-600' : 'text-red-600';
+        const signo = esPago ? '+' : '-';
+        const tipoLabel = esPago ? 'Pago' : 'Cuota ' + m.mes + '/' + m.anio;
+        html += '<tr class="border-b hover:bg-gray-50">';
+        html += '<td class="px-4 py-2 text-sm">' + m.fecha_computo + '</td>';
+        html += '<td class="px-4 py-2 text-sm">' + tipoLabel + '</td>';
+        html += '<td class="px-4 py-2 text-sm text-right ' + clase + '">' + signo + '$' + Math.abs(parseFloat(m.importe)).toFixed(2) + '</td>';
+        html += '<td class="px-4 py-2 text-center"><button onclick="eliminarMovimiento(' + m.id_cuota + ')" class="text-red-500 hover:text-red-700 text-sm">Eliminar</button></td>';
+        html += '</tr>';
+      });
     }
 
-  });
+    el('#tabla-movimientos').innerHTML = html;
+    el('#saldo-total').textContent = (totalFiltrado >= 0 ? '$' : '-$') + Math.abs(totalFiltrado).toFixed(2);
+    el('#saldo-total').classList.remove('text-green-600', 'text-red-600');
+    el('#saldo-total').classList.add(totalFiltrado >= 0 ? 'text-green-600' : 'text-red-600');
 
-  $("#movs").on('click', '.eliminar', function(event) {
-    event.preventDefault();
-    var id = this.id;
-    $.post('/movimientos/eliminar', 'id=' + id,
-      escribeMov, 'json');
-  });
+    const totalPaginas = Math.ceil(filtrado.length / porPagina);
+    el('#info-paginacion').textContent = 'Página ' + paginaActual + ' de ' + totalPaginas + ' (' + filtrado.length + ' registros)';
+    el('#btn-anterior').disabled = paginaActual === 1;
+    el('#btn-siguiente').disabled = paginaActual >= totalPaginas;
+  }
 
+  function poblarAnios() {
+    if (!tienePermisoSaldo) return;
+    if (aniosPoblados) return;
+    aniosPoblados = true;
+    const anios = {};
+    movimientosData.forEach(m => {
+      if (m.anio) anios[m.anio] = true;
+    });
+    let opciones = '<option value="">Todos los años</option>';
+    Object.keys(anios).sort((a, b) => b - a).forEach(a => {
+      opciones += '<option value="' + a + '">' + a + '</option>';
+    });
+    el('#filtro-anio').innerHTML = opciones;
+  }
 
+  function paginaAnterior() {
+    if (paginaActual > 1) cargarMovimientos(paginaActual - 1);
+  }
+
+  function paginaSiguiente() {
+    cargarMovimientos(paginaActual + 1);
+  }
+
+  function abrirModalPago() {
+    el('#pago-fecha').value = new Date().toISOString().split('T')[0];
+    el('#modal-pago').classList.remove('hidden');
+    el('#modal-pago').classList.add('flex');
+  }
+
+  function cerrarModalPago() {
+    el('#modal-pago').classList.remove('flex');
+    el('#modal-pago').classList.add('hidden');
+  }
+
+async function guardarPago() {
+    const importe = parseFloat(el('#pago-importe').value);
+    const fecha = el('#pago-fecha').value;
+    if (!importe || !fecha) {
+      alert('Complete todos los campos');
+      return;
+    }
+    await fetch('/movimientos/ingresarPago', {
+      method: 'POST',
+      body: new URLSearchParams({ id: idSocio, importe, fecha, _token: csrfToken })
+    });
+    cerrarModalPago();
+    cargarMovimientos();
+    el('#pago-importe').value = '';
+  }
+
+  async function eliminarMovimiento(id) {
+    if (!confirm('¿Eliminar este movimiento?')) return;
+    await fetch('/movimientos/eliminar', {
+      method: 'POST',
+      body: new URLSearchParams({ id, _token: csrfToken })
+    });
+    cargarMovimientos();
+  }
+    await fetch('/movimientos/ingresarPago/P', {
+      method: 'POST',
+      body: new URLSearchParams({
+        id: idSocio,
+        importe,
+        fecha
+      })
+    });
+    cerrarModalPago();
+    cargarMovimientos();
+    el('#pago-importe').value = '';
+  }
+
+  async function eliminarMovimiento(id) {
+    if (!confirm('¿Eliminar este movimiento?')) return;
+    await fetch('/movimientos/eliminar', {
+      method: 'POST',
+      body: new URLSearchParams({
+        id
+      })
+    });
+    cargarMovimientos();
+  }
+
+  if (tienePermisoSaldo) cargarMovimientos();
 
   function mostrarImagen(input) {
     if (input.files && input.files[0]) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $('#img-previa').attr('src', e.target.result);
-      }
+      const reader = new FileReader();
+      reader.onload = (e) => el('#img-previa').src = e.target.result;
       reader.readAsDataURL(input.files[0]);
     }
   }
 
-  $("#foto").change(function() {
-    mostrarImagen(this);
-  });
+  el('#foto').addEventListener('change', () => mostrarImagen(el('#foto')));
 
-  const frm = document.getElementById('form1')
-
+  const frm = el('#form1');
   frm.addEventListener('submit', async (evt) => {
-    evt.preventDefault()
+    evt.preventDefault();
     if (frm.apellido.value == '') {
-      alert('Debe ingresar nombre y apellido por serparado')
-      return
+      alert('Debe ingresar nombre y apellido por separado');
+      return;
     }
-    let formData = new FormData()
-    formData.append('documento', frm.documento.value)
-    let res = await fetch('/socios/getByDocumento', {
-      method: 'post',
+    const formData = new FormData();
+    formData.append('documento', frm.documento.value);
+    const res = await fetch('/socios/getByDocumento', {
+      method: 'POST',
       body: formData
-    })
-    let resultado = await res.json()
-    //console.log(resultado)
+    });
+    const resultado = await res.json();
     if (frm.documento.dataset.doc != frm.documento.value) {
       if (resultado.documento != 0) {
-        let alerta = document.getElementById('alerta')
-        alerta.innerHTML = 'Socio existente en la base de datos, revise'
-        frm.documento.focus()
-        return
+        el('#alerta').innerHTML = 'Socio existente en la base de datos, revise';
+        frm.documento.focus();
+        return;
       }
-
       if (digitoCedula(frm.documento.value)) {
-
-        frm.submit()
+        frm.submit();
       } else {
-        alert('Cédula erronea, verifique')
-        frm.documento.focus()
+        alert('Cédula erronea, verifique');
+        frm.documento.focus();
       }
     } else {
-
-      frm.submit()
+      frm.submit();
     }
-  })
+  });
 
   function digitoCedula(ci) {
-    let digitoIngresado = ci.substring(ci.length - 1)
-    let cedula = ci.substring(0, ci.length - 1)
-
-    let arrayCedula = cedula.split('')
-    if (arrayCedula.length < 6) {
-      return false
-    } else if (arrayCedula.length == 6) {
-      arrayCedula.unshift(0)
-    }
-    let testigo = [2, 9, 8, 7, 6, 3, 4]
-    let sumatoria = 0
-    for (let i in testigo) {
-      sumatoria += testigo[i] * arrayCedula[i]
-    }
-
-    let modulo = sumatoria % 10
-    if (modulo == 0) {
-      modulo = 10
-    }
-
-    return 10 - (modulo) == digitoIngresado
-
+    const digitoIngresado = ci.substring(ci.length - 1);
+    const cedula = ci.substring(0, ci.length - 1);
+    let arrayCedula = cedula.split('');
+    if (arrayCedula.length < 6) return false;
+    if (arrayCedula.length == 6) arrayCedula.unshift(0);
+    const testigo = [2, 9, 8, 7, 6, 3, 4];
+    let sumatoria = 0;
+    for (let i in testigo) sumatoria += testigo[i] * arrayCedula[i];
+    let modulo = sumatoria % 10;
+    if (modulo == 0) modulo = 10;
+    return 10 - modulo == digitoIngresado;
   }
 
   function soloNumeros(e) {
-
-    key = e.keyCode || e.which
-    //console.log(key)
-    let numeros = "0123456789"
-    let teclado = String.fromCharCode(key)
-
-    let especiales = [8, 9, 37, 39, 46]
-
-    let teclado_especial = false
-    for (let i = 0; i < especiales.length; i++) {
-      if (key == especiales[i]) {
-
-        teclado_especial = true
-      }
-    }
-
-    if (numeros.indexOf(teclado) == -1 && !teclado_especial) {
-      return false
-    }
+    const key = e.keyCode || e.which;
+    const numeros = "0123456789";
+    const teclado = String.fromCharCode(key);
+    const especiales = [8, 9, 37, 39, 46];
+    const teclado_especial = especiales.includes(key);
+    if (numeros.indexOf(teclado) == -1 && !teclado_especial) return false;
   }
 
   function quitaPuntos() {
-    let valor = document.getElementById('documento').value
-    document.getElementById('documento').value = valor.replace(/\./g, '')
+    el('#documento').value = el('#documento').value.replace(/\./g, '');
   }
 </script>

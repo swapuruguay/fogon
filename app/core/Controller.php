@@ -25,6 +25,19 @@ abstract class Controller
 
     abstract public function index(): void;
 
+    protected function requireAuth(): void
+    {
+        if (!Session::get('autenticado')) {
+            $this->redirect('login');
+        }
+    }
+
+    protected function csrfVerify(): bool
+    {
+        $token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        return Session::csrfVerify($token);
+    }
+
     protected function loadModel(string $modelo): mixed
     {
         $modeloClass = $modelo . 'Model';
@@ -112,22 +125,15 @@ abstract class Controller
         exit;
     }
 
-    protected function requireAuth(): void
-    {
-        if (!Session::get('autenticado')) {
-            $this->redirect('login');
-        }
-    }
-
     protected function cambiarfecha_mysql(string $fecha): string
     {
-        list($dia, $mes, $ano) = explode('/', $fecha);
+        [$dia, $mes, $ano] = explode('/', $fecha);
         return "$ano-$mes-$dia";
     }
 
     protected function cambiarfecha_vista(string $fecha): string
     {
-        list($anio, $mes, $dia) = explode('-', $fecha);
+        [$anio, $mes, $dia] = explode('-', $fecha);
         return "$dia/$mes/$anio";
     }
 

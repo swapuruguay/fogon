@@ -36,14 +36,13 @@ try {
 
     App\Core\Session::init();
 
-    // CSRF - pendiente: agregar csrf_field() al formulario de login
-    // if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    //     $token = $_POST['_token'] ?? '';
-    //     if (!App\Core\Session::csrfVerify($token)) {
-    //         http_response_code(419);
-    //         die('CSRF token mismatch');
-    //     }
-    // }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $token = $_POST['_token'] ?? '';
+        if (!App\Core\Session::csrfVerify($token)) {
+            http_response_code(419);
+            die('CSRF token mismatch');
+        }
+    }
 
     App\Core\Bootstrap::run(new App\Core\Request());
 } catch (Exception $exc) {

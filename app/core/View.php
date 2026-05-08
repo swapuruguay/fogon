@@ -12,7 +12,7 @@ class View
 
     public function __construct(string $controlador)
     {
-        $this->controlador = $controlador;
+        $this->controlador = strtolower($controlador);
     }
 
     public function __set(string $name, mixed $value): void

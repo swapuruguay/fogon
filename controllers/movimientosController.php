@@ -61,6 +61,20 @@ class movimientosController extends Controller {
         echo json_encode($retorno);
     }
 
+    public function getMovimientosSocio(): void {
+        $socioModel = $this->loadModel('socios');
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
+        $socio = $socioModel->getById($id);
+        $retorno = $this->_ajax->getMovimientosSocio($socio, 0);
+        foreach ($retorno as $valor) {
+            $fechaOriginal = $valor->fecha_computo;
+            $valor->fecha_computo = date('d/m/Y', strtotime($fechaOriginal));
+            $valor->fecha_iso = date('Y-m-d', strtotime($fechaOriginal));
+            $valor->anio = (int) date('Y', strtotime($fechaOriginal));
+        }
+        echo json_encode($retorno);
+    }
+
     public function pagar(): void {
         $this->requireAuth();
         $this->_view->titulo = 'Pagar';

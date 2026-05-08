@@ -3,6 +3,7 @@
     <h3 class="text-xl font-bold text-center mb-4">Ingrese mes y a&ntilde;o a imprimir</h3>
     <div id="divpago">
         <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/imprimir140' ?>" method="POST" class="max-w-lg mx-auto space-y-4">
+            <?php echo csrf_field(); ?>
 
             <div class="flex items-center gap-3">
                 <label class="font-semibold w-32">Mes</label>

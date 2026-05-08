@@ -18,6 +18,18 @@ if (!function_exists('csrf_field')) {
     }
 }
 
+if (!function_exists('csrf_meta')) {
+    function csrf_meta(): string {
+        return '<meta name="csrf-token" content="' . csrf_token() . '">';
+    }
+}
+
+if (!function_exists('csrf_js')) {
+    function csrf_js(): string {
+        return '<script>const csrfToken = "' . csrf_token() . '";</script>';
+    }
+}
+
 if (!function_exists('url')) {
     function url(string $path = ''): string {
         return rtrim(BASE_URL, '/') . '/' . ltrim($path, '/');
