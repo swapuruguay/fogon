@@ -5,76 +5,66 @@
         <div class="mb-4">
             <label class="font-semibold">Fecha</label>
             <div class="w-full md:w-1/6">
-
                 <input type="date" name='fecha' id='fecha' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
         <div class="mb-4">
-
             <label class="font-semibold">Nro de Socio</label>
             <div class="w-16">
                 <input type="text" name='id' id='id' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
-            <label id="nombre" name="nombre" md:w-1/3">Name</label>
-
-
+            <label id="nombre" name="nombre">Name</label>
         </div>
         <div class="mb-4">
             <label class="font-semibold">Importe</label>
             <div class="w-full md:w-1/6">
-
                 <input type="text" name='importe' id='importe' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
 
         <input type="submit" value="Guardar" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"/>
-
     </form>
-    <div id="ultimos" style ="width: 100%; display: inline;" ></div>
+    <div id="ultimos"></div>
 </div>
 <script>
+    const frm = document.querySelector('#form_pago');
+    const idInput = document.querySelector('#id');
+    const nombreLabel = document.querySelector('#nombre');
+    const importeInput = document.querySelector('#importe');
+    const fechaInput = document.querySelector('#fecha');
+    const ultimosDiv = document.querySelector('#ultimos');
 
-    $('#id').change(function() {
-        $.post('/socios/loadSocioAjax', 'id='+$(this).val(), function(resp) {
-            $('#nombre').html(resp.nombre)
-        }, 'json')
-    })
-    $('#form_pago').delegate('#id','keypress', function(e) {
-        if(e.keyCode == 13) {
-            $('#importe').focus();
-        }
-    })
+    idInput.addEventListener('change', async () => {
+        const resp = await fetch('/socios/loadSocioAjax', {
+            method: 'POST',
+            body: new URLSearchParams({ id: idInput.value })
+        }).then(r => r.json());
+        nombreLabel.textContent = resp.nombre;
+    });
 
-    /*$('#form_pago').delegate('#importe','keypress', function(e) {
-        if(e.keyCode == 13) {
-           hacerSubmit()
+    idInput.addEventListener('keypress', (e) => {
+        if (e.keyCode === 13) {
+            importeInput.focus();
         }
-    })*/
-   const frm = document.querySelector('#form_pago')
-    frm.addEventListener('submit', evt => {
+    });
+
+    frm.addEventListener('submit', async (evt) => {
         evt.preventDefault();
-        hacerSubmit();
-    })
-
-    function hacerSubmit() {
-         obj = $('#id');
-         $valorFecha = $('#fecha').val();
-         if($valorFecha < '1970-01-01') {
-             alert("El año tiene que ser de 4 dígitos, por favor, revise")
-             return;
-         }
-
-            let data = `id=${obj.val()}&importe=${$('#importe').val()}&fecha=${$('#fecha').val()}`;
-
-            $.post('/movimientos/ingresarPago/M', data, function(resp) {
-      
-                $("#ultimos").innerHTML = '<p>Pago guardado</p>';
-            }, 'json')
-            frm.importe.value = ""
-            frm.id.value= "";
-            obj.focus();
-    }
-
-    
-
+        if (fechaInput.value < '1970-01-01') {
+            alert("El año tiene que ser de 4 dígitos, por favor, revise");
+            return;
+        }
+        await fetch('/movimientos/ingresarPago/M', {
+            method: 'POST',
+            body: new URLSearchParams({
+                id: idInput.value,
+                importe: importeInput.value,
+                fecha: fechaInput.value
+            })
+        });
+        ultimosDiv.innerHTML = '<p>Pago guardado</p>';
+        idInput.value = '';
+        importeInput.value = '';
+        idInput.focus();
+    });
 </script>

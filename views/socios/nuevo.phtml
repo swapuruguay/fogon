@@ -184,16 +184,16 @@ function soloNumeros(e)
 }
 
 function mostrarImagen(input) {
- if (input.files && input.files[0]) {
-  var reader = new FileReader();
-  reader.onload = function (e) {
-   $('#img-previa').attr('src', e.target.result);
-  }
-  reader.readAsDataURL(input.files[0]);
- }
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      document.querySelector('#img-previa').src = e.target.result;
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
 }
- 
-$("#foto").change(function(){
- mostrarImagen(this);
+
+document.querySelector('#foto').addEventListener('change', function(){
+  mostrarImagen(this);
 });
 </script>

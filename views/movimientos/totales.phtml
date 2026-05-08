@@ -1,37 +1,31 @@
 <div class="max-w-7xl mx-auto px-4">
-    <form class="flex flex-wrap items-center gap-3">
+    <form id="form-totales" class="flex flex-wrap items-center gap-3">
         <label for="fecha" class="font-semibold">Fecha</label>
         <input type="text" name="fecha" id="fecha" class="border border-gray-300 rounded px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-400">
         <input type="submit" id="boton" value="Consultar" name="btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer">
     </form>
     <div>&nbsp;</div>
     <div id="resultado" class="w-full overflow-x-auto">
-        <table id="tabla" class="table table-bordered table-condensed table-striped w-full">
-
-        </table>
+        <table id="tabla" class="table table-bordered table-condensed table-striped w-full"></table>
     </div>
 </div>
 <script type="text/javascript">
-
-    $("#boton").click(function(evt){
+    document.querySelector('#form-totales').addEventListener('submit', async (evt) => {
         evt.preventDefault();
-        var fecha = $("#fecha").val()
-        $.post(
-            '/movimientos/getTotales',
-            'fecha='+fecha,
-            function(resp) {
-                var texto = "<tr><th class='text-center'>Categor&iacute;a</th><th class='text-center'>Cantidad</th><th class='text-center'>Importe</th></tr>\n"
-                var tot = 0
+        const fecha = document.querySelector('#fecha').value;
+        const resp = await fetch('/movimientos/getTotales', {
+            method: 'POST',
+            body: new URLSearchParams({ fecha })
+        }).then(r => r.json());
 
-                for(var i = 0; i < resp.length; i++) {
-                    tot+= parseInt(resp[i].importe)
-                    texto+= "<tr><td>"+resp[i].cat+"</td><td class='text-right'>"+resp[i].cantidad+"</td><td class='text-right'>"+resp[i].importe+"</td></tr>"
-                }
-                texto+= "<tr><td colspan=2 class='text-center'><strong>Total ===></strong> </td><td class='text-right'><strong>"+tot+"</strong></td></tr>"
-                $("#tabla").html(texto)
-            },'json'
-        )
-        console.log('ok')
+        let texto = '<tr><th class="text-center">Categoría</th><th class="text-center">Cantidad</th><th class="text-center">Importe</th></tr>';
+        let tot = 0;
+
+        resp.forEach(r => {
+            tot += parseInt(r.importe);
+            texto += `<tr><td>${r.cat}</td><td class="text-right">${r.cantidad}</td><td class="text-right">${r.importe}</td></tr>`;
+        });
+        texto += `<tr><td colspan=2 class="text-center"><strong>Total ===></strong> </td><td class="text-right"><strong>${tot}</strong></td></tr>`;
+        document.querySelector('#tabla').innerHTML = texto;
     });
-
 </script>

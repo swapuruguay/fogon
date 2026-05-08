@@ -12,7 +12,6 @@
   <link rel="stylesheet" type="text/css" href="<?php echo $_layoutParams['ruta_css'] ?>estilos.css">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="<?php echo BASE_URL . 'public/js/menu/' ?>styles.css">
-  <script type="text/javascript" src="<?php echo BASE_URL . 'public/js/jquery.js'; ?>"></script>
   <script type="text/javascript" src="<?php echo BASE_URL . 'views/layout/default/js/funciones2.js'; ?>"></script>
   <script type="text/javascript" src="<?php echo BASE_URL . 'public/js/menu/script.js'; ?>"></script>
   <script type="text/javascript" src="<?php echo BASE_URL . 'views/layout/default/js/md5.min.js' ?>"></script>
