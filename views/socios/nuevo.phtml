@@ -109,12 +109,17 @@
      alert('Debe ingresar nombre y apellido por serparado')
      return
    }
-   let formData = new FormData()
-   formData.append('documento', frm.documento.value)
-   let res = await fetch('/socios/getByDocumento', {
-     method: 'post',
-     body: formData
-   })
+let formData = new FormData()
+    formData.append('documento', frm.documento.value)
+    formData.append('_token', csrfToken)
+    let res = await fetch('/socios/getByDocumento', {
+      method: 'post',
+      credentials: 'same-origin',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: formData
+    })
    let resultado = await res.json()
    //console.log(resultado)
    if(resultado.documento != 0) {

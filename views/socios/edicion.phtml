@@ -205,8 +205,10 @@
           limit: 0
         })
       });
+      const text = await res.text();
+      console.log('Response:', text.substring(0, 200));
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      movimientosData = await res.json();
+      movimientosData = JSON.parse(text);
       poblarAnios();
       renderizarTabla();
     } catch (e) {

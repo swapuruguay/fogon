@@ -2,29 +2,34 @@
 
 require_once 'libs/Paginador.php';
 
-class sociosController extends Controller {
+class sociosController extends Controller
+{
 
     private $_pdf;
     private $_ajax;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->_ajax = $this->loadModel('socios');
         $this->getLibrary('fpdf');
         $this->_pdf = new FPDF();
     }
 
-    public function index(): void {
+    public function index(): void
+    {
         $this->requireAuth();
         $this->_view->renderizar('index');
     }
 
-    public function busqueda(): void {
+    public function busqueda(): void
+    {
         $this->requireAuth();
         $this->_view->renderizar('busqueda');
     }
 
-    public function getByDoc(): void {
+    public function getByDoc(): void
+    {
         $documento = filter_input(INPUT_POST, 'search', FILTER_VALIDATE_INT) ?: 0;
         $modelo = $this->loadModel('socios');
         $socio = $modelo->getByDocumento($documento);
@@ -39,7 +44,8 @@ class sociosController extends Controller {
         }
     }
 
-    public function listar(int $pag = 0): void {
+    public function listar(int $pag = 0): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socios = $modelo->getAll();
@@ -61,7 +67,8 @@ class sociosController extends Controller {
         $this->_view->renderizar('listar');
     }
 
-    public function nuevo(): void {
+    public function nuevo(): void
+    {
         $this->requireAuth();
         $modeloCat = $this->loadModel('categorias');
         $this->_view->categorias = $modeloCat->getAll();
@@ -69,14 +76,16 @@ class sociosController extends Controller {
         $this->_view->renderizar('nuevo');
     }
 
-    public function nuevoPariente(int $idSocio): void {
+    public function nuevoPariente(int $idSocio): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socio = $modelo->getById($idSocio);
         $this->_view->renderizar('nuevo_pariente');
     }
 
-    public function editar(int $id): void {
+    public function editar(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $modeloCat = $this->loadModel('categorias');
@@ -85,14 +94,16 @@ class sociosController extends Controller {
         $this->_view->renderizar('edicion');
     }
 
-    public function editarPariente(int $id): void {
+    public function editarPariente(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->pariente = $modelo->getParienteById($id);
         $this->_view->renderizar('editar-pariente');
     }
 
-    public function guardar(): void {
+    public function guardar(): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $modeloCat = $this->loadModel('categorias');
@@ -119,6 +130,8 @@ class sociosController extends Controller {
                 } else {
                     $socio->setFoto('socio.png');
                 }
+            } else {
+                $socio->setFoto('socio.png');
             }
             $socio->setExento(isset($_POST['exento']) ? 1 : 0);
             $ingreso = to_mysql_date((string) $_POST['fecha_ingreso']);
@@ -165,14 +178,16 @@ class sociosController extends Controller {
         $this->_view->renderizar('resultado');
     }
 
-    public function confirmar(int $id): void {
+    public function confirmar(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socio = $modelo->getById($id);
         $this->_view->renderizar('confirmar');
     }
 
-    public function eliminar(int $id): void {
+    public function eliminar(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $socio = $modelo->getById($id);
@@ -184,14 +199,16 @@ class sociosController extends Controller {
         $this->_view->renderizar('resultado');
     }
 
-    public function atrasados(): void {
+    public function atrasados(): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socios = $modelo->getAtrasados();
         $this->_view->renderizar('atrasados');
     }
 
-    public function findSocios(): void {
+    public function findSocios(): void
+    {
         $active = $_POST['active'] ?? '';
         $texto = sanitize((string) $_POST['texto']);
         if ($active === 'activo') {
@@ -205,7 +222,8 @@ class sociosController extends Controller {
         echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
     }
 
-    public function loadSocioAjax(): void {
+    public function loadSocioAjax(): void
+    {
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         if ($id) {
             $retorno = $this->_ajax->getById($id);
@@ -218,7 +236,8 @@ class sociosController extends Controller {
         }
     }
 
-    public function getByDocumento(): void {
+    public function getByDocumento(): void
+    {
         $documento = filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0;
         if ($documento) {
             $retorno = $this->_ajax->getByDocumento($documento);
@@ -236,7 +255,8 @@ class sociosController extends Controller {
         }
     }
 
-    public function getParentByDocumento(): void {
+    public function getParentByDocumento(): void
+    {
         $documento = filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0;
         if ($documento) {
             $retorno = $this->_ajax->getParentByDocumento($documento);
@@ -254,7 +274,8 @@ class sociosController extends Controller {
         }
     }
 
-    public function eliminados(int $pag = 0): void {
+    public function eliminados(int $pag = 0): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socios = $modelo->getEliminados();
@@ -276,7 +297,8 @@ class sociosController extends Controller {
         $this->_view->renderizar('eliminados');
     }
 
-    public function eliminadosAuto(): void {
+    public function eliminadosAuto(): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $modelMov = $this->loadModel('movimientos');
@@ -286,21 +308,24 @@ class sociosController extends Controller {
         $this->_view->renderizar('bajas-auto');
     }
 
-    public function listarAdelantos(): void {
+    public function listarAdelantos(): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socios = $modelo->getAdelantos();
         $this->_view->renderizar('listar-adelantos');
     }
 
-    public function activar(int $id): void {
+    public function activar(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socio = $modelo->getById($id);
         $this->_view->renderizar('activar');
     }
 
-    public function activarf(int $id): void {
+    public function activarf(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $socio = $modelo->getById($id);
@@ -312,12 +337,14 @@ class sociosController extends Controller {
         $this->_view->renderizar('resultado');
     }
 
-    public function totales(): void {
+    public function totales(): void
+    {
         $this->requireAuth();
         $this->_view->renderizar('totales');
     }
 
-    public function listarsocios(): void {
+    public function listarsocios(): void
+    {
         $this->requireAuth();
         $modelSocios = $this->loadModel('socios');
         $row = $modelSocios->getAll('apel');
@@ -408,7 +435,8 @@ class sociosController extends Controller {
         $pdf->Output();
     }
 
-    public function imprimirparientes(): void {
+    public function imprimirparientes(): void
+    {
         $this->requireAuth();
         $modelSocios = $this->loadModel('socios');
         $row = $modelSocios->getAllParents('parentezco, p.apellido, p.nombre');
@@ -479,20 +507,23 @@ class sociosController extends Controller {
         $pdf->Output();
     }
 
-    public function nuevoAdelanto(): void {
+    public function nuevoAdelanto(): void
+    {
         $this->requireAuth();
         $this->_view->titulo = 'Titulo';
         $this->_view->renderizar('nuevo-adelanto');
     }
 
-    public function editarAdelanto(int $id): void {
+    public function editarAdelanto(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->adelanto = $modelo->getAdelanto($id);
         $this->_view->renderizar('editar-adelanto');
     }
 
-    public function listarParientes(int $idSocio): void {
+    public function listarParientes(int $idSocio): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->idSocio = $idSocio;
@@ -500,7 +531,8 @@ class sociosController extends Controller {
         $this->_view->renderizar('parientes');
     }
 
-    public function guardarParientes(): void {
+    public function guardarParientes(): void
+    {
         $modelo = $this->loadModel('socios');
         if (!isset($_POST['idsoc'])) {
             return;
@@ -543,18 +575,21 @@ class sociosController extends Controller {
         }
     }
 
-    public function removePariente(): void {
+    public function removePariente(): void
+    {
         $id = sanitize((string) $_POST['id']);
         $modelo = $this->loadModel('socios');
         $modelo->removePariente($id);
         echo json_encode(['id' => $id]);
     }
 
-    private function capitalizeName(string $name): string {
+    private function capitalizeName(string $name): string
+    {
         return mb_convert_case(trim($name), MB_CASE_TITLE, "UTF-8");
     }
 
-    private function iso(string $text): string {
+    private function iso(string $text): string
+    {
         return mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
     }
 }

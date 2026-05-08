@@ -42,8 +42,8 @@ function escribirSocios(resp, tablaEl) {
     resp.forEach(s => {
         html += `<tr>
             <td>${s.id_socio}</td>
-            <td>${utf8_decode(s.nombre)}</td>
-            <td>${utf8_decode(s.apellido)}</td>
+            <td>${s.nombre}</td>
+            <td>${s.apellido}</td>
             <td><a href="/socios/editar/${s.id_socio}"><img src="/views/layout/default/img/edit.png"></a></td>
             <td><a href="/socios/confirmar/${s.id_socio}"><img src="/views/layout/default/img/delete.png"></a></td>
         </tr>`;
@@ -56,8 +56,8 @@ function escribirSociosEliminados(resp, tablaEl) {
     resp.forEach(s => {
         html += `<tr>
             <td>${s.id_socio}</td>
-            <td>${utf8_decode(s.nombre)}</td>
-            <td>${utf8_decode(s.apellido)}</td>
+            <td>${s.nombre}</td>
+            <td>${s.apellido}</td>
             <td><a href="/socios/activar/${s.id_socio}"><img src="/views/layout/default/img/active.png"></a></td>
             <td><a href="/socios/editar/${s.id_socio}"><img src="/views/layout/default/img/edit.png"></a></td>
         </tr>`;
@@ -65,33 +65,6 @@ function escribirSociosEliminados(resp, tablaEl) {
     tablaEl.innerHTML = html;
 }
 
-function utf8_decode(strData) {
-    const tmpArr = [];
-    let i = 0;
-    let c1 = 0;
-    let seqlen = 0;
-    strData += '';
-    while (i < strData.length) {
-        c1 = strData.charCodeAt(i) & 0xFF;
-        seqlen = 0;
-        if (c1 <= 0xBF) { c1 = (c1 & 0x7F); seqlen = 1; }
-        else if (c1 <= 0xDF) { c1 = (c1 & 0x1F); seqlen = 2; }
-        else if (c1 <= 0xEF) { c1 = (c1 & 0x0F); seqlen = 3; }
-        else { c1 = (c1 & 0x07); seqlen = 4; }
-        for (let ai = 1; ai < seqlen; ++ai) {
-            c1 = ((c1 << 0x06) | (strData.charCodeAt(ai + i) & 0x3F));
-        }
-        if (seqlen === 4) {
-            c1 -= 0x10000;
-            tmpArr.push(String.fromCharCode(0xD800 | ((c1 >> 10) & 0x3FF)));
-            tmpArr.push(String.fromCharCode(0xDC00 | (c1 & 0x3FF)));
-        } else {
-            tmpArr.push(String.fromCharCode(c1));
-        }
-        i += seqlen;
-    }
-    return tmpArr.join('');
-}
 
 function utf8_encode(argString) {
     if (argString === null || typeof argString === 'undefined') return '';

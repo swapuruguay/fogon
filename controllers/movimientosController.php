@@ -65,6 +65,10 @@ class movimientosController extends Controller {
         $socioModel = $this->loadModel('socios');
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $socio = $socioModel->getById($id);
+        if (!$socio) {
+            echo json_encode(['error' => 'Socio no encontrado', 'id' => $id]);
+            return;
+        }
         $retorno = $this->_ajax->getMovimientosSocio($socio, 0);
         foreach ($retorno as $valor) {
             $fechaOriginal = $valor->fecha_computo;
@@ -314,7 +318,7 @@ class movimientosController extends Controller {
         $pdf->Output();
     }
 
-    public function listarec(int $mes, int $anio, int $dire): void {
+    public function listarec(int $mes = 0, int $anio = 0, int $dire = 3): void {
         $this->requireAuth();
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');

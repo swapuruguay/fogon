@@ -36,8 +36,8 @@ try {
 
     App\Core\Session::init();
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $token = $_POST['_token'] ?? '';
+    if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'DELETE', 'PATCH'])) {
+        $token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if (!App\Core\Session::csrfVerify($token)) {
             http_response_code(419);
             die('CSRF token mismatch');

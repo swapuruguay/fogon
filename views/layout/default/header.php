@@ -33,6 +33,9 @@
       window.fetch = function(url, options = {}) {
         options.headers = options.headers || {};
         if (csrfToken && (!options.method || ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method))) {
+          if (!options.headers['X-CSRF-TOKEN']) {
+            options.headers['X-CSRF-TOKEN'] = csrfToken;
+          }
           if (options.body && typeof options.body === 'object') {
             if (options.body instanceof FormData) {
               options.body.append('_token', csrfToken);
