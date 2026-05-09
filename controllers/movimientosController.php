@@ -1,41 +1,48 @@
 <?php
 
-class movimientosController extends Controller {
+class movimientosController extends Controller
+{
 
     private $_ajax;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->_ajax = $this->loadModel('movimientos');
     }
 
-    public function index(): void {
+    public function index(): void
+    {
         $this->requireAuth();
         $this->_view->titulo = 'Movimientos';
         $this->_view->renderizar('index');
     }
 
-    public function adelantos(): void {
+    public function adelantos(): void
+    {
         $this->requireAuth();
         $this->_view->titulo = "Ingresar pagos adelantados";
         $this->_view->renderizar('nuevo-adelanto');
     }
 
-    public function categorias(): void {
+    public function categorias(): void
+    {
         $this->requireAuth();
         $modelCategorias = $this->loadModel('categorias');
         $this->_view->categorias = $modelCategorias->getAll();
         $this->_view->renderizar('lista-categorias');
     }
 
-    public function editarCategoria(int $id): void {
+    public function editarCategoria(int $id): void
+    {
         $this->requireAuth();
         $modelCategorias = $this->loadModel('categorias');
         $this->_view->categoria = $modelCategorias->getById($id);
         $this->_view->renderizar('editar-categoria');
     }
 
-    public function guardarCategoria(): void {
+    public function guardarCategoria(): void
+    {
         $modelo = $this->loadModel('categorias');
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $importe = filter_input(INPUT_POST, 'importe', FILTER_VALIDATE_FLOAT) ?: 0.0;
@@ -46,7 +53,9 @@ class movimientosController extends Controller {
         echo json_encode(['result' => $result]);
     }
 
-    public function getSaldo(): void {
+    public function getSaldo(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
         $socioModel = $this->loadModel('socios');
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $socio = $socioModel->getById($id);
@@ -58,10 +67,12 @@ class movimientosController extends Controller {
         if (!$retorno) {
             $retorno = ['fecha_computo' => '', 'importe' => 0];
         }
-        echo json_encode($retorno);
+        echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
     }
 
-    public function getMovimientosSocio(): void {
+    public function getMovimientosSocio(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
         $socioModel = $this->loadModel('socios');
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $socio = $socioModel->getById($id);
@@ -76,22 +87,25 @@ class movimientosController extends Controller {
             $valor->fecha_iso = date('Y-m-d', strtotime($fechaOriginal));
             $valor->anio = (int) date('Y', strtotime($fechaOriginal));
         }
-        echo json_encode($retorno);
+        echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
     }
 
-    public function pagar(): void {
+    public function pagar(): void
+    {
         $this->requireAuth();
         $this->_view->titulo = 'Pagar';
         $this->_view->renderizar('pagar');
     }
 
-    public function manual(): void {
+    public function manual(): void
+    {
         $this->requireAuth();
         $this->_view->titulo = 'Cobros manuales';
         $this->_view->renderizar('manual');
     }
 
-    public function getLasts(string $fecha): void {
+    public function getLasts(string $fecha): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
@@ -108,12 +122,13 @@ class movimientosController extends Controller {
         $this->_view->renderizar('lista-pagos');
     }
 
-    public function ingresarPago(string $tipo = 'S'): void {
+    public function ingresarPago(string $tipo = 'S'): void
+    {
         $mov = $this->_ajax->buildMovimiento();
         $modeloSocio = $this->loadModel('socios');
         $socioId = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $mov->setSocio($modeloSocio->getById($socioId));
-        $mov->setImporte(-(filter_input(INPUT_POST, 'importe', FILTER_VALIDATE_FLOAT) ?: 0));
+        $mov->setImporte(- (filter_input(INPUT_POST, 'importe', FILTER_VALIDATE_FLOAT) ?: 0));
         $ingreso = (string) $_POST['fecha'];
         $mes = (int) date('m', strtotime($ingreso));
         $anio = (int) date('Y', strtotime($ingreso));
@@ -139,7 +154,8 @@ class movimientosController extends Controller {
         echo json_encode($retorno);
     }
 
-    public function ingresarAdelanto(): void {
+    public function ingresarAdelanto(): void
+    {
         $adelanto = [];
         $adelanto['id'] = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $adelanto['desde'] = (string) $_POST['desde'];
@@ -148,13 +164,15 @@ class movimientosController extends Controller {
         echo json_encode(['texto' => 'Registro Ingresado']);
     }
 
-    public function getLastEmitido(): void {
+    public function getLastEmitido(): void
+    {
         $model = $this->loadModel('movimientos');
         $row = $model->lastEmision();
         echo json_encode($row);
     }
 
-    public function preprint(): void {
+    public function preprint(): void
+    {
         $this->requireAuth();
         $model = $this->loadModel('movimientos');
         $row = $model->lastEmision();
@@ -164,13 +182,15 @@ class movimientosController extends Controller {
         $this->_view->renderizar('formprint');
     }
 
-    public function choose(): void {
+    public function choose(): void
+    {
         $this->requireAuth();
         $this->_view->titulo = 'Elegir';
         $this->_view->renderizar('frmchoose');
     }
 
-    public function imprimir(): void {
+    public function imprimir(): void
+    {
         $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT) ?: 0;
         $anio = filter_input(INPUT_POST, 'anio', FILTER_VALIDATE_INT) ?: 0;
 
@@ -224,7 +244,8 @@ class movimientosController extends Controller {
         $pdf->Output();
     }
 
-    public function imprimir140(array $lista = []): void {
+    public function imprimir140(array $lista = []): void
+    {
         $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT) ?: 0;
         $anio = filter_input(INPUT_POST, 'anio', FILTER_VALIDATE_INT) ?: 0;
         $dire = filter_input(INPUT_POST, 'dire', FILTER_VALIDATE_INT) ?: 3;
@@ -318,7 +339,8 @@ class movimientosController extends Controller {
         $pdf->Output();
     }
 
-    public function listarec(int $mes = 0, int $anio = 0, int $dire = 3): void {
+    public function listarec(int $mes = 0, int $anio = 0, int $dire = 3): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
@@ -333,7 +355,8 @@ class movimientosController extends Controller {
         $pos_y = 13;
         $pdf->AddPage();
         $pdf->SetXY(20, $pos_y);
-        $pdf->Cell(0, 8, 'Listado de emission de recibos ' . $mes . '/' . $anio, 0, 0, 'C');
+        $titulo = utf8_decode('Listado de emisión de recibos ') . $mes . '/' . $anio;
+        $pdf->Cell(0, 8, $titulo, 0, 0, 'C');
         $pos_y = 25;
         $it = 0;
         for ($i = 0; $i < $paginas; $i++) {
@@ -390,17 +413,20 @@ class movimientosController extends Controller {
         $pdf->Output();
     }
 
-    private function iso(string $text): string {
+    private function iso(string $text): string
+    {
         return mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
     }
 
-    public function generar(): void {
+    public function generar(): void
+    {
         $this->requireAuth();
         $this->_view->titulo = 'Generar';
         $this->_view->renderizar('generar');
     }
 
-    public function generacuota(): void {
+    public function generacuota(): void
+    {
         $this->requireAuth();
         $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT) ?: 0;
         $anio = filter_input(INPUT_POST, 'anio', FILTER_VALIDATE_INT) ?: 0;
@@ -409,7 +435,8 @@ class movimientosController extends Controller {
         $this->_view->renderizar('generacuota');
     }
 
-    public function confirmar(int $mes, int $anio): void {
+    public function confirmar(int $mes, int $anio): void
+    {
         $this->requireAuth();
         $model = $this->loadModel('movimientos');
         $result = $model->verificarMes($mes, $anio);
@@ -435,7 +462,8 @@ class movimientosController extends Controller {
         }
     }
 
-    public function eliminar(): void {
+    public function eliminar(): void
+    {
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $mov = $this->_ajax->getById($id);
         $this->_ajax->delete($mov);
@@ -449,7 +477,8 @@ class movimientosController extends Controller {
         echo json_encode($retorno);
     }
 
-    public function eliminarPago(int $id, string $fecha): void {
+    public function eliminarPago(int $id, string $fecha): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('movimientos');
         $modelSocios = $this->loadModel('socios');
@@ -468,23 +497,27 @@ class movimientosController extends Controller {
         $this->_view->renderizar('lista-pagos');
     }
 
-    public function totales(): void {
+    public function totales(): void
+    {
         $this->requireAuth();
         $this->_view->renderizar('totales');
     }
 
-    public function getTotales(): void {
+    public function getTotales(): void
+    {
         $fecha = to_mysql_date((string) $_POST['fecha']);
         $retorno = $this->_ajax->getTotales($fecha);
         echo json_encode($retorno);
     }
 
-    private function getTotalesE(int $mes, int $anio, int $dire): string {
+    private function getTotalesE(int $mes, int $anio, int $dire): string
+    {
         $retorno = $this->_ajax->getTotales("$anio-$mes-01", $dire);
         return json_encode($retorno);
     }
 
-    public function guardarAdelanto(int $id): void {
+    public function guardarAdelanto(int $id): void
+    {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         if (!isset($_POST['idsoc'])) {
@@ -493,7 +526,8 @@ class movimientosController extends Controller {
         $this->_view->renderizar('resultado');
     }
 
-    public function prueba(): void {
+    public function prueba(): void
+    {
         $datos = json_decode((string) $_POST['datos']);
         $this->imprimir140($datos);
     }

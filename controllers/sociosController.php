@@ -34,14 +34,35 @@ class sociosController extends Controller
         $modelo = $this->loadModel('socios');
         $socio = $modelo->getByDocumento($documento);
         if ($socio) {
-            echo json_encode([
+            $data = [
                 'id' => $socio->getId(),
-                'nombre' => $socio->getNombre() . ' ' . $socio->getApellido(),
+                'nombre' => $this->fixEncoding($socio->getNombre()),
+                'apellido' => $this->fixEncoding($socio->getApellido()),
                 'documento' => $socio->getDocumento(),
-            ]);
+            ];
         } else {
-            echo json_encode(['error' => 'No encontrado']);
+            $data = ['error' => 'No encontrado'];
         }
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
+    }
+
+    private function fixEncoding(string $str): string
+    {
+        $fixes = [
+            "\xC3\x83\xC2\xB1" => "\xC3\xB1",
+            "\xC3\x83\xC2\xA1" => "\xC3\xA1",
+            "\xC3\x83\xC2\xA9" => "\xC3\xA9",
+            "\xC3\x83\xC2\xAD" => "\xC3\xAD",
+            "\xC3\x83\xC2\xB3" => "\xC3\xB3",
+            "\xC3\x83\xC2\xBA" => "\xC3\xBA",
+            "\xC3\x83\xC2\x81" => "\xC3\x81",
+            "\xC3\x83\xC2\x89" => "\xC3\x89",
+            "\xC3\x83\xC2\x8D" => "\xC3\x8D",
+            "\xC3\x83\xC2\x93" => "\xC3\x93",
+            "\xC3\x83\xC2\x9A" => "\xC3\x9A",
+        ];
+        return str_replace(array_keys($fixes), array_values($fixes), $str);
     }
 
     public function listar(int $pag = 0): void
@@ -217,20 +238,31 @@ class sociosController extends Controller
             $retorno = $this->_ajax->getByApellidoE($texto);
         }
         if (!$retorno) {
-            $retorno = ['nombre' => 'Sin', 'apellido' => 'Resultados'];
+            $retorno = [['id_socio' => 0, 'nombre' => 'Sin', 'apellido' => 'Resultados']];
+        }
+        foreach ($retorno as &$s) {
+            if (is_object($s)) {
+                $s->nombre = $this->fixEncoding($s->nombre ?? '');
+                $s->apellido = $this->fixEncoding($s->apellido ?? '');
+            } else {
+                $s['nombre'] = $this->fixEncoding($s['nombre'] ?? '');
+                $s['apellido'] = $this->fixEncoding($s['apellido'] ?? '');
+            }
         }
         echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
     }
 
     public function loadSocioAjax(): void
     {
+        header('Content-Type: application/json; charset=utf-8');
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         if ($id) {
             $retorno = $this->_ajax->getById($id);
+            $nombre = $this->fixEncoding($retorno->getNombre() . ' ' . $retorno->getApellido());
             echo json_encode([
                 'id' => $retorno->getId(),
-                'nombre' => $retorno->getNombre() . ' ' . $retorno->getApellido(),
-            ]);
+                'nombre' => $nombre,
+            ], JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(['nombre' => 'No encontrado']);
         }
@@ -238,15 +270,17 @@ class sociosController extends Controller
 
     public function getByDocumento(): void
     {
+        header('Content-Type: application/json; charset=utf-8');
         $documento = filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0;
         if ($documento) {
             $retorno = $this->_ajax->getByDocumento($documento);
             if ($retorno) {
+                $nombre = $this->fixEncoding($retorno->getNombre() . ' ' . $retorno->getApellido());
                 echo json_encode([
                     'id' => $retorno->getId(),
-                    'nombre' => $retorno->getNombre() . ' ' . $retorno->getApellido(),
+                    'nombre' => $nombre,
                     'documento' => $retorno->getDocumento(),
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
             } else {
                 echo json_encode(['documento' => 0]);
             }

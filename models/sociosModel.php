@@ -172,8 +172,10 @@ class sociosModel extends Model {
     }
 
     public function getByDocumento(int $id): ?Socio {
-        $sql = "SELECT * FROM socios WHERE documento = ?";
-        $listado = $this->_db->select($sql, [$id])->fetch(PDO::FETCH_OBJ);
+        $sql = "SELECT id_socio, nombre, apellido, documento FROM socios WHERE documento = ?";
+        $stmt = $this->_db->prepare($sql);
+        $stmt->execute([$id]);
+        $listado = $stmt->fetch(PDO::FETCH_OBJ);
         if ($listado) {
             $socio = new Socio($listado->id_socio, $listado->nombre, $listado->apellido);
             $socio->setDocumento($listado->documento);

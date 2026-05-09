@@ -17,12 +17,40 @@
   <script type="text/javascript" src="<?php echo BASE_URL . 'views/layout/default/js/md5.min.js' ?>"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    table { width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; background: #fff; }
-    table th { background: #f3f4f6; padding: 0.75em; text-align: left; font-weight: 600; border-bottom: 2px solid #e5e7eb; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em; }
-    table td { padding: 0.6em 0.75em; border-bottom: 1px solid #f3f4f6; }
-    table tbody tr:hover { background: #f9fafb; }
-    table tbody tr:nth-child(odd) { background: #fafafa; }
-    table tbody tr:nth-child(even) { background: #ffffff; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+    }
+
+    table th {
+      background: #f3f4f6;
+      padding: 0.75em;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    table td {
+      padding: 0.6em 0.75em;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    table tbody tr:nth-child(odd) {
+      background: #fafafa;
+    }
+
+    table tbody tr:nth-child(even) {
+      background: #ffffff;
+    }
   </style>
 
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -62,7 +90,7 @@
         </div>
         <div class="max-w-7xl mx-auto px-4">
           <div class="titulo">
-            <h2 style="font-family: 'Anton'; color:#1c1c63;"><?php echo NOMBRE ?></h2>
+            <h2 style="font-family: 'Anton'; color:#1c1c63; font-size: 2em;"><?php echo NOMBRE ?></h2>
           </div>
           <div class="text-right titulo">
             <h2>Bienvenid@ <?php echo Session::get('usuario')->nombre; ?></h2>

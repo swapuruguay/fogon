@@ -9,7 +9,7 @@ class Database extends PDO
 {
     private static ?Database $instance = null;
 
-    public function __construct()
+public function __construct()
     {
         $dsn = sprintf(
             'mysql:host=%s;dbname=%s;charset=utf8mb4',

@@ -38,6 +38,7 @@ async function busca(texto, tablaEl, active) {
 }
 
 function escribirSocios(resp, tablaEl) {
+
     let html = '<tr><th>Nro.</th><th>Nombre</th><th>Apellido</th><th></th><th></th></tr>';
     resp.forEach(s => {
         html += `<tr>
@@ -48,6 +49,9 @@ function escribirSocios(resp, tablaEl) {
             <td><a href="/socios/confirmar/${s.id_socio}"><img src="/views/layout/default/img/delete.png"></a></td>
         </tr>`;
     });
+    if (resp.length === 1) {
+        html = `<tr><td>${resp[0].nombre} ${resp[0].apellido}</td></tr>`
+    }
     tablaEl.innerHTML = html;
 }
 

@@ -31,23 +31,35 @@ class Categoria {
         $this->_id = $id;
     }
     
-    public function getNombre() {
-        return $this->_nombre;
+    private function fixEncoding(string $str): string {
+        $fixes = [
+            "\xC3\x83\xC2\xB1" => "\xC3\xB1",
+            "\xC3\x83\xC2\xA1" => "\xC3\xA1",
+            "\xC3\x83\xC2\xA9" => "\xC3\xA9",
+            "\xC3\x83\xC2\xAD" => "\xC3\xAD",
+            "\xC3\x83\xC2\xB3" => "\xC3\xB3",
+            "\xC3\x83\xC2\xBA" => "\xC3\xBA",
+        ];
+        return str_replace(array_keys($fixes), array_values($fixes), $str);
     }
-    
+
+    public function getNombre() {
+        return $this->fixEncoding($this->_nombre);
+    }
+
     public function setNombre($nombre) {
         $this->_nombre = $nombre;
     }
-    
+
     public function getImporte() {
         return $this->_importe;
     }
-    
+
     public function setImporte($importe) {
         $this->_importe = $importe;
     }
-    
+
     public function __toString() {
-        return $this->_nombre;
+        return $this->fixEncoding($this->_nombre);
     }
 }
