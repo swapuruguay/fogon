@@ -88,12 +88,12 @@
         <div class="titulo" style="color: #1c1c63;">
           <img src="<?php echo BASE_URL . 'public/img/logo.min.svg' ?>" style="margin: 1em; border-radius: unset; width: 100px; max-width: 100%;" alt="Encabezado" class="img-responsive img-circle">
         </div>
-        <div class="max-w-7xl mx-auto px-4">
-          <div class="titulo">
+        <div class="grid grid-rows-2 gap-3 w-full">
+          <div>
             <h2 style="font-family: 'Anton'; color:#1c1c63; font-size: 2em;"><?php echo NOMBRE ?></h2>
           </div>
-          <div class="text-right titulo">
-            <h2>Bienvenid@ <?php echo Session::get('usuario')->nombre; ?></h2>
+          <div>
+            <h2 class="text-3xl text-right mr-4">Bienvenid@ <?php echo Session::get('usuario')->nombre; ?></h2>
           </div>
         </div>
       </div>
