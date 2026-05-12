@@ -358,20 +358,26 @@ class movimientosController extends Controller
             $modelSocios = $this->loadModel('socios');
             $row = $modelo->getMes($anioPost, $mesPost, $direPost);
             $registros = count($row);
-            $paginas = $registros / 45;
+            $paginas = ceil($registros / 45); // Usamos ceil para asegurar que cubra todos
+
             $this->getLibrary('fpdf');
             $pdf = new FPDF();
             $pdf->AliasNbPages();
             $pdf->SetTopMargin(5);
             $pdf->SetFont('Arial', 'B', 14);
-            $pos_y = 13;
-            $pdf->AddPage();
-            $pdf->SetXY(20, $pos_y);
-            $titulo = utf8_decode('Listado de emisión de recibos ') . $mesPost . '/' . $anioPost;
-            $pdf->Cell(0, 8, $titulo, 0, 0, 'C');
-            $pos_y = 25;
+
             $it = 0;
             for ($i = 0; $i < $paginas; $i++) {
+                $pdf->AddPage();
+                $pos_y = 13;
+                $pdf->SetXY(20, $pos_y);
+
+                // TITULO (Tu Feature)
+                $titulo = utf8_decode('Listado de emisión de recibos ') . $mesPost . '/' . $anioPost;
+                $pdf->Cell(0, 8, $titulo, 0, 0, 'C');
+
+                // CABECERA DE TABLA
+                $pos_y = 25;
                 $pdf->SetFont('Arial', 'B', 8);
                 $pdf->SetXY(20, $pos_y);
                 $pdf->Cell(10, 4, 'Nro.', 0, 0);
@@ -383,42 +389,58 @@ class movimientosController extends Controller
                 $pdf->Cell(10, 4, 'Cat', 0, 0);
                 $pdf->SetXY(170, $pos_y);
                 $pdf->Cell(50, 4, 'Importe', 0, 0);
-                $pdf->SetFont('Arial', '', 8);
+
                 $pos_y = 28;
-                $pdf->SetY($pos_y);
+                $pdf->SetFont('Arial', '', 8);
+
+                // BUCLE DE SOCIOS (45 por página)
                 for ($j = 0; $j < 45; $j++) {
                     if (!($it < $registros)) break;
+
                     $socio = $modelSocios->getById($row[$it]->id_socio_fk);
+
+                    // LÓGICA DEL FIX (Nombres capitalizados que venía de Master)
+                    $apellidoLow = strtolower($this->iso($socio->__toString()));
+                    $apellidos = explode(' ', $apellidoLow);
+                    $apellidosCap = [];
+                    foreach ($apellidos as $a) {
+                        $apellidosCap[] = ucfirst($a);
+                    }
+                    $nombreFormateado = implode(' ', $apellidosCap);
+
                     $pdf->SetXY(20, $pos_y);
                     $pdf->Cell(10, 4, $socio->getId(), 0, 0);
                     $pdf->SetXY(30, $pos_y);
-                    $pdf->Cell(50, 4, $this->iso($socio->__toString()), 0, 0);
+                    $pdf->Cell(50, 4, $nombreFormateado, 0, 0); // Aplicamos el Fix aquí
                     $pdf->SetXY(90, $pos_y);
                     $pdf->Cell(65, 4, $this->iso($socio->getDomicilio()), 0, 0);
                     $pdf->SetXY(160, $pos_y);
                     $pdf->Cell(10, 4, $this->iso(substr($socio->getCategoria()->__toString(), 0, 1)), 0, 0);
                     $pdf->SetXY(170, $pos_y);
                     $pdf->Cell(50, 4, $row[$it]->importe, 0, 0);
+
                     $pos_y += 5;
-                    $pdf->SetY($pos_y);
                     $it++;
                 }
-                $pdf->SetY($pos_y + 10);
-                $pdf->SetFont('Arial', 'I', 8);
-                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
-                if ($pdf->PageNo() < $paginas) {
-                    $pos_y = 25;
-                    $pdf->AddPage();
+
+                // PIE DE PÁGINA O TOTALES
+                if ($it < $registros) {
+                    $pdf->SetY(280); // Ajusta según tu FPDF
+                    $pdf->SetFont('Arial', 'I', 8);
+                    $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
                 } else {
-                    $pdf->SetY($pos_y + 20);
+                    // Última página: Totales
+                    $pos_y += 10;
                     $tot = json_decode($this->getTotalesE($mesPost, $anioPost, $direPost));
                     $totales = ($tot[0]->importe ?? 0) + ($tot[1]->importe ?? 0) + ($tot[2]->importe ?? 0);
+                    $pdf->SetY($pos_y);
                     $pdf->Cell(0, 10, 'Total Activos: $' . ($tot[0]->importe ?? 0), 0, 0, 'C');
-                    $pdf->SetY($pos_y + 25);
+                    $pdf->SetY($pos_y + 5);
                     $pdf->Cell(0, 10, 'Total Cadetes: $' . ($tot[1]->importe ?? 0), 0, 0, 'C');
-                    $pdf->SetY($pos_y + 30);
+                    $pdf->SetY($pos_y + 10);
                     $pdf->Cell(0, 10, 'Total Jubilados: $' . ($tot[2]->importe ?? 0), 0, 0, 'C');
-                    $pdf->SetY($pos_y + 35);
+                    $pdf->SetY($pos_y + 15);
+                    $pdf->SetFont('Arial', 'B', 10);
                     $pdf->Cell(0, 10, 'Total General: $' . $totales, 0, 0, 'C');
                 }
             }

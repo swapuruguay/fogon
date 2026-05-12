@@ -68,27 +68,27 @@ class sociosController extends Controller
         return str_replace(array_keys($fixes), array_values($fixes), $str);
     }
 
-public function listar(int $pag = 0, string $filtro = 'all'): void
+    public function listar(int $pag = 0, string $filtro = 'all'): void
     {
         $this->requireAuth();
-        
+
         $filter = $_GET['filter'] ?? $filtro;
         $this->_view->filter = $filter;
-        
+
         $modelo = $this->loadModel('socios');
-        
+
         $allSocios = $modelo->getAll();
         $inHouse = array_filter($allSocios, fn($s) => $s->isInHouse());
         $street = array_filter($allSocios, fn($s) => !$s->isInHouse());
         $atrasados = $modelo->getAtrasados();
-        
+
         $this->_view->counts = [
             'all' => count($allSocios),
             'club' => count($inHouse),
             'street' => count($street),
             'late' => count($atrasados)
         ];
-        
+
         $sociosFiltrados = $allSocios;
         if ($filter === 'club') {
             $sociosFiltrados = $inHouse;
@@ -97,34 +97,34 @@ public function listar(int $pag = 0, string $filtro = 'all'): void
         } elseif ($filter === 'late') {
             $sociosFiltrados = $atrasados;
         }
-        
+
         $this->_view->totalSocios = count($sociosFiltrados);
-        
+
         $totalPages = (int) ceil($this->_view->totalSocios / 15);
         $this->_view->totalPages = $totalPages;
         $this->_view->currentPage = $pag + 1;
-        
+
         $desde = $pag * 15;
         $paginatedSocios = array_slice($sociosFiltrados, $desde, 15);
         $this->_view->socios = $paginatedSocios;
         $this->_view->data['socios'] = $paginatedSocios;
-        
+
         $this->_view->renderizar('listar');
     }
-    
+
     public function buscar(): void
     {
         $this->requireAuth();
         $termino = trim($_GET['q'] ?? '');
-        
+
         if (strlen($termino) < 2) {
             echo json_encode([]);
             return;
         }
-        
+
         $modelo = $this->loadModel('socios');
         $resultado = $modelo->buscar($termino);
-        
+
         echo json_encode($resultado);
     }
 
@@ -357,24 +357,24 @@ public function listar(int $pag = 0, string $filtro = 'all'): void
     {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
-        
+
         $termino = trim($_GET['q'] ?? '');
         $this->_view->searchTerm = $termino;
-        
+
         if ($termino !== '') {
             $allEliminados = $modelo->buscarEliminados($termino);
         } else {
             $allEliminados = $modelo->getEliminados();
         }
-        
+
         $totalRegistros = count($allEliminados);
         $totalPages = (int) ceil($totalRegistros / 15);
         $this->_view->totalPages = max(1, $totalPages);
         $this->_view->currentPage = $pag;
-        
+
         $desde = ($pag - 1) * 15;
         $this->_view->socios = array_slice($allEliminados, $desde, 15);
-        
+
         $this->_view->renderizar('eliminados');
     }
 
@@ -435,6 +435,7 @@ public function listar(int $pag = 0, string $filtro = 'all'): void
         $modelSocios = $this->loadModel('socios');
         $row = $modelSocios->getAll('apel');
         $parientes = $modelSocios->getByParent();
+
         $conyuges = 0;
         $varones = 0;
         $mujeres = 0;
@@ -449,21 +450,24 @@ public function listar(int $pag = 0, string $filtro = 'all'): void
                 }
             }
         }
+
         $registros = count($row);
-        $paginas = $registros / 45;
+        $paginas = ceil($registros / 45); // Usamos ceil para redondear hacia arriba
+
         $this->getLibrary('fpdf');
         $pdf = new FPDF();
         $pdf->AliasNbPages();
         $pdf->SetTopMargin(5);
         $pdf->SetFont('Arial', 'B', 14);
-        $pos_y = 13;
-        $pdf->AddPage();
-        $pdf->SetXY(20, $pos_y);
-        $pdf->Cell(0, 8, 'Listado de Socios', 0, 0, 'C');
 
-        $pos_y = 25;
         $it = 0;
         for ($i = 0; $i < $paginas; $i++) {
+            $pdf->AddPage();
+            $pos_y = 13;
+            $pdf->SetXY(20, $pos_y);
+            $pdf->Cell(0, 8, 'Listado de Socios', 0, 0, 'C');
+
+            $pos_y = 25;
             $pdf->SetFont('Arial', 'B', 10);
             $pdf->SetXY(20, $pos_y);
             $pdf->Cell(10, 4, 'Nro.', 0, 0);
@@ -476,46 +480,58 @@ public function listar(int $pag = 0, string $filtro = 'all'): void
 
             $pdf->SetFont('Arial', '', 10);
             $pos_y = 28;
-            $pdf->SetY($pos_y);
+
             for ($j = 0; $j < 45; $j++) {
                 if (!($it < $registros)) break;
+
+                // --- LÓGICA DEL FIX (Capitalización de Nombres y Apellidos) ---
+                $nombreCompleto = $this->iso($row[$it]->getApellido() . ', ' . $row[$it]->getNombre());
+                $nombreLow = strtolower($nombreCompleto);
+                $partes = explode(' ', $nombreLow);
+                $partesCap = [];
+                foreach ($partes as $p) {
+                    $partesCap[] = ucfirst($p);
+                }
+                $nombreFinal = implode(' ', $partesCap);
+                // --------------------------------------------------------------
+
                 $pdf->SetXY(20, $pos_y);
                 $pdf->Cell(10, 4, $row[$it]->getId(), 0, 0);
                 $pdf->SetXY(30, $pos_y);
-                $pdf->Cell(50, 4, $this->iso($row[$it]->getApellido() . ', ' . $row[$it]->getNombre()), 0, 0);
+                $pdf->Cell(50, 4, $nombreFinal, 0, 0); // Aplicamos el fix aquí
                 $pdf->SetXY(90, $pos_y);
                 $pdf->Cell(65, 4, $this->iso($row[$it]->getDomicilio()), 0, 0);
                 $pdf->SetXY(160, $pos_y);
                 $pdf->Cell(10, 4, $this->iso(substr($row[$it]->getCategoria()->__toString(), 0, 1)), 0, 0);
+
                 $pos_y += 5;
-                $pdf->SetY($pos_y);
                 $it++;
             }
 
-            if ($pdf->PageNo() < $paginas) {
-                $pdf->SetY($pos_y + 10);
+            // PIE DE PÁGINA O RESUMEN FINAL
+            if ($it < $registros) {
+                $pdf->SetY(280);
                 $pdf->SetFont('Arial', 'I', 8);
                 $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
-                $pos_y = 25;
-                $pdf->AddPage();
             } else {
+                // Totales finales al terminar el bucle de registros
                 $pdf->SetY($pos_y + 10);
                 $pdf->SetFont('Arial', 'B', 12);
                 $pdf->SetX(20);
                 $pdf->Cell(0, 10, 'Cantidad de socios: ' . $registros, 0, 0, 'L');
-                $pdf->SetY($pos_y + 15);
+                $pdf->SetY($pdf->GetY() + 5);
                 $pdf->SetX(20);
                 $pdf->Cell(0, 10, 'Cantidad conyuges: ' . $conyuges, 0, 0, 'L');
-                $pdf->SetY($pos_y + 20);
+                $pdf->SetY($pdf->GetY() + 5);
                 $pdf->SetX(20);
                 $pdf->Cell(0, 10, 'Cantidad hijos varones: ' . $varones, 0, 0, 'L');
-                $pdf->SetY($pos_y + 25);
+                $pdf->SetY($pdf->GetY() + 5);
                 $pdf->SetX(20);
                 $pdf->Cell(0, 10, 'Cantidad hijas: ' . $mujeres, 0, 0, 'L');
-                $pdf->SetY($pos_y + 35);
+
+                $pdf->SetY(280);
                 $pdf->SetFont('Arial', 'I', 8);
                 $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
-                $pos_y = 25;
             }
         }
         $pdf->Output();
