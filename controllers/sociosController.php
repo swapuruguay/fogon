@@ -433,7 +433,14 @@ class sociosController extends Controller
                 $pdf->SetXY(20, $pos_y);
                 $pdf->Cell(10, 4, $row[$it]->getId(), 0, 0);
                 $pdf->SetXY(30, $pos_y);
-                $pdf->Cell(50, 4, $this->iso($row[$it]->getApellido()), 0, 0);
+                $apellidoLow = strtolower($this->iso($row[$it]->getApellido()));
+                $apellidos = explode(' ', $apellidoLow);
+                $apellidosCap = [];
+                foreach ($apellidos as $a) {
+                    $apellidosCap[] = ucfirst($a);
+                }
+
+                $pdf->Cell(50, 4, implode(' ', $apellidosCap), 0, 0);
                 $pdf->SetXY(90, $pos_y);
                 $pdf->Cell(65, 4, $this->iso($row[$it]->getDomicilio()), 0, 0);
                 $pdf->SetXY(160, $pos_y);

@@ -380,10 +380,16 @@ class movimientosController extends Controller
             for ($j = 0; $j < 45; $j++) {
                 if (!($it < $registros)) break;
                 $socio = $modelSocios->getById($row[$it]->id_socio_fk);
+                $apellidoLow = strtolower($this->iso($socio->__toString()));
+                $apellidos = explode(' ', $apellidoLow);
+                $apellidosCap = [];
+                foreach ($apellidos as $a) {
+                    $apellidosCap[] = ucfirst($a);
+                }
                 $pdf->SetXY(20, $pos_y);
                 $pdf->Cell(10, 4, $socio->getId(), 0, 0);
                 $pdf->SetXY(30, $pos_y);
-                $pdf->Cell(50, 4, $this->iso($socio->__toString()), 0, 0);
+                $pdf->Cell(50, 4, implode(' ', $apellidosCap), 0, 0);
                 $pdf->SetXY(90, $pos_y);
                 $pdf->Cell(65, 4, $this->iso($socio->getDomicilio()), 0, 0);
                 $pdf->SetXY(160, $pos_y);
