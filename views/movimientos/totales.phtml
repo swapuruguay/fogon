@@ -1,42 +1,95 @@
-<div class="container">
-    <form class="form-horizontal">
-        <div class="form-group">
-            <label for="fecha" class="control-label col-md-2">Fecha</label>
-            <div class="col-md-3">
-                <input type="text" name="fecha" id="fecha" class="form-control">
-            </div>
-        </div>
-        <input type="submit" id="boton" value="Consultar" name="btn" class="btn btn-primary">
+<?php use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-8">
 
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Totales por Categoría</h1>
+    <p class="text-gray-500 text-sm mt-1">Verimporte totalizado por categoría para una fecha específica</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6 mb-6">
+    <form id="form-totales" class="flex flex-wrap items-end gap-4">
+      <div class="flex-1 min-w-[200px]">
+        <label for="fecha" class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+        <input type="date" name="fecha" id="fecha" 
+               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+               value="<?php echo date('Y-m-d'); ?>">
+      </div>
+      <button type="submit" id="boton" 
+              class="px-6 py-2.5 bg-fogon-900 text-white font-medium rounded-lg hover:bg-fogon-800 transition flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        Consultar
+      </button>
     </form>
-    <div>&nbsp;</div>
-    <div id="resultado" class="col-md-6">
-        <table id="tabla" class="table table-bordered table-condensed table-striped">
+  </div>
 
-        </table>
+  <!-- Results Table -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table id="tabla" class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoría</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Cantidad</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Importe</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body" class="divide-y divide-gray-100">
+          <tr>
+            <td colspan="3" class="px-6 py-8 text-center text-gray-500">Seleccione una fecha y presione Consultar</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
+
 </div>
+
 <script type="text/javascript">
+  document.querySelector('#form-totales').addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    const fecha = document.querySelector('#fecha').value;
+    const tbody = document.querySelector('#tabla-body');
+    tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-gray-500">Cargando...</td></tr>';
+    
+    try {
+      const resp = await fetch('<?php echo BASE_URL; ?>movimientos/getTotales', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        body: new URLSearchParams({ fecha })
+      });
+      const data = await resp.json();
 
-    $("#boton").click(function(evt){
-        evt.preventDefault();
-        var fecha = $("#fecha").val()
-        $.post(
-            '/movimientos/getTotales',
-            'fecha='+fecha,
-            function(resp) {
-                var texto = "<tr><th class='text-center'>Categor&iacute;a</th><th class='text-center'>Cantidad</th><th class='text-center'>Importe</th></tr>\n"
-                var tot = 0
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-gray-500">Sin datos para esta fecha</td></tr>';
+        return;
+      }
 
-                for(var i = 0; i < resp.length; i++) {
-                    tot+= parseInt(resp[i].importe)
-                    texto+= "<tr><td>"+resp[i].cat+"</td><td class='text-right'>"+resp[i].cantidad+"</td><td class='text-right'>"+resp[i].importe+"</td></tr>"
-                }
-                texto+= "<tr><td colspan=2 class='text-center'><strong>Total ===></strong> </td><td class='text-right'><strong>"+tot+"</strong></td></tr>"
-                $("#tabla").html(texto)
-            },'json'
-        )
-        console.log('ok')
-    });
+      let texto = '';
+      let tot = 0;
 
+      data.forEach(r => {
+        tot += parseInt(r.importe);
+        texto += `<tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm text-gray-800">${r.cat}</td>
+          <td class="px-6 py-4 text-sm text-gray-600 text-right">${r.cantidad}</td>
+          <td class="px-6 py-4 text-sm text-gray-800 text-right font-medium">$ ${parseInt(r.importe).toLocaleString('es-ES')}</td>
+        </tr>`;
+      });
+
+      texto += `<tr class="bg-gray-50">
+        <td colspan="2" class="px-6 py-4 text-sm font-bold text-gray-900 text-center">Total ===></td>
+        <td class="px-6 py-4 text-sm font-bold text-gray-900 text-right">$ ${tot.toLocaleString('es-ES')}</td>
+      </tr>`;
+
+      tbody.innerHTML = texto;
+    } catch (err) {
+      console.error(err);
+      tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-red-500">Error al cargar datos</td></tr>';
+    }
+  });
 </script>

@@ -1,49 +1,322 @@
-<div class="container">
-<h2>Listado de socios</h2>
-<article id="formularios">
-<div class="row">
+<?php use App\Core\Session; 
+$totalPages = $this->totalPages ?? 1;
+$currentPage = $this->currentPage ?? 1;
+$socios = $this->socios;
+$counts = $this->counts ?? ['all'=>0,'club'=>0,'street'=>0,'late'=>0];
+$totalSocios = $this->totalSocios ?? 0;
+$filter = $this->filter ?? 'all';
+?>
+<div class="space-y-6">
 
-  <div class="form-group">
-    <form class="form-horizontal">
-    <label class="control-label col-md-2">Buscar</label>
-    <div class="col-sm-12 col-md-3">
-      <input type="text" id="busqueda" name="busqueda" class="form-control" >
+  <!-- Page Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Directorio de Socios</h1>
+      <p class="text-gray-500 text-sm mt-1"><?php echo $totalSocios; ?> socios registrados</p>
+    </div>
+    <div class="flex items-center space-x-3">
+      <a href="<?php echo BASE_URL . 'socios/nuevo'; ?>" 
+         class="inline-flex items-center px-4 py-2 bg-fogon-900 text-white rounded-lg hover:bg-fogon-800 transition">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Nuevo Socio
+      </a>
     </div>
   </div>
-</form>
+
+  <?php
+$msg = $_GET['mensaje'] ?? null;
+$error = $_GET['error'] ?? null;
+?>
+<?php if ($msg === 'eliminado'): ?>
+<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+  </svg>
+  Socio eliminado correctamente
 </div>
-<br>
-<div class="row">
-  <div class="col-sm-12 col-md-6">
-    <table id="tabla" class="table table-striped table-condensed table-bordered">
-      <tr>
-          <th>Nro.</th><th>Nombre</th><th>Apellido</th><th></th><th></th>
-      </tr>
-      <?php $contador = 1; ?>
-      <?php foreach($this->socios as $soc): ?>
-        <tr>
-          <td><?php echo $soc->getId(); ?></td>
-          <td><?php echo utf8_decode($soc->getNombre()); ?></td>
-          <td><?php echo utf8_decode($soc->getApellido()); ?></td>
-          <td><a href="<?php echo BASE_URL . 'socios/editar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
-          <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
+<?php elseif ($error === 'noeliminado'): ?>
+<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+  </svg>
+  No se pudo eliminar el socio
+</div>
+<?php endif; ?>
+
+  <!-- Filter Tabs -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="border-b border-gray-200">
+      <nav class="flex -mb-px" aria-label="Tabs">
+        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=all'; ?>" 
+           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'all' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
+           data-tab="all">
+          Todos
+          <span class="ml-2 px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600"><?php echo $counts['all']; ?></span>
+        </a>
+        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=club'; ?>" 
+           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'club' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
+           data-tab="club">
+          <span class="flex items-center">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+            En el Club
+          </span>
+          <span class="ml-2 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700"><?php echo $counts['club']; ?></span>
+        </a>
+        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=street'; ?>" 
+           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'street' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
+           data-tab="street">
+          <span class="flex items-center">
+            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+            En Calle
+          </span>
+          <span class="ml-2 px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700"><?php echo $counts['street']; ?></span>
+        </a>
+        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=late'; ?>" 
+           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'late' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
+           data-tab="late">
+          <span class="flex items-center">
+            <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+            Atrasados
+          </span>
+          <span class="ml-2 px-2 py-0.5 rounded-full text-xs bg-red-50 text-red-700"><?php echo $counts['late']; ?></span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="p-4 bg-gray-50 border-b border-gray-100">
+      <div class="relative max-w-md">
+        <input type="text" 
+               id="searchSocios" 
+               placeholder="#ID, documento o nombre..." 
+               class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-fogon-500 focus:border-transparent"
+               onkeyup="handleSearch(this.value)"
+               autocomplete="off">
+        <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      <p class="mt-1 text-xs text-gray-400">Usa #105 para ID, 1.234.567-8 para documento, o nombre para buscar</p>
+      <div id="searchResults" class="mt-2 hidden"></div>
+    </div>
+
+    <!-- Members List -->
+    <div id="sociosList" class="divide-y divide-gray-100">
       
-          <?php $contador++; ?>
-        </tr>
-      <?php endforeach; ?>
-    </table>
-  </div>
-</div>
-    </article>
-  </div>
-<br>
-<div style="text-align: center; width:60%; margin:0 auto; display: block;">
-<ul id="pagination-digg">
-<?php foreach($this->enlaces as $enlace) : ?>
-    <?php echo $enlace; ?>
-<?php endforeach; ?>
+      <?php if (!empty($socios)): ?>
+        <?php foreach ($socios as $socio): ?>
+          
+          <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition member-row" 
+               data-collection-type="<?php echo $socio->getCollectionType(); ?>"
+               data-name="<?php echo strtolower($socio->getNombre() . ' ' . $socio->getApellido()); ?>"
+               data-doc="<?php echo $socio->getDocumento(); ?>">
 
+            <!-- Left: Photo + Name + Document (clickable) -->
+            <a href="<?php echo BASE_URL . 'socios/editar/' . $socio->getId(); ?>" class="flex items-center space-x-4 flex-1 min-w-0 hover:opacity-80 transition">
+              <div class="flex-shrink-0">
+                <img src="<?php echo BASE_URL . 'views/socios/img/' . ($socio->getFoto() ?: 'socio.png'); ?>" 
+                     class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold text-gray-900 truncate"><?php echo $socio; ?></p>
+                <div class="flex items-center space-x-4 mt-1">
+                  <span class="text-xs text-gray-400 font-mono">#<?php echo $socio->getId(); ?></span>
+                  <?php 
+                  $doc = $socio->getDocumento() ?: '0';
+                  $len = strlen((string)$doc);
+                  if ($len >= 6) {
+                      $check = substr((string)$doc, -1);
+                      $main = substr((string)$doc, 0, -1);
+                      echo '<span class="text-sm text-gray-500 font-mono">Doc: ' . number_format($main, 0, '', '.') . '-' . $check . '</span>';
+                  }
+                  ?>
+                </div>
+              </div>
+            </a>
 
-</ul>
+            <!-- Collection Type Badge -->
+            <div class="px-4">
+              <?php if ($socio->isInHouse()): ?>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  En el Club
+                </span>
+              <?php else: ?>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  En Calle
+                </span>
+              <?php endif; ?>
+            </div>
+
+            <!-- Category + Status -->
+            <div class="hidden md:flex items-center space-x-6">
+              <div class="text-right">
+                <p class="text-sm font-medium text-gray-800"><?php echo $socio->getCategoria() ? $socio->getCategoria()->getNombre() : 'Sin categoría'; ?></p>
+                <p class="text-xs text-gray-500">$ <?php echo number_format($socio->getCategoria() ? $socio->getCategoria()->getImporte() : 0, 2, ',', '.'); ?></p>
+              </div>
+              <div class="text-right">
+                <?php 
+                $saldo = $socio->getSaldo() ?? 0;
+                if ($saldo <= 0): 
+                ?>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Al día</span>
+                <?php elseif ($saldo > 0): ?>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Debe</span>
+                <?php endif; ?>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center space-x-2">
+              <?php if ($socio->isInHouse()): ?>
+                <button onclick="registrarPago(<?php echo $socio->getId(); ?>)" 
+                        class="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Registrar Pago">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </button>
+              <?php else: ?>
+                <span class="p-2 text-blue-400 cursor-default" title="Socio en calle - recibo con cobrador">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </span>
+              <?php endif; ?>
+            </div>
+
+          </div>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div class="p-8 text-center text-gray-500">
+          <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <p>No se encontraron socios</p>
+        </div>
+      <?php endif; ?>
+
+    </div>
+
+    <!-- Pagination -->
+    <?php if (!empty($socios) && $totalPages > 1): ?>
+      <div class="p-4 bg-gray-50 border-t border-gray-100">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">
+            Mostrando <?php echo $currentPage; ?> de <?php echo $totalPages; ?>
+          </p>
+          <div class="flex items-center space-x-1">
+            <?php if ($currentPage > 1): ?>
+              <a href="<?php echo BASE_URL . 'socios/listar/' . ($currentPage - 1) . '?filter=' . $filter; ?>" 
+                 class="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm font-medium transition">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Anterior
+              </a>
+            <?php endif; ?>
+            <?php 
+            $start = max(1, $currentPage - 2);
+            $end = min($totalPages, $currentPage + 2);
+            for ($i = $start; $i <= $end; $i++): 
+            ?>
+              <a href="<?php echo BASE_URL . 'socios/listar/' . $i . '?filter=' . $filter; ?>" 
+                 class="w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-medium transition <?php echo ($i === $currentPage) ? 'bg-fogon-900 text-white border-fogon-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'; ?>">
+                <?php echo $i; ?>
+              </a>
+            <?php endfor; ?>
+            <?php if ($currentPage < $totalPages): ?>
+              <a href="<?php echo BASE_URL . 'socios/listar/' . ($currentPage + 1) . '?filter=' . $filter; ?>" 
+                 class="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm font-medium transition">
+                Siguiente
+                <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </a>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
+
+  </div>
+
 </div>
-<br><br>
+
+<script>
+let searchTimeout = null;
+
+function handleSearch(value) {
+    clearTimeout(searchTimeout);
+    
+    if (value.length < 2) {
+        document.getElementById('searchResults').classList.add('hidden');
+        document.querySelectorAll('.member-row').forEach(row => row.style.display = '');
+        return;
+    }
+    
+    searchTimeout = setTimeout(async () => {
+        const resultsDiv = document.getElementById('searchResults');
+        
+        try {
+            const resp = await fetch('<?php echo BASE_URL; ?>socios/buscar?q=' + encodeURIComponent(value), {
+                credentials: 'same-origin'
+            });
+            const socios = await resp.json();
+            
+            if (socios.length === 0) {
+                resultsDiv.innerHTML = '<div class="p-2 text-gray-500 text-sm">No se encontraron socios</div>';
+                resultsDiv.classList.remove('hidden');
+                document.querySelectorAll('.member-row').forEach(row => row.style.display = 'none');
+                return;
+            }
+            
+            let html = '<div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">';
+            socios.forEach(s => {
+                const badge = s.domicilio && (s.domicilio.toLowerCase().includes('fog')) 
+                    ? '<span class="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800">En el Club</span>'
+                    : '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">En Calle</span>';
+                const nombreCompleto = s.nombre + ' ' + s.apellido;
+                const docFormatted = s.documento && s.documento.length >= 6 
+                    ? (s.documento.slice(0, -1).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + '-' + s.documento.slice(-1))
+                    : '';
+                html += `<div class="flex items-center justify-between p-3 border-b border-gray-100 hover:bg-gray-50">
+                    <div class="flex items-center space-x-3">
+                        <img src="<?php echo BASE_URL; ?>views/socios/img/${s.foto || 'socio.png'}" class="w-10 h-10 rounded-full object-cover">
+                        <div>
+                            <p class="font-medium text-gray-900">${nombreCompleto}</p>
+                            <div class="flex items-center space-x-3 mt-0.5">
+                                <span class="text-xs text-gray-400 font-mono">#${s.id_socio}</span>
+                                ${docFormatted ? `<span class="text-xs text-gray-500 font-mono">Doc: ${docFormatted}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        ${badge}
+                        <a href="<?php echo BASE_URL; ?>socios/editar/${s.id_socio}" class="px-3 py-1 bg-fogon-900 text-white text-sm rounded hover:bg-fogon-800">Editar</a>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.remove('hidden');
+            
+            document.querySelectorAll('.member-row').forEach(row => row.style.display = 'none');
+            
+        } catch (err) {
+            console.error('Search error:', err);
+        }
+    }, 300);
+}
+
+function filterSocios(filter) {
+    window.location.href = '<?php echo BASE_URL . 'socios/listar/1?filter='; ?>' + filter;
+}
+</script>

@@ -1,97 +1,206 @@
-<p>&nbsp;</p>
-<div id="divpago" class="container">
-    <form id="form_pago" class="form-horizontal">
-        <div class="form-group">
-            <label class="control-label col-md-2">Fecha</label>
-            <div class="col-md-2">
+<?php use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-8">
+  
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Registrar Pago</h1>
+    <p class="text-gray-500 text-sm mt-1">Ingreso de pagos de cuotas en el club</p>
+  </div>
 
-                <input type="date" name='fecha' id='fecha' class="form-control">
-                 
-            </div>
-            <div class="col-md-2"><a id="enlace" href="<?php echo BASE_URL. 'movimientos/getLasts/'?>" class="btn btn-info" style="pointer-events: none;">Pagos de la fecha</a></div>
-        </div>
-       
-        <div class="form-group">
-
-            <label class="control-label col-md-2">Nro de Socio</label>
-            <div class="col-md-1">
-                <input type="text" name='id' id='id' class="form-control">
-            </div>
-            <label id="nombre" name="nombre" class="control-label col-md-4">Name</label>
-
-
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">Importe</label>
-            <div class="col-md-2">
-
-                <input type="text" name='importe' id='importe' class="form-control">
-            </div>
-        </div>
-
-        <input type="button" value="Guardar" class="btn btn-primary"/>
-
-    </form>
-    <div id="ultimos" style ="width: 100%; display: inline;" ></div>
-</div>
-<script>
-    
-    $enlace = document.querySelector("#enlace")
-    $date = document.querySelector("#fecha")
-    
-    $date.addEventListener('change', evt => {
-       if(evt.target.value) {
-           $enlace.style.pointerEvents = 'auto'
-       }
-    })
-    
-    $enlace.addEventListener('click', evt => {
-        evt.preventDefault();
-        const frm = document.querySelector("#form_pago");
-        let url = $enlace.href;
-        url+= frm.fecha.value;
-        window.location.href = url
+  <!-- Payment Form Card -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <h2 class="font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        Datos del Pago
+      </h2>
+    </div>
+    <div class="p-6">
+      <form id="form_pago" class="space-y-6">
+        <?php echo csrf_field(); ?>
         
-    })
+        <!-- Fecha + Referencia -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Pago</label>
+            <input type="date" name='fecha' id='fecha'
+                   value="<?php echo date('Y-m-d'); ?>"
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Referencia</label>
+            <a id="enlace" href="<?php echo BASE_URL . 'movimientos/getLasts/'; ?>"
+               class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Ver pagos de la fecha
+            </a>
+          </div>
+        </div>
+
+        <!-- Socio + Importe -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Nro de Socio</label>
+            <div class="flex items-center space-x-3">
+              <input type="text" name='id' id='id'
+                     class="border border-gray-300 rounded-lg px-4 py-2.5 w-24 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500 text-center font-semibold text-lg">
+              <span id="nombre" class="text-gray-800 font-medium">-</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Importe ($)</label>
+            <input type="number" step="0.01" name='importe' id='importe'
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                   placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center space-x-4">
+          <button type="button" id="btn-guardar"
+                  class="px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Guardar Pago
+          </button>
+          <span id="status" class="text-sm text-gray-500"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Recent Payments -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <h2 class="font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        Últimos Pagos
+      </h2>
+    </div>
+    <div id="ultimos" class="p-6">
+      <p class="text-gray-500 text-center py-4">Sin pagos registrados aún</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const enlace = document.querySelector('#enlace');
+const fecha = document.querySelector('#fecha');
+const idInput = document.querySelector('#id');
+const nombreLabel = document.querySelector('#nombre');
+const importeInput = document.querySelector('#importe');
+const ultimosDiv = document.querySelector('#ultimos');
+const statusSpan = document.querySelector('#status');
+const btnGuardar = document.querySelector('#btn-guardar');
+
+const BASE_URL = '<?php echo rtrim(BASE_URL, '/'); ?>';
+
+fecha.addEventListener('change', () => {
+    // No actualiza el href, solo guarda la fecha para el click
+});
+
+enlace.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    if (fecha.value) {
+        window.location.href = BASE_URL + '/movimientos/getLasts/' + fecha.value;
+    }
+});
+
+idInput.addEventListener('change', async () => {
+    if (!idInput.value) return;
     
+    try {
+        const resp = await fetch(BASE_URL + '/socios/loadSocioAjax', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: new URLSearchParams({ id: idInput.value })
+        });
+        const data = await resp.json();
+        nombreLabel.textContent = data.nombre || 'No encontrado';
+    } catch (err) {
+        nombreLabel.textContent = 'Error';
+        console.error(err);
+    }
+});
 
-    $('#id').change(function() {
-        $.post('/socios/loadSocioAjax', `id=${$(this).val()}`, function(resp) {
-            $('#nombre').html(resp.nombre)
-        }, 'json')
-    })
-    $('#form_pago').delegate('#id','keypress', function(e) {
-        if(e.keyCode == 13) {
-            $('#importe').focus();
-        }
-    })
+idInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        importeInput.focus();
+    }
+});
 
-    $('#form_pago').delegate('#importe','keypress', function(e) {
-        if(e.keyCode == 13) {
-            obj = $('#id');
-            if($date.value < '1970-01-01') {
-                alert("El año debe ser de 4 dígitos, por favor revise")
-                return;
-            }
-                const data = 'id='+obj.val()+'&importe='+$('#importe').val()+'&fecha='+$('#fecha').val();
-                $.post('/movimientos/ingresarPago/P', data, function(resp) {
+async function guardarPago() {
+    if (!idInput.value || !importeInput.value || !fecha.value) {
+        statusSpan.textContent = 'Complete todos los campos';
+        statusSpan.className = 'text-sm text-red-500';
+        return;
+    }
 
-                var contenido = '<p>&nbsp;</p><table class="table table-bordered table-condensed table-striped">'
-                contenido += '<tr><th>Id</th><th>Nombre</th><th>Importe</th></tr>'
-                for(var i = 0; i < resp.length; i++) {
-                    contenido+= '<tr>'
-
-                    contenido += '<td>'+ resp[i].id+'</td><td>'+resp[i].nombre+'</td><td>'+resp[i].importe+'</td></tr>'
-                }
-                contenido += '</table>'
-                $("#ultimos").html('<p></p>');
-                $("#ultimos").append(contenido);
-            }, 'json')
+    try {
+        const resp = await fetch(BASE_URL + '/movimientos/ingresarPago/P', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: new URLSearchParams({
+                id: idInput.value,
+                importe: importeInput.value,
+                fecha: fecha.value
+            })
+        });
+        
+        const data = await resp.json();
+        
+        if (Array.isArray(data)) {
+            let contenido = '<div class="overflow-x-auto">';
+            contenido += '<table class="w-full text-sm">';
+            contenido += '<thead><tr class="bg-gray-50"><th class="px-4 py-2 text-left">Id</th><th class="px-4 py-2 text-left">Nombre</th><th class="px-4 py-2 text-right">Importe</th></tr></thead>';
+            contenido += '<tbody>';
+            data.forEach(p => {
+                contenido += `<tr class="border-b border-gray-100"><td class="px-4 py-2">${p.id}</td><td class="px-4 py-2">${p.nombre}</td><td class="px-4 py-2 text-right">$ ${parseFloat(p.importe).toFixed(2)}</td></tr>`;
+            });
+            contenido += '</tbody></table></div>';
+            ultimosDiv.innerHTML = contenido;
             
-            obj.val('');
-            obj.focus();
+            statusSpan.textContent = `${data.length} pago(s) registrado(s)`;
+            statusSpan.className = 'text-sm text-green-600';
+            
+            idInput.value = '';
+            importeInput.value = '';
+            nombreLabel.textContent = '-';
+            idInput.focus();
+        } else {
+            statusSpan.textContent = 'Error al guardar';
+            statusSpan.className = 'text-sm text-red-500';
         }
-    })
+    } catch (err) {
+        statusSpan.textContent = 'Error de conexión';
+        statusSpan.className = 'text-sm text-red-500';
+        console.error(err);
+    }
+}
 
+btnGuardar.addEventListener('click', guardarPago);
 
+importeInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        guardarPago();
+    }
+});
 </script>

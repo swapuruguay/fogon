@@ -1,33 +1,35 @@
 <p>&nbsp;</p>
-<div id="divpago" class="container">
+<div id="divpago" class="max-w-7xl mx-auto px-4">
+    <?php use App\Core\Session; ?>
     <h3 class="etiquetas">Cambio de constraseña</h3>
-    <form id="form_password" class="form-horizontal">
-        <div class="form-group">
+    <form id="form_password" class="space-y-4">
+        <?php echo csrf_field(); ?>
+        <div class="mb-4">
 
-            <label class="control-label col-md-2">Password actual</label>
-            <div class="col-md-4">
+            <label class="font-semibold">Password actual</label>
+            <div class="w-full md:w-1/3">
 
-                <input data-hash="<?php echo Session::get('usuario')->password ?>" type="password" data-id = "<?php echo Session::get('usuario')->idusuario ?>" name='actual' id='actual' class="form-control">
+                <input data-hash="<?php echo Session::get('usuario')->password ?>" type="password" data-id = "<?php echo Session::get('usuario')->idusuario ?>" name='actual' id='actual' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">Nueva contraseña</label>
-            <div class="col-md-4">
-                <input type="password" name='nuevo' id='nuevo' class="form-control">
-
-            </div>
-
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">Repita contraseña</label>
-            <div class="col-md-4">
-                <input type="password" name='repetir' id='repetir' class="form-control">
+        <div class="mb-4">
+            <label class="font-semibold">Nueva contraseña</label>
+            <div class="w-full md:w-1/3">
+                <input type="password" name='nuevo' id='nuevo' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
 
             </div>
 
         </div>
+        <div class="mb-4">
+            <label class="font-semibold">Repita contraseña</label>
+            <div class="w-full md:w-1/3">
+                <input type="password" name='repetir' id='repetir' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
 
-        <input type="submit" value="Cambiar" class="btn btn-info"/>
+            </div>
+
+        </div>
+
+        <input type="submit" value="Cambiar" class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"/>
 
     </form>
 

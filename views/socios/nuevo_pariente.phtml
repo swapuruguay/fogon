@@ -1,39 +1,40 @@
-<div class="container">
+<div class="max-w-7xl mx-auto px-4">
     <div id="mensaje"></div>
-    <form id="form1"  method="POST" class="form-horizontal" enctype="multipart/form-data">
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nro de Socio</label>
-        <div class="col-sm-3">
-          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->socio->getId(); ?>" readonly class="form-control"> <span><?php echo $this->socio; ?></span>
+    <form id="form1"  method="POST" class="space-y-4" enctype="multipart/form-data">
+      <?php echo csrf_field(); ?>
+      <div class="mb-4">
+        <label class="font-semibold">Nro de Socio</label>
+        <div class="w-full md:w-1/4">
+          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->socio->getId(); ?>" readonly class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"> <span><?php echo $this->socio; ?></span>
         </div>
       </div>
       <input type="hidden" name="id" id="id" value=0>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nombre</label>
-        <div class="col-sm-4">
-          <input type="text" name='nombre' id='nombre' required  class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Nombre</label>
+        <div class="w-full md:w-1/3">
+          <input type="text" name='nombre' id='nombre' required  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Apellido</label>
-        <div class="col-sm-4">
-          <input type="text" name='apellido' id='apellido' required class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Apellido</label>
+        <div class="w-full md:w-1/3">
+          <input type="text" name='apellido' id='apellido' required class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Documento</label>
-        <div class="col-sm-4">
+      <div class="mb-4">
+        <label class="font-semibold">Documento</label>
+        <div class="w-full md:w-1/3">
           <label for="check">Deshabilitar para extranjero</label>
           <input type="checkbox" name="check" id="check">
-          <input type="text" required onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control">
+          <input type="text" required onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
           <span id="alerta" style="color:red; font-weight:bold;"></span>
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Parentezco</label>
-        <div class="col-sm-4">
+      <div class="mb-4">
+        <label class="font-semibold">Parentezco</label>
+        <div class="w-full md:w-1/3">
           <select name="parentezco" id="parentezco">
             <option value="a">--Parentezco--</option>
             <option value="c">Cónyuge</option>
@@ -41,24 +42,24 @@
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Sexo</label>
-        <div class="col-sm-4">
-          <select name="sexo" class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Sexo</label>
+        <div class="w-full md:w-1/3">
+          <select name="sexo" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
             <option value="A">--SEXO--</option>
             <option value="F">Femenino</option>
             <option value="M">Masculino</option>
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Nacimiento</label>
-        <div class="col-sm-3">
-          <input type="date" name='fecha_nacimiento' required id='fecha_nacimiento' class="form-control">
+      <div class="mb-4">
+        <label class="font-semibold">Fecha Nacimiento</label>
+        <div class="w-full md:w-1/4">
+          <input type="date" name='fecha_nacimiento' required id='fecha_nacimiento' class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
 
       </div>
-      <input type="submit" value="Guardar" class="btn btn-success"/>
+      <input type="submit" value="Guardar" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"/>
   </form>
 </div>
 

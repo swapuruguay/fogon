@@ -44,7 +44,22 @@ class Socio {
     }
 
     public function getNombre() {
-        return $this->_nombre;
+        return $this->fixEncoding($this->_nombre);
+    }
+
+    private function fixEncoding(?string $str): string {
+        if ($str === null) {
+            return '';
+        }
+        $fixes = [
+            "\xC3\x83\xC2\xB1" => "\xC3\xB1",
+            "\xC3\x83\xC2\xA1" => "\xC3\xA1",
+            "\xC3\x83\xC2\xA9" => "\xC3\xA9",
+            "\xC3\x83\xC2\xAD" => "\xC3\xAD",
+            "\xC3\x83\xC2\xB3" => "\xC3\xB3",
+            "\xC3\x83\xC2\xBA" => "\xC3\xBA",
+        ];
+        return str_replace(array_keys($fixes), array_values($fixes), $str);
     }
 
     public function setNombre($nombre) {
@@ -52,7 +67,7 @@ class Socio {
     }
 
     public function getApellido() {
-        return $this->_apellido;
+        return $this->fixEncoding($this->_apellido);
     }
 
     public function setApellido($apellido) {
@@ -68,7 +83,7 @@ class Socio {
     }
 
     public  function getDomicilio() {
-        return $this->_domicilio;
+        return $this->fixEncoding($this->_domicilio);
     }
 
     public function setDomicilio($domicilio) {
@@ -149,5 +164,18 @@ class Socio {
 
     public function __toString() {
         return $this->_nombre . ' ' . $this->_apellido;
+    }
+
+    public function isInHouse(): bool {
+        $domicilio = strtolower(trim($this->_domicilio ?? ''));
+        return $domicilio === 'el fogon' || $domicilio === 'el fogón' || $domicilio === 'fogon';
+    }
+
+    public function getCollectionType(): string {
+        return $this->isInHouse() ? 'in_house' : 'street';
+    }
+
+    public function getCollectionTypeLabel(): string {
+        return $this->isInHouse() ? 'En el Club' : 'En Calle';
     }
 }

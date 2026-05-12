@@ -1,27 +1,74 @@
-<div class="container">
-<h2>Recibos pasados del <?php echo $this->fecha ?></h2>
-<article id="formularios">
-<table class="table table-bordered table-condensed table-striped table-responsive">
-    <tr>
-        <th>Nro.</th><th>Nombre</th><th>Apellido</th><th>Importe</th><th></th>
-    </tr>
-    <?php foreach($this->pagos as $p): ?>
-        
+<?php use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-4">
 
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center space-x-4">
+      <h1 class="text-xl font-bold text-gray-900">Pagos del <?php echo $this->fecha; ?></h1>
+      <span class="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"><?php echo count($this->pagos); ?></span>
+    </div>
+    <a href="<?php echo BASE_URL . 'movimientos/pagar'; ?>" 
+       class="px-3 py-1.5 text-gray-600 hover:text-gray-800 transition text-sm">
+      ← Volver
+    </a>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-3">
+    <input type="text" id="buscar" placeholder="Buscar por ID, nombre o apellido..." 
+           class="w-full sm:w-64 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+           autocomplete="off">
+  </div>
+
+  <!-- Payments Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50">
         <tr>
-
-            <td><?php echo $p->socio->getId(); ?></td>
-            <td><?php echo utf8_decode($p->socio->getNombre()); ?></td>
-            <td><?php echo utf8_decode($p->socio->getApellido()); ?></td>
-            <td><?php echo $p->importe ?></td>
-            <td><a href="<?php echo BASE_URL . 'movimientos/eliminarPago/' . $p->id_cuota . "/" . $this->fechaMy; ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
-
+          <th class="px-3 py-2 text-left text-gray-500 font-medium">Nro</th>
+          <th class="px-3 py-2 text-left text-gray-500 font-medium">Socio</th>
+          <th class="px-3 py-2 text-right text-gray-500 font-medium">Importe</th>
+          <th class="px-3 py-2 w-12"></th>
         </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <?php foreach ($this->pagos as $p): ?>
+        <tr class="hover:bg-gray-50 fila-pago"
+            data-id="<?php echo $p->socio->getId(); ?>"
+            data-nombre="<?php echo strtolower($p->socio->getNombre() . ' ' . $p->socio->getApellido()); ?>">
+          <td class="px-3 py-2 text-gray-900 font-mono"><?php echo $p->socio->getId(); ?></td>
+          <td class="px-3 py-2 text-gray-900"><?php echo htmlspecialchars($p->socio->getNombre() . ' ' . $p->socio->getApellido()); ?></td>
+          <td class="px-3 py-2 text-right font-semibold">$<?php echo number_format($p->importe, 0, '', '.'); ?></td>
+          <td class="px-3 py-2 text-center">
+            <a href="<?php echo BASE_URL . 'movimientos/eliminarPago/' . $p->id_cuota . '/' . $this->fechaMy; ?>" 
+               class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition"
+               onclick="return confirm('¿Eliminar?')"
+               title="Eliminar">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </a>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
 
-    <?php endforeach; ?>
-</table>
-    </article>
 </div>
-<br>
 
-<br><br>
+<script>
+const input = document.getElementById('buscar');
+const filas = document.querySelectorAll('.fila-pago');
+
+input.addEventListener('input', () => {
+    const term = input.value.toLowerCase().trim();
+    
+    filas.forEach(fila => {
+        const id = fila.dataset.id || '';
+        const nombre = fila.dataset.nombre || '';
+        const match = id.includes(term) || nombre.includes(term);
+        fila.style.display = match ? '' : 'none';
+    });
+});
+</script>

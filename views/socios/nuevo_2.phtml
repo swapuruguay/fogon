@@ -1,4 +1,5 @@
 <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/0'?>" method="POST">
+    <?php echo csrf_field(); ?>
     
     <label class="etiquetas">Nro de Socio</label><input type="text" name='id' id='id' readonly /><br>
     <label class="etiquetas">Nombre</label><input type="text" name='nombre' id='nombre' /><br>

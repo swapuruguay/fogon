@@ -1,0 +1,70 @@
+<?php use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-8">
+  
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Listado de Recibos</h1>
+    <p class="text-gray-500 text-sm mt-1">Listado con totales por categoría</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6">
+    <form id="form_listado" action="<?php echo BASE_URL . 'movimientos/listarec' ?>" method="POST" class="space-y-6">
+      <?php echo csrf_field(); ?>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Mes</label>
+          <select name="mes" id="mes" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+            <?php for ($m = 1; $m <= 12; $m++): ?>
+              <option value="<?php echo $m; ?>" <?php echo ($m == (int)date('m')) ? 'selected' : ''; ?>><?php echo str_pad($m, 2, '0', STR_PAD_LEFT); ?></option>
+            <?php endfor; ?>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Año</label>
+          <select name="anio" id="anio" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+            <?php for ($a = date('Y') - 2; $a <= date('Y'); $a++): ?>
+              <option value="<?php echo $a; ?>" <?php echo ($a == (int)date('Y')) ? 'selected' : ''; ?>><?php echo $a; ?></option>
+            <?php endfor; ?>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+          <select name="dire" id="dire" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+            <option value="3">Todos</option>
+            <option value="1">Club - El Fogón</option>
+            <option value="2">Cobrador - En Calle</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end">
+        <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-fogon-900 text-white font-medium rounded-lg hover:bg-fogon-800 transition">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+          </svg>
+          Imprimir Listado
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div class="flex items-start">
+      <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <div>
+        <h4 class="text-sm font-medium text-blue-800">Nota</h4>
+        <p class="text-sm text-blue-600 mt-1">
+          Este listado muestra número de socio, nombre, domicilio y categoría junto con el importe. 
+          Al final del PDF encontrará los totales separados por categoría (Activos, Cadetes, Jubilados).
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>

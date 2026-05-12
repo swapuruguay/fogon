@@ -1,37 +1,120 @@
-<p>&nbsp;</p>
-<div class="container">
-    <h3>Ingrese mes y a&ntilde;o a imprimir</h3>
-    <div id="divpago">
-        <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/imprimir140' ?>" method="POST" class="form-horizontal">
+<?php use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-8">
 
-            <div class="form-group">
-                <label class="control-label col-md-2">Mes</label>
-                <div class="col-md-4">
-                    <input type="text" name='mes' id='mes' readonly class="form-control"  value="<?php echo $this->mes ?>">
-                </div>
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Impresión de Recibos</h1>
+    <p class="text-gray-500 text-sm mt-1">Seleccione el tipo de impresión para cobrar</p>
+  </div>
 
-            </div>
+  <!-- Quick Links -->
+  <div class="flex items-center justify-between mb-8">
+    <a href="<?php echo BASE_URL . 'movimientos/listarec'; ?>" 
+       class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      Listado con Totales
+    </a>
+    <a href="<?php echo BASE_URL . 'socios/listarsocios'; ?>" 
+       class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+      </svg>
+      Listado de Socios
+    </a>
+  </div>
 
-            <div class="form-group">
-                <label class="control-label col-md-2">A&ntilde;o</label>
-                <div class="col-md-4">
-                    <input type="text" name='anio' id='anio' readonly class="form-control" value="<?php echo $this->anio ?>">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-md-2">Qué Imprimo?</label>
-                <div class="col-md-4">
-                    <select type="text" name='dire' id='dire' class="form-control">
-                        <option value="1">Fogón</option>
-                        <option value="2">Cobrador</option>
-                    </select>
-                </div>
-            </div>
-
-
-            <input type="submit" value="Imprimir" class="btn btn-primary"/>
-
-        </form>
-
+  <!-- Form Card -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <h2 class="font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+        </svg>
+        Datos de la Emisión
+      </h2>
     </div>
+    <div class="p-6">
+      <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/imprimir140' ?>" method="POST" class="space-y-6">
+        <?php echo csrf_field(); ?>
+
+        <!-- Mes y Año -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mes</label>
+            <input type="text" name='mes' id='mes' readonly 
+                   class="bg-gray-100 border border-gray-200 rounded-lg px-4 py-2.5 w-full text-gray-600 cursor-not-allowed" 
+                   value="<?php echo $this->mes; ?>">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Año</label>
+            <input type="text" name='anio' id='anio' readonly 
+                   class="bg-gray-100 border border-gray-200 rounded-lg px-4 py-2.5 w-full text-gray-600 cursor-not-allowed" 
+                   value="<?php echo $this->anio; ?>">
+          </div>
+        </div>
+
+        <!-- Tipo de Impresión -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">Tipo de Impresión</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-fogon-500 hover:bg-fogon-50 transition group">
+              <input type="radio" name="dire" value="1" class="w-5 h-5 text-fogon-600 focus:ring-fogon-500" checked>
+              <div class="ml-4">
+                <div class="flex items-center">
+                  <svg class="w-6 h-6 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  <span class="font-semibold text-gray-900 group-hover:text-fogon-700">Club - El Fogón</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Socios que pagan en el club</p>
+              </div>
+            </label>
+            <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-fogon-500 hover:bg-fogon-50 transition group">
+              <input type="radio" name="dire" value="2" class="w-5 h-5 text-fogon-600 focus:ring-fogon-500">
+              <div class="ml-4">
+                <div class="flex items-center">
+                  <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <span class="font-semibold text-gray-900 group-hover:text-fogon-700">Cobrador - En Calle</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Socios que pagan con cobrador</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <h4 class="text-sm font-medium text-blue-800">Última emisión</h4>
+              <p class="text-sm text-blue-600 mt-1">
+                Mes: <strong><?php echo str_pad($this->mes, 2, '0', STR_PAD_LEFT); ?>/<?php echo $this->anio; ?></strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end pt-4">
+          <button type="submit" 
+                  class="inline-flex items-center px-6 py-2.5 bg-fogon-900 text-white font-medium rounded-lg hover:bg-fogon-800 transition">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+            </svg>
+            Imprimir Recibos
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
 </div>

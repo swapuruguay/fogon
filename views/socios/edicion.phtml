@@ -1,249 +1,613 @@
+<?php use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-8">
+  
+  <!-- Header -->
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Editar Socio</h1>
+      <p class="text-gray-500 text-sm mt-1">Modifique los datos del socio</p>
+    </div>
+    <a href="<?php echo BASE_URL . 'socios/listar'; ?>" 
+       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Volver
+    </a>
+  </div>
 
-<div class="container">
-    <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/'. $this->socio->getId(); ?>" method="POST" class="form-horizontal" enctype="multipart/form-data">
-      <div class="form-group">
-          <label class="control-label col-sm-2">Nro de Socio</label>
-              <?php if($this->socio->getEstado() == 'B') :  ?>
-          <strong><span class="text-danger">Socio Eliminado</span></strong>
-              <?php endif ?>
-        <div class="col-sm-1">
-          <input type="text" name='id' id='id' readonly value="<?php echo $this->socio->getId(); ?>" class="form-control">
-          <a class="btn btn-primary" href="<?php echo BASE_URL . 'socios/listarParientes/'. $this->socio->getId(); ?>">Ver Parientes</a>
-        </div>
-      </div>
-      <input type="hidden" name="idsoc" id="idsoc" value="<?php echo $this->socio->getId(); ?>">
-      <div class="form-group">
-        <label class="control-label col-sm-2">Nombre</label>
-        <div class="col-sm-4">
-          <input type="text" name='nombre' id='nombre' value="<?php echo utf8_decode($this->socio->getNombre()); ?>" class="form-control">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Apellido</label>
-        <div class="col-sm-4">
-          <input type="text" name='apellido' id='apellido' value="<?php echo utf8_decode($this->socio->getApellido()); ?>" class="form-control">
-        </div>
+  <!-- Success/Error Messages -->
+  <div id="mensaje" class="hidden mb-6 p-4 rounded-lg"></div>
 
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Documento</label>
-        <div class="col-sm-4">
-          <input type="text"  data-doc="<?php echo $this->socio->getDocumento() ?>" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento'  class="form-control" value="<?php echo $this->socio->getDocumento(); ?>">
-        <span id="alerta" style="color:red; font-weight:bold;"></span>
-        </div>
+  <?php if ($this->socio->getEstado() == 'B'): ?>
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <span class="text-red-700 font-medium">Socio Eliminado</span>
+    </div>
+  <?php endif; ?>
 
+  <form id="form1" action="<?php echo BASE_URL . 'socios/guardar/' . $this->socio->getId(); ?>" method="POST" class="space-y-6" enctype="multipart/form-data">
+    <?php echo csrf_field(); ?>
+    <input type="hidden" name="idsoc" id="idsoc" value="<?php echo $this->socio->getId(); ?>">
+
+    <!-- Card: Datos Personales -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h2 class="font-semibold text-gray-800 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+          </svg>
+          Datos Personales
+        </h2>
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Domicilio</label>
-        <div class="col-sm-4">
-          <input type="text" name='domicilio' id='domicilio' value="<?php echo utf8_decode($this->socio->getDomicilio()); ?>" class="form-control">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Categor&iacute;a</label>
-        <div class="col-sm-4">
-          <select name="categorias" class="form-control">
-          <?php foreach($this->categorias as $cat):?>
-              <?php
-                  $selected = ($cat->getNombre() === $this->socio->getCategoria()->getNombre()?"SELECTED":"");
-              ?>
-              <option id="<?php echo $cat->getId(); ?>" value="<?php echo $cat->getNombre()."_" . $cat->getId(); ?>" <?php echo $selected ?>>
-                  <?php echo $cat->getNombre(); ?></option>
-          <?php endforeach; ?>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-4">
-              <div class="checkbox">
-                  <label>
-                      <input type="checkbox" name="exento" id="exento" <?php echo ($this->socio->getExento())? 'CHECKED':'' ?> value="ok"> Exento
-                  </label>
-              </div>
+      <div class="p-6 space-y-6">
+        
+        <!-- Nro Socio + categoria row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Nro de Socio</label>
+            <input type="text" name='id' id='id' value="<?php echo $this->socio->getId(); ?>" readonly
+                   class="bg-gray-100 border border-gray-200 rounded-lg px-4 py-2.5 w-full text-gray-500 cursor-not-allowed">
           </div>
-      </div>
-      <div class="form-group">
-        <label for="foto" class="control-label col-sm-2">Foto</label>
-        <div class="col-sm-4">
-          <input type="file" name="foto" id="foto" class="form-control">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+            <select name="categorias" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+              <?php foreach ($this->categorias as $cat): ?>
+                <?php $selected = ($cat->getNombre() === $this->socio->getCategoria()->getNombre()) ? 'selected' : ''; ?>
+                <option value="<?php echo $cat->getNombre() . "_" . $cat->getId(); ?>" <?php echo $selected; ?>>
+                  <?php echo $cat->getNombre(); ?> - $<?php echo number_format($cat->getImporte(), 2, ',', '.'); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
         </div>
-        <img id="img-previa" src="<?php echo BASE_URL .'views/socios/img/' .$this->socio->getFoto() ?>" alt="Mi imagen" class="img-thumbnail" style="height:128px; width:96px;">
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Ingreso</label>
-        <div class="col-sm-3">
-          <input type="text" name='fecha_ingreso' id='fecha_ingreso' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaIngreso())); ?>" class="form-control">
+
+        <!-- Nombre + Apellido -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre <span class="text-red-500">*</span></label>
+            <input type="text" name='nombre' id='nombre' required value="<?php echo $this->socio->getNombre(); ?>"
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                   placeholder="Primer nombre">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Apellido <span class="text-red-500">*</span></label>
+            <input type="text" name='apellido' id='apellido' required value="<?php echo $this->socio->getApellido(); ?>"
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                   placeholder="Apellido completo">
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Fecha Nacimiento</label>
-        <div class="col-sm-3">
-          <input type="text" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('d/m/Y',  strtotime($this->socio->getFechaNacimiento())); ?>" class="form-control">
+
+        <!-- Documento -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Documento <span class="text-red-500">*</span></label>
+            <input type="text" data-doc="<?php echo $this->socio->getDocumento(); ?>" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento' required value="<?php echo $this->socio->getDocumento(); ?>"
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                   placeholder="Cédula de identidad">
+            <span id="alerta" class="text-red-500 text-sm font-medium mt-1 block"></span>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+            <input type="text" name='telefono' id='telefono' value="<?php echo $this->socio->getTelefono(); ?>"
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                   placeholder="098 123 456">
+          </div>
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">Tel&eacute;fono</label>
-        <div class="col-sm-3">
-          <input type="text" name='telefono' id='telefono' value="<?php echo $this->socio->getTelefono(); ?>" class="form-control">
+    </div>
+
+    <!-- Card: Ubicación y Contacto -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h2 class="font-semibold text-gray-800 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          Ubicación y Contacto
+        </h2>
+      </div>
+      <div class="p-6 space-y-6">
+
+        <!-- Domicilio -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Domicilio</label>
+          <input type="text" name='domicilio' id='domicilio' value="<?php echo $this->socio->getDomicilio(); ?>"
+                 class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                 placeholder="Dirección del socio">
+          <p class="mt-1 text-xs text-gray-500">Si el domicilio es "El Fogón", el socio pagará directamente en el club.</p>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+          <input type="email" name='email' id='email' value="<?php echo $this->socio->getEmail(); ?>"
+                 class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                 placeholder="correo@ejemplo.com">
+        </div>
+
+        <!-- Fechas row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Ingreso</label>
+            <input type="date" name='fecha_ingreso' id='fecha_ingreso'
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                   value="<?php echo $this->socio->getFechaIngreso(); ?>">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+            <input type="date" name='fecha_nacimiento' id='fecha_nacimiento'
+                   class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500"
+                   value="<?php echo $this->socio->getFechaNacimiento(); ?>">
+          </div>
         </div>
 
       </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2">E-mail</label>
-        <div class="col-sm-3">
-          <input type="text" name='email' id='email' value="<?php echo $this->socio->getEmail(); ?>" class="form-control">
-        </div>
+    </div>
 
+    <!-- Card: Configuración -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h2 class="font-semibold text-gray-800 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          Configuración
+        </h2>
       </div>
-      
-      <?php if(Session::get('usuario')->perfil < 3): ?>
-      <input type="submit" value="Guardar" class="btn btn-success"/>
-      <?php endif ?>
+      <div class="p-6">
+        <div class="flex items-center">
+          <input type="checkbox" name="exento" id="exento" value="ok" <?php echo ($this->socio->getExento()) ? 'checked' : ''; ?> class="w-5 h-5 text-fogon-600 rounded border-gray-300 focus:ring-fogon-500">
+          <label for="exento" class="ml-3 text-gray-700 font-medium">Socio exento de pago</label>
+        </div>
+        <p class="mt-1 text-xs text-gray-500 ml-8">Marque esta opción si el socio no debe pagar cuotas</p>
+      </div>
+    </div>
+
+    <!-- Card: Foto -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h2 class="font-semibold text-gray-800 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          Fotografía
+        </h2>
+      </div>
+      <div class="p-6">
+        <div class="flex items-start space-x-6">
+          <div class="flex-shrink-0">
+            <img id="img-previa" src="<?php echo BASE_URL . 'views/socios/img/' . $this->socio->getFoto(); ?>" alt="Vista previa"
+                 class="w-32 h-32 object-cover rounded-xl border-2 border-gray-200">
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Seleccionar nueva imagen</label>
+            <input type="file" name="foto" id="foto" accept="image/*"
+                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-fogon-50 file:text-fogon-700 hover:file:bg-fogon-100">
+            <p class="mt-2 text-xs text-gray-500">Formatos: JPG, PNG. Tamaño máximo: 2MB</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Parientes -->
+    <?php if (!($this->socio->getCategoria()->getNombre() == "Cadete")): ?>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h2 class="font-semibold text-gray-800 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          Familia
+        </h2>
+      </div>
+      <div class="p-6">
+        <a href="<?php echo BASE_URL . 'socios/listarParientes/' . $this->socio->getId(); ?>" 
+           class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+          </svg>
+          Ver Parientes
+        </a>
+      </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between pt-4">
+      <div class="flex items-center space-x-4">
+        <?php if (Session::get('usuario')->perfil < 3): ?>
+        <button type="button" onclick="mostrarModalEliminar()"
+                class="px-4 py-2.5 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Eliminar Socio
+        </button>
+        <?php endif; ?>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="<?php echo BASE_URL . 'socios/listar'; ?>" 
+           class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
+          Cancelar
+        </a>
+        <?php if (Session::get('usuario')->perfil < 3): ?>
+        <button type="submit" 
+                class="px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          Guardar Cambios
+        </button>
+        <?php endif; ?>
+      </div>
+    </div>
+
   </form>
-    <br>
-    <?php if(Session::get('usuario')->perfil < 3): ?>
-  <div>
-      <a href="" id="ver" data-perfil="<?php echo Session::get('usuario')->perfil ?>">Ver Saldo >>></a>
-  </div>
-  <?php endif ?>
-  <div id="saldos" style=" display: none; width: 30%;">
-      <div class='col-md-6'>
-      <table id="movs" class="table table-condensed table-bordered table-striped">
 
-      </table>
-          <span id='total'></span>
+  <?php if (Session::get('usuario')->perfil < 3): ?>
+  <!-- Card: Estado de Cuenta -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-8">
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <h2 class="font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        Estado de Cuenta
+      </h2>
+    </div>
+    <div class="p-6">
+      
+      <!-- Saldo Total -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <span class="text-sm text-gray-500">Saldo Total</span>
+          <div id="saldo-total" class="text-2xl font-bold text-gray-800">Cargando...</div>
+        </div>
+        <button type="button" onclick="abrirModalPago()" class="bg-fogon-900 hover:bg-fogon-800 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Agregar Pago
+        </button>
       </div>
+
+      <!-- Filtros -->
+      <div class="flex gap-2 mb-4">
+        <select id="filtro-anio" onchange="renderizarTabla()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-fogon-500">
+          <option value="">Todos los años</option>
+        </select>
+        <select id="filtro-tipo" onchange="renderizarTabla()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-fogon-500">
+          <option value="">Todos los tipos</option>
+          <option value="cuota">Cuotas</option>
+          <option value="pago">Pagos</option>
+        </select>
+      </div>
+
+      <!-- Tabla de Movimientos -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b">Fecha</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b">Concepto</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600 border-b">Importe</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600 border-b">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-movimientos">
+            <tr>
+              <td colspan="4" class="px-4 py-6 text-center text-gray-500">Cargando movimientos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="flex items-center justify-between mt-4">
+        <span id="info-paginacion" class="text-sm text-gray-500"></span>
+        <div class="flex gap-1">
+          <button onclick="paginaAnterior()" id="btn-anterior" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">Anterior</button>
+          <button onclick="paginaSiguiente()" id="btn-siguiente" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">Siguiente</button>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Modal para agregar pago -->
+  <div id="modal-pago" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 shadow-xl">
+      <h3 class="text-lg font-semibold mb-4 text-gray-900">Agregar Pago</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Importe</label>
+          <input type="number" id="pago-importe" step="0.01" class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+          <input type="date" id="pago-fecha" class="border border-gray-300 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" onclick="cerrarModalPago()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
+        <button type="button" onclick="guardarPago()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Guardar</button>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
 </div>
+
 <script type="text/javascript">
-    $("#ver").click(function(event){
-        event.preventDefault();
-        if($("#saldos").css('display') === 'none') {
-            $("#saldos").css('display', 'table-cell');
-            var texto = $('#id').val()
-            $("#ver").html(' <<< Ocultar saldo ');
-            $.post('/movimientos/getSaldo','id='+texto,
-                    escribeMov,'json');
+  const el = (sel) => document.querySelector(sel);
+  const tienePermisoSaldo = <?php echo Session::get('usuario')->perfil < 3 ? 'true' : 'false'; ?>;
+  const idSocio = <?php echo $this->socio->getId(); ?>;
 
-        } else {
-            $("#saldos").css('display', 'none');
-            $("#ver").html('Ver saldo >>>');
-        }
+  let paginaActual = 1;
+  const porPagina = 10;
+  let movimientosData = [];
+  let aniosPoblados = false;
 
+  async function cargarMovimientos(pagina = 1) {
+    if (!tienePermisoSaldo) return;
+    paginaActual = pagina;
+    el('#tabla-movimientos').innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Cargando... (id:' + idSocio + ')</td></tr>';
+    try {
+      const res = await fetch('<?php echo BASE_URL; ?>movimientos/getMovimientosSocio', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        body: new URLSearchParams({
+          id: idSocio,
+          limit: 0
+        })
+      });
+      const text = await res.text();
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      movimientosData = JSON.parse(text);
+      poblarAnios();
+      renderizarTabla();
+    } catch (e) {
+      console.error('Error cargarMovimientos:', e);
+      el('#tabla-movimientos').innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-red-500">Error: ' + e.message + '</td></tr>';
+    }
+  }
+
+  function renderizarTabla() {
+    if (!tienePermisoSaldo) return;
+    const anio = el('#filtro-anio').value;
+    const tipo = el('#filtro-tipo').value;
+
+    let filtrado = movimientosData.filter(m => {
+      const mAnio = m.anio ? m.anio.toString() : '';
+      const mTipo = parseFloat(m.importe) >= 0 ? 'cuota' : 'pago';
+      return (!anio || mAnio === anio) && (!tipo || mTipo === tipo);
     });
 
-$("#movs").on('click', '.eliminar', function(event) {
-    event.preventDefault();
-    var id = this.id;
-    $.post('/movimientos/eliminar','id='+id,
-                    escribeMov,'json');
-});
+    filtrado.sort((a, b) => new Date(b.fecha_iso) - new Date(a.fecha_iso));
 
+    let totalFiltrado = 0;
+    filtrado.forEach(m => totalFiltrado += parseFloat(m.importe));
 
+    const inicio = (paginaActual - 1) * porPagina;
+    const paginado = filtrado.slice(inicio, inicio + porPagina);
 
-function mostrarImagen(input) {
- if (input.files && input.files[0]) {
-  var reader = new FileReader();
-  reader.onload = function (e) {
-   $('#img-previa').attr('src', e.target.result);
-  }
-  reader.readAsDataURL(input.files[0]);
- }
-}
- 
-$("#foto").change(function(){
- mostrarImagen(this);
-});
-
-const frm = document.getElementById('form1')
-
-frm.addEventListener('submit', async (evt) => {
-  evt.preventDefault()
-  if(frm.apellido.value == '') {
-    alert('Debe ingresar nombre y apellido por serparado')
-    return
-  }
-  let formData = new FormData()
-  formData.append('documento', frm.documento.value)
-  let res = await fetch('/socios/getByDocumento', {
-    method: 'post',
-    body: formData
-  })
-  let resultado = await res.json()
-  //console.log(resultado)
-  if(frm.documento.dataset.doc != frm.documento.value) {
-    if(resultado.documento != 0) {
-      let alerta = document.getElementById('alerta')
-      alerta.innerHTML = 'Socio existente en la base de datos, revise'
-      frm.documento.focus()
-      return
-    }
-
-    if(digitoCedula(frm.documento.value)) {
-
-      frm.submit()
+    let html = '';
+    if (paginado.length === 0) {
+      html = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">No hay movimientos</td></tr>';
     } else {
-      alert('Cédula erronea, verifique')
-      frm.documento.focus()
+      paginado.forEach(m => {
+        const esPago = parseFloat(m.importe) < 0;
+        const clase = esPago ? 'text-green-600' : 'text-red-600';
+        const signo = esPago ? '+' : '-';
+        const tipoLabel = esPago ? 'Pago' : 'Cuota ' + m.mes + '/' + m.anio;
+        html += '<tr class="border-b border-gray-100 hover:bg-gray-50">';
+        html += '<td class="px-4 py-3 text-sm text-gray-900">' + m.fecha_computo + '</td>';
+        html += '<td class="px-4 py-3 text-sm text-gray-700">' + tipoLabel + '</td>';
+        html += '<td class="px-4 py-3 text-sm text-right font-medium ' + clase + '">' + signo + '$' + Math.abs(parseFloat(m.importe)).toFixed(2) + '</td>';
+        html += '<td class="px-4 py-3 text-center"><button onclick="eliminarMovimiento(' + m.id_cuota + ')" class="text-red-500 hover:text-red-700 text-sm font-medium">Eliminar</button></td>';
+        html += '</tr>';
+      });
     }
-  } else {
 
-    frm.submit()
+    el('#tabla-movimientos').innerHTML = html;
+    el('#saldo-total').textContent = (totalFiltrado >= 0 ? '$' : '-$') + Math.abs(totalFiltrado).toFixed(2);
+    el('#saldo-total').classList.remove('text-green-600', 'text-red-600');
+    el('#saldo-total').classList.add(totalFiltrado >= 0 ? 'text-green-600' : 'text-red-600');
+
+    const totalPaginas = Math.ceil(filtrado.length / porPagina);
+    el('#info-paginacion').textContent = 'Página ' + paginaActual + ' de ' + totalPaginas + ' (' + filtrado.length + ' registros)';
+    el('#btn-anterior').disabled = paginaActual === 1;
+    el('#btn-siguiente').disabled = paginaActual >= totalPaginas;
   }
-})
 
-function digitoCedula(ci) {
- let digitoIngresado = ci.substring(ci.length -1)
- let cedula = ci.substring(0, ci.length - 1)
+  function poblarAnios() {
+    if (!tienePermisoSaldo) return;
+    if (aniosPoblados) return;
+    aniosPoblados = true;
+    const anios = {};
+    movimientosData.forEach(m => {
+      if (m.anio) anios[m.anio] = true;
+    });
+    let opciones = '<option value="">Todos los años</option>';
+    Object.keys(anios).sort((a, b) => b - a).forEach(a => {
+      opciones += '<option value="' + a + '">' + a + '</option>';
+    });
+    el('#filtro-anio').innerHTML = opciones;
+  }
 
- let arrayCedula = cedula.split('')
- if(arrayCedula.length < 6) {
-   return false
- } else if (arrayCedula.length == 6) {
-   arrayCedula.unshift(0)
- }
- let testigo = [2,9,8,7,6,3,4]
- let sumatoria = 0
- for(let i in testigo) {
-   sumatoria+= testigo[i] * arrayCedula[i]
- }
+  function paginaAnterior() {
+    if (paginaActual > 1) {
+      paginaActual--;
+      renderizarTabla();
+    }
+  }
 
- let modulo = sumatoria % 10
- if(modulo == 0) {
-   modulo = 10
- }
+  function paginaSiguiente() {
+    paginaActual++;
+    renderizarTabla();
+  }
 
- return 10-(modulo) == digitoIngresado
+  function abrirModalPago() {
+    el('#pago-fecha').value = new Date().toISOString().split('T')[0];
+    el('#modal-pago').classList.remove('hidden');
+    el('#modal-pago').classList.add('flex');
+  }
 
-}
+  function cerrarModalPago() {
+    el('#modal-pago').classList.remove('flex');
+    el('#modal-pago').classList.add('hidden');
+  }
 
-function soloNumeros(e)
-{
+  async function guardarPago() {
+    const importe = parseFloat(el('#pago-importe').value);
+    const fecha = el('#pago-fecha').value;
+    if (!importe || !fecha) {
+      alert('Complete todos los campos');
+      return;
+    }
+    try {
+      await fetch('<?php echo BASE_URL; ?>movimientos/ingresarPago', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        body: new URLSearchParams({ id: idSocio, importe, fecha })
+      });
+      cerrarModalPago();
+      cargarMovimientos();
+      el('#pago-importe').value = '';
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
- key = e.keyCode || e.which
- //console.log(key)
- let numeros = "0123456789"
- let teclado = String.fromCharCode(key)
+  async function eliminarMovimiento(id) {
+    if (!confirm('¿Eliminar este movimiento?')) return;
+    try {
+      await fetch('<?php echo BASE_URL; ?>movimientos/eliminar', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        body: new URLSearchParams({ id })
+      });
+      cargarMovimientos();
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
- let especiales = [8,9,37,39,46]
+  if (tienePermisoSaldo) cargarMovimientos();
 
- let teclado_especial = false
- for(let i = 0; i< especiales.length; i++) {
-   if(key == especiales[i]) {
+  function mostrarImagen(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => el('#img-previa').src = e.target.result;
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
 
-     teclado_especial = true
-   }
- }
+  el('#foto').addEventListener('change', () => mostrarImagen(el('#foto')));
 
- if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
-   return false
- }
-}
+  const frm = el('#form1');
+  frm.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    if (frm.apellido.value == '') {
+      alert('Debe ingresar nombre y apellido por separado');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('documento', frm.documento.value);
+    const res = await fetch('<?php echo BASE_URL; ?>socios/getByDocumento', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRF-TOKEN': csrfToken },
+      body: formData
+    });
+    const resultado = await res.json();
+    if (frm.documento.dataset.doc != frm.documento.value) {
+      if (resultado.documento != 0) {
+        el('#alerta').innerHTML = 'Socio existente en la base de datos, revise';
+        frm.documento.focus();
+        return;
+      }
+      if (digitoCedula(frm.documento.value)) {
+        frm.submit();
+      } else {
+        alert('Cédula erronea, verifique');
+        frm.documento.focus();
+      }
+    } else {
+      frm.submit();
+    }
+  });
 
-function quitaPuntos() {
-  let valor = document.getElementById('documento').value
-  document.getElementById('documento').value = valor.replace(/\./g, '')
-}
+  function digitoCedula(ci) {
+    const digitoIngresado = ci.substring(ci.length - 1);
+    const cedula = ci.substring(0, ci.length - 1);
+    let arrayCedula = cedula.split('');
+    if (arrayCedula.length < 6) return false;
+    if (arrayCedula.length == 6) arrayCedula.unshift(0);
+    const testigo = [2, 9, 8, 7, 6, 3, 4];
+    let sumatoria = 0;
+    for (let i in testigo) sumatoria += testigo[i] * arrayCedula[i];
+    let modulo = sumatoria % 10;
+    if (modulo == 0) modulo = 10;
+    return 10 - modulo == digitoIngresado;
+  }
+
+  function soloNumeros(e) {
+    const key = e.keyCode || e.which;
+    const numeros = "0123456789";
+    const teclado = String.fromCharCode(key);
+    const especiales = [8, 9, 37, 39, 46];
+    const teclado_especial = especiales.includes(key);
+    if (numeros.indexOf(teclado) == -1 && !teclado_especial) return false;
+  }
+
+  function quitaPuntos() {
+    el('#documento').value = el('#documento').value.replace(/\./g, '');
+  }
+
+  function mostrarModalEliminar() {
+    const modal = document.getElementById('modal-eliminar');
+    modal.classList.remove('hidden');
+  }
+
+  function cerrarModalEliminar() {
+    const modal = document.getElementById('modal-eliminar');
+    modal.classList.add('hidden');
+  }
+
+  function confirmarEliminar() {
+    window.location.href = '<?php echo BASE_URL . 'socios/eliminar/' . $this->socio->getId(); ?>';
+  }
 </script>
+
+<!-- Modal Eliminar -->
+<div id="modal-eliminar" class="hidden fixed inset-0 z-50 overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen px-4">
+    <div class="fixed inset-0 bg-black opacity-50 transition-opacity" onclick="cerrarModalEliminar()"></div>
+    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 transform transition-all">
+      <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-red-100 mb-4">
+          <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">¿Eliminar este socio?</h3>
+        <p class="text-gray-500 mb-6">
+          Esta acción moverá al socio "<strong><?php echo htmlspecialchars($this->socio->getNombre() . ' ' . $this->socio->getApellido()); ?></strong>" a la lista de eliminados. Podrá recuperarlo en cualquier momento.
+        </p>
+        <div class="flex items-center justify-center space-x-4">
+          <button onclick="cerrarModalEliminar()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+            Cancelar
+          </button>
+          <button onclick="confirmarEliminar()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

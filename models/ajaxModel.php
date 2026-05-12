@@ -1,8 +1,10 @@
 <?php
 
+use App\Core\Model;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
+ * To change this template file, choose Tools, Templates
  * and open the template in the editor.
  */
 
@@ -11,14 +13,17 @@
  *
  * @author walter
  */
-class ajaxModel extends Model{
-    
-    public function __construct() {
+class ajaxModel extends Model
+{
+
+    public function __construct()
+    {
         parent::__construct();
     }
-    
-    public function guardarSocio(Socio $soc) {
-        if($soc.getId()==0) {
+
+    public function guardarSocio(Socio $soc)
+    {
+        if ($soc->getId() == 0) {
             $dato = array(
                 'id'        => $soc->getId(),
                 'nombre'    => $soc->getNombre(),
@@ -28,17 +33,13 @@ class ajaxModel extends Model{
                 'fecha_ingreso' => $soc->getFechaIngreso(),
                 'fecha_nacimiento' => $soc->getFechaNacimiento(),
                 'estado'            => $soc->getEstado(),
-                
+
             );
             $this->_db->query("INSERT INTO  socios ");
         } else {
-            
         }
-        
     }
-    
-    
-    public function buscar() {
-        
-    }
+
+
+    public function buscar() {}
 }

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 85" width="275" height="388">
+  <defs>
+    <style type="text/css">
+      @import url('https://fonts.googleapis.com/css2?family=Anton');
+    </style>
+  </defs>
+  <rect x="0" y="0" width="30" height="40" fill="#f0f005" />
+  <rect x="30" y="0" width="30" height="40" fill="#227222" />
+  <polygon points="0,40 30,40 30,85 0,65" fill="#30306e" />
+  <polygon points="30,40 60,40 60,65 30,85" fill="#e30202" />
+  <polygon points="15,40 30,15 45,40 30,65" fill="#fff" />
+  <text x="25" y="30" font-size="3.5" font-weight="700" fill="#1c1c63">
+    C.D.S
+  </text>
+  <text x="18" y="40" font-family="Anton" font-size="5.5" font-weight="700" fill="#1c1c63">
+    "EL FOGON"
+  </text>
+  <text x="22" y="45" font-family="system-ui" font-size="3.5" font-weight="700" fill="#1c1c63">
+    LASCANO
+  </text>
+  <text x="22" y="50" font-family="system-ui" font-size="2.5" font-weight="700" fill="#1c1c63">
+    Dpto. Rocha
+  </text>
+  <polygon points="0,0 60,0 60,65 30,83.1 0,65" fill="none" stroke-width="3px" stroke="#222" />
+</svg>

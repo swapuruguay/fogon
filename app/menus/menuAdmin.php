@@ -26,6 +26,11 @@
       <li><a href="<?php echo BASE_URL . 'movimientos/totales' ?>">Totales</a></li></li>
     </ul>
   </li>
+  <li><a href="<?php echo BASE_URL . 'categorias#' ?>">Categorias</a>
+    <ul>
+      <li><a href="<?php echo BASE_URL . 'movimientos/categorias' ?>">Listar Categoría</a></li>
+    </ul>
+  </li>
   <li><a href="<?php echo BASE_URL . 'usuarios#' ?>">Ajustes impresión</a>
     <ul>
       <li><a href="<?php echo BASE_URL . 'ajustes/getajustes'?>" >Ajustar espacios</a></li>
@@ -39,30 +44,37 @@
   </li>
 </ul>
 <script type="text/javascript">
+  var BASE_URL = "<?php echo rtrim(BASE_URL, '/'); ?>";
   let menu = document.getElementById('menu_recibos1')
   menu.addEventListener('click', async (evt) => {
     evt.preventDefault();
     let url = evt.target.href
-    let respuesta = await fetch(`/movimientos/getLastEmitido`, {
+    let respuesta = await fetch(BASE_URL + '/movimientos/getLastEmitido', {
       method: 'post',
-      
+      credentials: 'same-origin',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,
+        'Content-Type': 'application/json'
+      }
     })
     let res = await respuesta.json()
-    url = `${url}/${res.mes}/${res.anio}/1`
+    url = url + '/' + res.mes + '/' + res.anio + '/1'
     window.location.href = url
-    
   })
   let menu2 = document.getElementById('menu_recibos2')
   menu2.addEventListener('click', async (evt) => {
     evt.preventDefault();
     let url = evt.target.href
-    let respuesta = await fetch(`/movimientos/getLastEmitido`, {
+    let respuesta = await fetch(BASE_URL + '/movimientos/getLastEmitido', {
       method: 'post',
-      
+      credentials: 'same-origin',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,
+        'Content-Type': 'application/json'
+      }
     })
     let res = await respuesta.json()
-    url = `${url}/${res.mes}/${res.anio}/2`
+    url = url + '/' + res.mes + '/' + res.anio + '/2'
     window.location.href = url
-    
   })
 </script>

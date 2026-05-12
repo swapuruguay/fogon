@@ -1,26 +1,89 @@
-<p>&nbsp;</p>
-<div id="divpago" class="container">
-    <h3 class="etiquetas">Ingrese mes y a&ntilde;o a generar</h3>
-    <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/generacuota' ?>" method="POST" class="form-horizontal">
-        <div class="form-group">
+<?php use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-8">
 
-            <label class="control-label col-md-2">Mes</label>
-            <div class="col-md-4">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Generar Mes</h1>
+    <p class="text-gray-500 text-sm mt-1">Genere las cuotas mensuales para todos los socios activos</p>
+  </div>
 
-                <input type="text" name='mes' id='mes' class="form-control">
-            </div>
+  <!-- Info Card -->
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+    <div class="flex items-start">
+      <svg class="w-6 h-6 text-amber-600 mt-0.5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+      <div>
+        <h4 class="font-semibold text-amber-800">Importante</h4>
+        <p class="text-sm text-amber-700 mt-1">
+          Esta acción generará cuotas para <strong>todos los socios activos</strong> que no sean exentos. 
+          Los socios con deuda mayor a 6 cuotas serán dados de baja automáticamente.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <h2 class="font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-fogon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5v-3m-4 0v3"></path>
+        </svg>
+        Datos del Mes
+      </h2>
+    </div>
+    <div class="p-6">
+      <form id="form_pago" action="<?php echo BASE_URL . 'movimientos/generacuota' ?>" method="POST" class="space-y-6">
+        <?php echo csrf_field(); ?>
+
+        <!-- Mes y Año -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mes</label>
+            <select name="mes" id="mes" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+              <?php for ($m = 1; $m <= 12; $m++): ?>
+                <option value="<?php echo $m; ?>" <?php echo ($m == (int)date('m')) ? 'selected' : ''; ?>>
+                  <?php echo str_pad($m, 2, '0', STR_PAD_LEFT); ?> - <?php echo date('F', mktime(0, 0, 0, $m, 1)); ?>
+                </option>
+              <?php endfor; ?>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Año</label>
+            <select name="anio" id="anio" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+              <?php for ($a = date('Y') - 1; $a <= date('Y') + 1; $a++): ?>
+                <option value="<?php echo $a; ?>" <?php echo ($a == (int)date('Y')) ? 'selected' : ''; ?>>
+                  <?php echo $a; ?>
+                </option>
+              <?php endfor; ?>
+            </select>
+          </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2">A&ntilde;o</label>
-            <div class="col-md-4">
-                <input type="text" name='anio' id='anio' class="form-control">
 
-            </div>
-
+        <!-- Preview Info -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-gray-700 mb-2">Resumen de la generación</h4>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li>• Cuotas según categoría de cada socio</li>
+            <li>• Socios exentos no recibirán cuota</li>
+            <li>• Socios con 6+ cuotas de deuda serán dados de baja</li>
+          </ul>
         </div>
 
-        <input type="submit" value="Generar" class="btn btn-primary"/>
+        <!-- Actions -->
+        <div class="flex items-center justify-end pt-4">
+          <button type="submit" 
+                  class="inline-flex items-center px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Generar Mes
+          </button>
+        </div>
 
-    </form>
+      </form>
+    </div>
+  </div>
 
 </div>

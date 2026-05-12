@@ -1,44 +1,30 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- * Description of categoriasModelo
- *
- * @author walter
- */
+use App\Core\Model;
 
 require_once 'Ajuste.php';
 
-class ajustesModel extends Model{
-    
+class ajustesModel extends Model {
+
     public function __construct() {
         parent::__construct();
     }
-    
-    
-    public function get() {
-        $consulta = $this->_db->query("SELECT * FROM ajustes");
-        $retorno = array();
-        $resultado = $consulta->fetch(PDO::FETCH_OBJ);
-        $aux = new Ajuste($resultado->margen, $resultado->espacio);
-        $retorno = $aux;
-        return $retorno;
+
+    public function get(): Ajuste {
+        $resultado = $this->_db->query("SELECT * FROM ajustes")->fetch(PDO::FETCH_OBJ);
+        $izquierda = $resultado->izquierda ?? 0;
+        return new Ajuste($resultado->margen, $resultado->espacio, $izquierda);
     }
-    
-    public function set(Ajuste $ajuste, $usuario) {
-        $datos = array(
 
-            'margen'            => $ajuste->getMargen(),
-            'espacio'          => $ajuste->getEspacio()
+    public function set(Ajuste $ajuste, int $usuario): bool {
+        return $this->_db->update(
+            'ajustes',
+            [
+                'margen' => $ajuste->getMargen(),
+                'espacio' => $ajuste->getEspacio(),
+                'izquierda' => $ajuste->getLeft(),
+            ],
+            '1=1'
         );
-
-        $sql = 'UPDATE ajustes SET ' . $this->preparaUpdate($datos);
-
-        return $this->_db->query($sql);
     }
 }

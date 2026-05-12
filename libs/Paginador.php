@@ -322,30 +322,44 @@ class Paginador
     public function getHtmlPaginacion($varGet = 'pagina', $cont = 'li', $accion = 'listar')
     {
         $paginador = array();
+        // Detect controlador actual desde la URL
+        $urlRaw = isset($_GET['url']) ? ltrim($_GET['url'], '/') : '';
+        $parts = explode('/', $urlRaw);
+        $controller = !empty($parts[0]) ? $parts[0] : 'socios';
+        
         foreach ($this->_paginacion as $enlace) {
             $htmlPag    = '';
-            if ($enlace['class']) {
-                $htmlPag   .= '<' . $cont;
-                if ($enlace['class'] != '<>' ) {
-                    $htmlPag   .=  ' class="' . $enlace['class'] . '" ';
-                }
-                $htmlPag   .= '>';
-            }
+            $isOff = !empty($enlace['off']);
+            $isCurrent = ($enlace['numero'] == $this->_pagActual);
             
-            if ($enlace['numero'] != $this->_pagActual && empty ($enlace['off'])) {
-            $htmlPag   .= '<a href="' . BASE_URL.'socios/'. $accion .'/'   
-                        . $enlace['numero'] 
-                        . $this->_propagar . '" '
-                        . 'title="' . $enlace['title'] . '" '
-                        . '>' . $enlace['vista'] . '</a>'; 
+            // Tailwind base classes - larger
+            $baseClass = 'inline-flex items-center px-4 py-2 text-base font-semibold rounded-lg transition-colors';
+            
+            if ($isOff) {
+                $htmlPag .= '<li class="inline-block">';
+                $htmlPag .= '<span class="' . $baseClass . ' bg-gray-100 text-gray-400 cursor-not-allowed">';
+            } elseif ($isCurrent) {
+                $htmlPag .= '<li class="inline-block">';
+                $htmlPag .= '<span class="' . $baseClass . ' bg-blue-600 text-white cursor-default">';
             } else {
-                $htmlPag   .= $enlace['vista'] ;
+                $htmlPag .= '<li class="inline-block">';
+                $htmlPag .= '<a href="' . BASE_URL . $controller . '/' . $accion . '/'   
+                            . $enlace['numero'] 
+                            . $this->_propagar . '" '
+                            . 'title="' . $enlace['title'] . '" '
+                            . 'class="' . $baseClass . ' text-blue-600 hover:bg-blue-100 hover:text-blue-700">';
             }
             
-            if ($enlace['class']) {
-                $htmlPag   .= '</' . $cont . '>';
+            $htmlPag .= $enlace['vista'];
+            
+            if ($isOff || $isCurrent) {
+                $htmlPag .= '</span>';
+            } else {
+                $htmlPag .= '</a>';
             }
-            $paginador[]= $htmlPag;
+            
+            $htmlPag .= '</li>';
+            $paginador[] = $htmlPag;
         }
         
         return $paginador;

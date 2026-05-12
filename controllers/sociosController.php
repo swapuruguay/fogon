@@ -1,741 +1,681 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+use App\Core\Controller;
+use App\Core\Session;
+
 require_once 'libs/Paginador.php';
 
-
-/**
- * Description of sociosController
- *
- * @author walter
- */
-class sociosController extends Controller{
+class sociosController extends Controller
+{
 
     private $_pdf;
-
     private $_ajax;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ajax  = $this->loadModel('socios');
+        $this->_ajax = $this->loadModel('socios');
         $this->getLibrary('fpdf');
         $this->_pdf = new FPDF();
     }
 
-    public function index() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
-        //$modelo->getNroNuevo('socios');
+    public function index(): void
+    {
+        $this->requireAuth();
         $this->_view->renderizar('index');
-
     }
 
-    public function busqueda() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        //$modelo  = $this->loadModel('socios');
-        //$modelo->getNroNuevo('socios');
+    public function busqueda(): void
+    {
+        $this->requireAuth();
         $this->_view->renderizar('busqueda');
-
     }
 
-    //create function getByDocumento
-    public function getByDoc() {
-        $documento = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_NUMBER_INT);
-        $modelo  = $this->loadModel('socios');
+    public function getByDoc(): void
+    {
+        $documento = filter_input(INPUT_POST, 'search', FILTER_VALIDATE_INT) ?: 0;
+        $modelo = $this->loadModel('socios');
         $socio = $modelo->getByDocumento($documento);
-        $objeto = array(
-            'id'        => $socio->getId(),
-            'nombre'    => utf8_decode($socio->getNombre(). ' ' . $socio->getApellido()),
-            'documento' => $socio->getDocumento()
-          );
-        echo json_encode($objeto);
+        if ($socio) {
+            $data = [
+                'id' => $socio->getId(),
+                'nombre' => $this->fixEncoding($socio->getNombre()),
+                'apellido' => $this->fixEncoding($socio->getApellido()),
+                'documento' => $socio->getDocumento(),
+            ];
+        } else {
+            $data = ['error' => 'No encontrado'];
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
+    private function fixEncoding(string $str): string
+    {
+        $fixes = [
+            "\xC3\x83\xC2\xB1" => "\xC3\xB1",
+            "\xC3\x83\xC2\xA1" => "\xC3\xA1",
+            "\xC3\x83\xC2\xA9" => "\xC3\xA9",
+            "\xC3\x83\xC2\xAD" => "\xC3\xAD",
+            "\xC3\x83\xC2\xB3" => "\xC3\xB3",
+            "\xC3\x83\xC2\xBA" => "\xC3\xBA",
+            "\xC3\x83\xC2\x81" => "\xC3\x81",
+            "\xC3\x83\xC2\x89" => "\xC3\x89",
+            "\xC3\x83\xC2\x8D" => "\xC3\x8D",
+            "\xC3\x83\xC2\x93" => "\xC3\x93",
+            "\xC3\x83\xC2\x9A" => "\xC3\x9A",
+        ];
+        return str_replace(array_keys($fixes), array_values($fixes), $str);
+    }
 
-    public function listar($pag=0) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
+public function listar(int $pag = 0, string $filtro = 'all'): void
+    {
+        $this->requireAuth();
+        
+        $filter = $_GET['filter'] ?? $filtro;
+        $this->_view->filter = $filter;
+        
+        $modelo = $this->loadModel('socios');
+        
+        $allSocios = $modelo->getAll();
+        $inHouse = array_filter($allSocios, fn($s) => $s->isInHouse());
+        $street = array_filter($allSocios, fn($s) => !$s->isInHouse());
+        $atrasados = $modelo->getAtrasados();
+        
+        $this->_view->counts = [
+            'all' => count($allSocios),
+            'club' => count($inHouse),
+            'street' => count($street),
+            'late' => count($atrasados)
+        ];
+        
+        $sociosFiltrados = $allSocios;
+        if ($filter === 'club') {
+            $sociosFiltrados = $inHouse;
+        } elseif ($filter === 'street') {
+            $sociosFiltrados = $street;
+        } elseif ($filter === 'late') {
+            $sociosFiltrados = $atrasados;
         }
-        $modelo  = $this->loadModel('socios');
-        $this->_view->socios = $modelo->getAll();
-        $totalRegistros = count($this->_view->socios);
-        $desde = $pag*15;
-        $this->_view->socios = $modelo->getPaginados($desde);
-        $paginador = new Paginador();
-        $paginador->setCantidadRegistros(15);
-        $paginador->setClass('primero',         'previous');
-        $paginador->setClass('bloqueAnterior',  'previous');
-        $paginador->setClass('anterior',        'previous');
-        $paginador->setClass('siguiente',       'next');
-        $paginador->setClass('bloqueSiguiente', 'next');
-        $paginador->setClass('ultimo',          'next');
-        $paginador->setClass('numero',          '<>');
-        $paginador->setClass('actual',          'active');
-        $pagina = $pag;
-        $this->_view->datos      = $paginador->paginar($pagina, $totalRegistros);
-        $this->_view->enlaces    = $paginador->getHtmlPaginacion('pagina', 'li');
+        
+        $this->_view->totalSocios = count($sociosFiltrados);
+        
+        $totalPages = (int) ceil($this->_view->totalSocios / 15);
+        $this->_view->totalPages = $totalPages;
+        $this->_view->currentPage = $pag + 1;
+        
+        $desde = $pag * 15;
+        $paginatedSocios = array_slice($sociosFiltrados, $desde, 15);
+        $this->_view->socios = $paginatedSocios;
+        $this->_view->data['socios'] = $paginatedSocios;
+        
         $this->_view->renderizar('listar');
-
+    }
+    
+    public function buscar(): void
+    {
+        $this->requireAuth();
+        $termino = trim($_GET['q'] ?? '');
+        
+        if (strlen($termino) < 2) {
+            echo json_encode([]);
+            return;
+        }
+        
+        $modelo = $this->loadModel('socios');
+        $resultado = $modelo->buscar($termino);
+        
+        echo json_encode($resultado);
     }
 
-    public function nuevo() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
+    public function nuevo(): void
+    {
+        $this->requireAuth();
         $modeloCat = $this->loadModel('categorias');
         $this->_view->categorias = $modeloCat->getAll();
         $this->_view->nroSocio = $this->_ajax->getNroNuevo('socios');
         $this->_view->renderizar('nuevo');
     }
 
-    
-
-    public function nuevoPariente($idSocio) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
-        $socio = $modelo->getById($idSocio);
-        $this->_view->socio = $socio;
+    public function nuevoPariente(int $idSocio): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
+        $this->_view->socio = $modelo->getById($idSocio);
         $this->_view->renderizar('nuevo_pariente');
     }
 
-    public function editar($id) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
+    public function editar(int $id): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
         $modeloCat = $this->loadModel('categorias');
-        $socio = $modelo->getById($id);
         $this->_view->categorias = $modeloCat->getAll();
-        $this->_view->socio = $socio;
+        $this->_view->socio = $modelo->getById($id);
         $this->_view->renderizar('edicion');
-
-
     }
 
-    public function editarPariente($id) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
-        $pariente = $modelo->getParienteById($id);
-        $this->_view->pariente = $pariente;
+    public function editarPariente(int $id): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
+        $this->_view->pariente = $modelo->getParienteById($id);
         $this->_view->renderizar('editar-pariente');
-
-
     }
 
-    public function guardar() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
+    public function guardar(): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
         $modeloCat = $this->loadModel('categorias');
-        if(isset($_POST['idsoc'])) {
-            $id = filter_input(INPUT_POST ,'idsoc', FILTER_SANITIZE_NUMBER_INT);
-            if($id == 0) {
-                $socio = $modelo->buildSocio();
-                $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
-                $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
-                $socio->setDomicilio(utf8_encode(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING)));
-                $socio->setTelefono(filter_input(INPUT_POST ,'telefono', FILTER_SANITIZE_STRING));
-                $nro = $modelo->getNroNuevo('socios');
-                if(isset($_FILES['foto'])) {
-                    $dir_subida = dirname(APP_PATH) . '/views/socios/img/';
-                    $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                    $fichero_subido = $dir_subida . $nro.'.'.$ext;
 
-                    if (move_uploaded_file($_FILES['foto']['tmp_name'], $fichero_subido)) {
-                        $socio->setFoto($nro.'.'.$ext);
-                    } else {
-                        $socio->setFoto('socio.png');
-                    }
-                }
+        if (!isset($_POST['idsoc'])) {
+            return;
+        }
 
-                $socio->setExento(isset($_POST['exento'])? 1 : 0);
-                $ingreso = filter_input(INPUT_POST ,'fecha_ingreso', FILTER_SANITIZE_STRING);
-                $ingreso = $this->cambiarfecha_mysql($ingreso);
-                $socio->setFechaIngreso($ingreso);
-                $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
-                $nacimiento = $this->cambiarfecha_mysql($nacimiento);
-                $socio->setFechaNacimiento($nacimiento);
-                $socio->setDocumento($_POST['documento']);
-                $idcat = filter_input(INPUT_POST ,'categorias', FILTER_SANITIZE_STRING);
-                $id = explode("_", $idcat);
-                $id1 = $id['1'];
-                $socio->setEmail($_POST['email']);
-                $socio->setCategoria($modeloCat->getById($id1));
-                if($modelo->save($socio, Session::get('usuario')->idusuario)) {
-                    $this->_view->mensaje = "Registro guardado";
-                }
+        $id = filter_input(INPUT_POST, 'idsoc', FILTER_VALIDATE_INT) ?: 0;
 
-                $this->_view->renderizar('resultado');
-
-            } else {
-                $socio = $modelo->buildSocio();
-                $socio->setId($id);
-                $socio->setNombre(utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING)));
-                $socio->setApellido(utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING)));
-                $socio->setDocumento($_POST['documento']);
-                $socio->setDomicilio(utf8_encode(filter_input(INPUT_POST ,'domicilio', FILTER_SANITIZE_STRING)));
-                $socio->setTelefono(filter_input(INPUT_POST ,'telefono', FILTER_SANITIZE_STRING));
+        if ($id == 0) {
+            $socio = $modelo->buildSocio();
+            $socio->setNombre(sanitize((string) $_POST['nombre']));
+            $socio->setApellido(sanitize((string) $_POST['apellido']));
+            $socio->setDomicilio(sanitize((string) $_POST['domicilio']));
+            $socio->setTelefono(sanitize((string) $_POST['telefono']));
+            $nro = $modelo->getNroNuevo('socios');
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                $dir_subida = dirname(APP_PATH) . '/views/socios/img/';
                 $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                if($_FILES['foto']['name'] != '') {
-                    $dir_subida = dirname(APP_PATH) . '/views/socios/img/';
-                    $fichero_subido = $dir_subida . $id.'.'.$ext;
-
-                    if (move_uploaded_file($_FILES['foto']['tmp_name'], $fichero_subido)) {
-                        $socio->setFoto($id.'.'.$ext);
-                    } else {
-                        $socio->setFoto('socio.png');
-                    }
+                $fichero_subido = $dir_subida . $nro . '.' . $ext;
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $fichero_subido)) {
+                    $socio->setFoto($nro . '.' . $ext);
                 } else {
-
+                    $socio->setFoto('socio.png');
                 }
-                $socio->setExento(isset($_POST['exento'])? 1 : 0);
-                $ingreso = filter_input(INPUT_POST ,'fecha_ingreso', FILTER_SANITIZE_STRING);
-                $ingreso = $this->cambiarfecha_mysql($ingreso);
-                $socio->setFechaIngreso($ingreso);
-                $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
-                $nacimiento = $this->cambiarfecha_mysql($nacimiento);
-                $socio->setFechaNacimiento($nacimiento);
-                $idcat = filter_input(INPUT_POST ,'categorias', FILTER_SANITIZE_STRING);
-                $id = explode("_", $idcat);
-                $id1 = $id['1'];
-                $socio->setEmail($_POST['email']);
-                $socio->setCategoria($modeloCat->getById($id1));
-                if($modelo->update($socio, Session::get('usuario')->idusuario)) {
-                    $this->_view->mensaje = "Registro guardado";
+            } else {
+                $socio->setFoto('socio.png');
+            }
+            $socio->setExento(isset($_POST['exento']) ? 1 : 0);
+            $ingreso = to_mysql_date((string) $_POST['fecha_ingreso']);
+            $socio->setFechaIngreso($ingreso);
+            $nacimiento = to_mysql_date((string) $_POST['fecha_nacimiento']);
+            $socio->setFechaNacimiento($nacimiento);
+            $socio->setDocumento((string) $_POST['documento']);
+            $idcat = (string) $_POST['categorias'];
+            $id_parts = explode("_", $idcat);
+            $socio->setEmail(sanitize((string) $_POST['email']));
+            $socio->setCategoria($modeloCat->getById((int) ($id_parts[1] ?? 0)));
+            $modelo->save($socio, Session::get('usuario')->idusuario);
+            $this->_view->mensaje = "Registro guardado";
+        } else {
+            $socio = $modelo->buildSocio();
+            $socio->setId($id);
+            $socio->setNombre(sanitize((string) $_POST['nombre']));
+            $socio->setApellido(sanitize((string) $_POST['apellido']));
+            $socio->setDocumento((string) $_POST['documento']);
+            $socio->setDomicilio(sanitize((string) $_POST['domicilio']));
+            $socio->setTelefono(sanitize((string) $_POST['telefono']));
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK && $_FILES['foto']['name'] !== '') {
+                $dir_subida = dirname(APP_PATH) . '/views/socios/img/';
+                $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+                $fichero_subido = $dir_subida . $id . '.' . $ext;
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $fichero_subido)) {
+                    $socio->setFoto($id . '.' . $ext);
+                } else {
+                    $socio->setFoto('socio.png');
                 }
             }
-
-            $this->_view->renderizar('resultado');
+            $socio->setExento(isset($_POST['exento']) ? 1 : 0);
+            $ingreso = to_mysql_date((string) $_POST['fecha_ingreso']);
+            $socio->setFechaIngreso($ingreso);
+            $nacimiento = to_mysql_date((string) $_POST['fecha_nacimiento']);
+            $socio->setFechaNacimiento($nacimiento);
+            $idcat = (string) $_POST['categorias'];
+            $id_parts = explode("_", $idcat);
+            $socio->setEmail(sanitize((string) $_POST['email']));
+            $socio->setCategoria($modeloCat->getById((int) ($id_parts[1] ?? 0)));
+            $modelo->update($socio, Session::get('usuario')->idusuario);
+            $this->_view->mensaje = "Registro guardado";
         }
+        $this->_view->renderizar('resultado');
     }
 
-    public function confirmar($id) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
-        $socio = $modelo->getById($id);
-        $this->_view->socio = $socio;
+    public function confirmar(int $id): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
+        $this->_view->socio = $modelo->getById($id);
         $this->_view->renderizar('confirmar');
     }
 
-    public function eliminar($id) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
+    public function eliminar(int $id): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
         $socio = $modelo->getById($id);
-        if($modelo->delete($socio, Session::get('usuario')->idusuario)) {
-            $this->_view->mensaje = "Registro eliminado con &eacute;xito";
+        if ($modelo->delete($socio, Session::get('usuario')->idusuario)) {
+            header('Location: ' . BASE_URL . 'socios/listar?mensaje=eliminado');
         } else {
-            $this->_view->mensaje = "No se pudo eliminar el socio intente m&aacute;s tarde";
+            header('Location: ' . BASE_URL . 'socios/listar?error=noeliminado');
         }
-        $this->_view->renderizar('resultado');
-
-
+        exit;
     }
 
-    public function atrasados() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
+    public function atrasados(): void
+    {
+        $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->socios = $modelo->getAtrasados();
         $this->_view->renderizar('atrasados');
     }
 
-    public function findSocios() {
-        $active = $_POST['active'];
-        if($active == 'activo') {
-            $retorno = $this->_ajax->getByApellido($this->getTexto('texto'));
+    public function findSocios(): void
+    {
+        $active = $_POST['active'] ?? '';
+        $texto = sanitize((string) $_POST['texto']);
+        if ($active === 'activo') {
+            $retorno = $this->_ajax->getByApellido($texto);
         } else {
-            $retorno = $this->_ajax->getByApellidoE($this->getTexto('texto'));
+            $retorno = $this->_ajax->getByApellidoE($texto);
         }
-
-      if(!$retorno) {
-
-
-          $retorno = array('nombre' => 'Sin', 'apellido' => 'Resultados');
-      }
-      echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
-
-
-
+        if (!$retorno) {
+            $retorno = [['id_socio' => 0, 'nombre' => 'Sin', 'apellido' => 'Resultados']];
+        }
+        foreach ($retorno as &$s) {
+            if (is_object($s)) {
+                $s->nombre = $this->fixEncoding($s->nombre ?? '');
+                $s->apellido = $this->fixEncoding($s->apellido ?? '');
+            } else {
+                $s['nombre'] = $this->fixEncoding($s['nombre'] ?? '');
+                $s['apellido'] = $this->fixEncoding($s['apellido'] ?? '');
+            }
+        }
+        echo json_encode($retorno, JSON_UNESCAPED_UNICODE);
     }
 
-    public function loadSocioAjax() {
-        $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
-        if($id) {
+    public function loadSocioAjax(): void
+    {
+        $this->csrfVerify();
+        header('Content-Type: application/json; charset=utf-8');
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
+        if ($id) {
             $retorno = $this->_ajax->getById($id);
-            $objeto = array(
-                'id'        => $retorno->getId(),
-                'nombre'    => $retorno->getNombre(). ' ' . $retorno->getApellido()
-            );
+            $nombre = $this->fixEncoding($retorno->getNombre() . ' ' . $retorno->getApellido());
+            echo json_encode([
+                'id' => $retorno->getId(),
+                'nombre' => $nombre,
+                'estado' => $retorno->getEstado(),
+                'documento' => $retorno->getDocumento(),
+                'foto' => $retorno->getFoto(),
+            ], JSON_UNESCAPED_UNICODE);
         } else {
-            $objeto = array('nombre' => 'No encontrado');
+            echo json_encode(['nombre' => 'No encontrado']);
         }
-        echo json_encode($objeto);
     }
 
-    public function getByDocumento() {
-        $documento = filter_input(INPUT_POST, 'documento', FILTER_SANITIZE_NUMBER_INT);
-        if($documento) {
+    public function getByDocumento(): void
+    {
+        $this->csrfVerify();
+        header('Content-Type: application/json; charset=utf-8');
+        $documento = filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0;
+        if ($documento) {
             $retorno = $this->_ajax->getByDocumento($documento);
-            if($retorno) {
-              $objeto = array(
-                'id'        => $retorno->getId(),
-                'nombre'    => $retorno->getNombre(). ' ' . $retorno->getApellido(),
-                'documento' => $retorno->getDocumento()
-              );
-
+            if ($retorno) {
+                $nombre = $this->fixEncoding($retorno->getNombre() . ' ' . $retorno->getApellido());
+                echo json_encode([
+                    'id' => $retorno->getId(),
+                    'nombre' => $nombre,
+                    'documento' => $retorno->getDocumento(),
+                ], JSON_UNESCAPED_UNICODE);
             } else {
-              $objeto = array('documento' => 0);
+                echo json_encode(['documento' => 0]);
             }
         } else {
-
-            $objeto = array( 'documento' => 0);
+            echo json_encode(['documento' => 0]);
         }
-        echo json_encode($objeto);
     }
 
-    public function getParentByDocumento() {
-        $documento = filter_input(INPUT_POST, 'documento', FILTER_SANITIZE_NUMBER_INT);
-        if($documento) {
+    public function getParentByDocumento(): void
+    {
+        $documento = filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0;
+        if ($documento) {
             $retorno = $this->_ajax->getParentByDocumento($documento);
-            if($retorno) {
-              $objeto = array(
-                'id'        => $retorno->getId(),
-                'nombre'    => $retorno->getNombre(). ' ' . $retorno->getApellido(),
-                'documento' => $retorno->getDocumento()
-              );
-
+            if ($retorno) {
+                echo json_encode([
+                    'id' => $retorno->getId(),
+                    'nombre' => $retorno->getNombre() . ' ' . $retorno->getApellido(),
+                    'documento' => $retorno->getDocumento(),
+                ]);
             } else {
-              $objeto = array('documento' => 0);
+                echo json_encode(['documento' => 0]);
             }
         } else {
-
-            $objeto = array( 'documento' => 0);
+            echo json_encode(['documento' => 0]);
         }
-        echo json_encode($objeto);
     }
 
-    public function eliminados($pag=0) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
+    public function eliminados(int $pag = 1): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
+        
+        $termino = trim($_GET['q'] ?? '');
+        $this->_view->searchTerm = $termino;
+        
+        if ($termino !== '') {
+            $allEliminados = $modelo->buscarEliminados($termino);
+        } else {
+            $allEliminados = $modelo->getEliminados();
         }
-        $modelo  = $this->loadModel('socios');
-        $this->_view->socios = $modelo->getEliminados();
-        $totalRegistros = count($this->_view->socios);
-        $desde = $pag*15;
-        $this->_view->socios = $modelo->getPaginadosE($desde);
-        $paginador = new Paginador();
-        $paginador->setCantidadRegistros(15);
-        $paginador->setClass('primero',         'previous');
-        $paginador->setClass('bloqueAnterior',  'previous');
-        $paginador->setClass('anterior',        'previous');
-        $paginador->setClass('siguiente',       'next');
-        $paginador->setClass('bloqueSiguiente', 'next');
-        $paginador->setClass('ultimo',          'next');
-        $paginador->setClass('numero',          '<>');
-        $paginador->setClass('actual',          'active');
-        $pagina = $pag;
-        $this->_view->datos      = $paginador->paginar($pagina, $totalRegistros);
-        $this->_view->enlaces    = $paginador->getHtmlPaginacion('pagina', 'li', 'eliminados');
+        
+        $totalRegistros = count($allEliminados);
+        $totalPages = (int) ceil($totalRegistros / 15);
+        $this->_view->totalPages = max(1, $totalPages);
+        $this->_view->currentPage = $pag;
+        
+        $desde = ($pag - 1) * 15;
+        $this->_view->socios = array_slice($allEliminados, $desde, 15);
+        
         $this->_view->renderizar('eliminados');
-
     }
-    
-    public function eliminadosAuto() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
+
+    public function eliminadosAuto(): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
         $modelMov = $this->loadModel('movimientos');
         $res = $modelMov->lastEmision();
         $emision = $res->fecha_generado;
         $this->_view->socios = $modelo->getEliminadosAuto($emision);
         $this->_view->renderizar('bajas-auto');
-
-    }
-    
-    
-
-    public function listarAdelantos() {
-      if(!Session::get('autenticado')) {
-          $this->redireccionar('login');
-      }
-      $modelo  = $this->loadModel('socios');
-      $this->_view->socios = $modelo->getAdelantos();
-      $this->_view->renderizar('listar-adelantos');
     }
 
-    public function activar($id) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
+    public function listarAdelantos(): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
+        $this->_view->socios = $modelo->getAdelantos();
+        $this->_view->renderizar('listar-adelantos');
+    }
+
+    public function activar(int $id): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
         $socio = $modelo->getById($id);
-        $this->_view->socio = $socio;
-        $this->_view->renderizar('activar');
+        if ($modelo->activar($socio, Session::get('usuario')->idusuario)) {
+            header('Location: ' . BASE_URL . 'socios/eliminados?mensaje=activado');
+        } else {
+            header('Location: ' . BASE_URL . 'socios/eliminados?error=noactivado');
+        }
+        exit;
     }
 
-    public function activarf($id) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
-        $modelo  = $this->loadModel('socios');
+    public function activarf(int $id): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
         $socio = $modelo->getById($id);
-        if($modelo->activar($socio, Session::get('usuario')->idusuario)) {
+        if ($modelo->activar($socio, Session::get('usuario')->idusuario)) {
             $this->_view->mensaje = "Socio activado con &eacute;xito";
         } else {
             $this->_view->mensaje = "No se pudo activar el socio intente m&aacute;s tarde";
         }
         $this->_view->renderizar('resultado');
-
-
     }
 
-    public function totales() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
+    public function totales(): void
+    {
+        $this->requireAuth();
         $this->_view->renderizar('totales');
     }
 
-    public function listarsocios() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }
+    public function listarsocios(): void
+    {
+        $this->requireAuth();
         $modelSocios = $this->loadModel('socios');
         $row = $modelSocios->getAll('apel');
         $parientes = $modelSocios->getByParent();
         $conyuges = 0;
         $varones = 0;
         $mujeres = 0;
-        foreach($parientes as $p) {
-            if($p["parentezco"] == 'C') {
-                $conyuges+= $p["conteo"];
+        foreach ($parientes as $p) {
+            if ($p["parentezco"] == 'C') {
+                $conyuges += $p["conteo"];
             } else {
-                if($p['sexo'] == 'F') {
-                    $mujeres+= $p['conteo'];
+                if ($p['sexo'] == 'F') {
+                    $mujeres += $p['conteo'];
                 } else {
-                    $varones+= $p['conteo'];
+                    $varones += $p['conteo'];
                 }
             }
         }
         $registros = count($row);
         $paginas = $registros / 45;
-        //echo $paginas . ' ' . $registros;
         $this->getLibrary('fpdf');
-        $pdf=new FPDF();
+        $pdf = new FPDF();
         $pdf->AliasNbPages();
         $pdf->SetTopMargin(5);
-        $pdf->SetFont('Arial','B',14);
-        $pos_y  =   13;
+        $pdf->SetFont('Arial', 'B', 14);
+        $pos_y = 13;
         $pdf->AddPage();
-        $pdf->SetXY(20,$pos_y);
-        $pdf->Cell(0,8,utf8_decode('Listado de Socios'),0,0,'C');
+        $pdf->SetXY(20, $pos_y);
+        $pdf->Cell(0, 8, 'Listado de Socios', 0, 0, 'C');
 
         $pos_y = 25;
-
         $it = 0;
-        for($i = 0; $i < $paginas; $i++) {
-            $pdf->SetFont('Arial','B',10);
-            $pdf->SetXY(20,$pos_y);
-            $pdf->Cell(10,4,'Nro.',0,0);
-            $pdf->SetXY(30,$pos_y);
-            $pdf->Cell(50,4,'Nombre',0,0);
-            $pdf->SetXY(90,$pos_y);
-            $pdf->Cell(65,4,'Domicilio',0,0);
-            $pdf->SetXY(160,$pos_y);
-            $pdf->Cell(10,4,'Cat',0,0);
+        for ($i = 0; $i < $paginas; $i++) {
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->SetXY(20, $pos_y);
+            $pdf->Cell(10, 4, 'Nro.', 0, 0);
+            $pdf->SetXY(30, $pos_y);
+            $pdf->Cell(50, 4, 'Nombre', 0, 0);
+            $pdf->SetXY(90, $pos_y);
+            $pdf->Cell(65, 4, 'Domicilio', 0, 0);
+            $pdf->SetXY(160, $pos_y);
+            $pdf->Cell(10, 4, 'Cat', 0, 0);
 
-            //$pos_y+=5;
-            $pdf->SetFont('Arial','',10);
+            $pdf->SetFont('Arial', '', 10);
             $pos_y = 28;
             $pdf->SetY($pos_y);
-            for($j = 0; $j < 45; $j++) {
-                    if(!($it < $registros))
-                        break;
-                        $pdf->SetXY(20,$pos_y);
-                        $pdf->Cell(10,4,$row[$it]->getId(),0,0);
-                        $pdf->SetXY(30,$pos_y);
-                        $pdf->Cell(50,4,utf8_decode(utf8_decode($row[$it]->getApellido())),0,0);
-                        $pdf->SetXY(90,$pos_y);
-                        $pdf->Cell(65,4,utf8_decode(utf8_decode($row[$it]->getDomicilio())),0,0);
-                        $pdf->SetXY(160,$pos_y);
-                        $pdf->Cell(10,4,substr($row[$it]->getCategoria()->__toString(),0,1),0,0);
-                        $pos_y+=5;
-                        $pdf->SetY($pos_y);
-
-                        $it++;
-
-                }
-
-                if($pdf->PageNo() < $paginas) {
-                    $pdf->SetY($pos_y + 10);
-                    $pdf->SetFont('Arial','I',8);
-                    $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
-                    $pos_y = 25;
-                    $pdf->AddPage();
-                } else {
-                    $pdf->SetY($pos_y + 10);
-                    $pdf->SetFont('Arial','B',12);
-                    $pdf->SetX(20);
-                    $pdf->Cell(0,10,'Cantidad de socios: '.$registros, 0,0,'L');
-                    $pdf->SetY($pos_y + 15);
-                    $pdf->SetX(20);
-                    $pdf->Cell(0,10, 'Cantidad '. utf8_decode('cónyuges').': ' .$conyuges, 0, 0, 'L');
-                    $pdf->SetY($pos_y + 20);
-                    $pdf->SetX(20);
-                    $pdf->Cell(0,10, 'Cantidad hijos varones: '.$varones, 0, 0, 'L');
-                    $pdf->SetY($pos_y + 25);
-                    $pdf->SetX(20);
-                    $pdf->Cell(0,10, 'Cantidad hijas: '.$mujeres, 0, 0, 'L');
-                    $pdf->SetY($pos_y + 35);
-                    $pdf->SetFont('Arial','I',8);
-                    $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
-                    $pos_y = 25;
-                }
-
-
-
-            //$pdf->SetFillColor(236,235,236);
-
-
-
+            for ($j = 0; $j < 45; $j++) {
+                if (!($it < $registros)) break;
+                $pdf->SetXY(20, $pos_y);
+                $pdf->Cell(10, 4, $row[$it]->getId(), 0, 0);
+                $pdf->SetXY(30, $pos_y);
+                $pdf->Cell(50, 4, $this->iso($row[$it]->getApellido() . ', ' . $row[$it]->getNombre()), 0, 0);
+                $pdf->SetXY(90, $pos_y);
+                $pdf->Cell(65, 4, $this->iso($row[$it]->getDomicilio()), 0, 0);
+                $pdf->SetXY(160, $pos_y);
+                $pdf->Cell(10, 4, $this->iso(substr($row[$it]->getCategoria()->__toString(), 0, 1)), 0, 0);
+                $pos_y += 5;
+                $pdf->SetY($pos_y);
+                $it++;
             }
 
-            $pdf->Output();
-
-    }
-    
-    public function imprimirparientes() {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
+            if ($pdf->PageNo() < $paginas) {
+                $pdf->SetY($pos_y + 10);
+                $pdf->SetFont('Arial', 'I', 8);
+                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                $pos_y = 25;
+                $pdf->AddPage();
+            } else {
+                $pdf->SetY($pos_y + 10);
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->SetX(20);
+                $pdf->Cell(0, 10, 'Cantidad de socios: ' . $registros, 0, 0, 'L');
+                $pdf->SetY($pos_y + 15);
+                $pdf->SetX(20);
+                $pdf->Cell(0, 10, 'Cantidad conyuges: ' . $conyuges, 0, 0, 'L');
+                $pdf->SetY($pos_y + 20);
+                $pdf->SetX(20);
+                $pdf->Cell(0, 10, 'Cantidad hijos varones: ' . $varones, 0, 0, 'L');
+                $pdf->SetY($pos_y + 25);
+                $pdf->SetX(20);
+                $pdf->Cell(0, 10, 'Cantidad hijas: ' . $mujeres, 0, 0, 'L');
+                $pdf->SetY($pos_y + 35);
+                $pdf->SetFont('Arial', 'I', 8);
+                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                $pos_y = 25;
+            }
         }
+        $pdf->Output();
+    }
+
+    public function imprimirparientes(): void
+    {
+        $this->requireAuth();
         $modelSocios = $this->loadModel('socios');
         $row = $modelSocios->getAllParents('parentezco, p.apellido, p.nombre');
         $registros = count($row);
         $paginas = $registros / 45;
-        //echo $paginas . ' ' . $registros;
         $this->getLibrary('fpdf');
-        $pdf=new FPDF();
+        $pdf = new FPDF();
         $pdf->AliasNbPages();
         $pdf->SetTopMargin(5);
-        $pdf->SetFont('Arial','B',14);
-        $pos_y  =   13;
+        $pdf->SetFont('Arial', 'B', 14);
+        $pos_y = 13;
         $pdf->AddPage();
-        $pdf->SetXY(20,$pos_y);
-        $pdf->Cell(0,8,utf8_decode('Listado de Familiares'),0,0,'C');
+        $pdf->SetXY(20, $pos_y);
+        $pdf->Cell(0, 8, 'Listado de Familiares', 0, 0, 'C');
 
         $pos_y = 25;
-
         $it = 0;
-        for($i = 0; $i < $paginas; $i++) {
-            $pdf->SetFont('Arial','B',10);
-            $pdf->SetXY(20,$pos_y);
-            $pdf->Cell(10,4,'Nro.',0,0);
-            $pdf->SetXY(30,$pos_y);
-            $pdf->Cell(10,4,'Parent.',0,0);
-            $pdf->SetXY(45,$pos_y);
-            $pdf->Cell(50,4,'Nombre',0,0);
-            $pdf->SetXY(90,$pos_y);
-            $pdf->Cell(65,4,'Apellido',0,0);
-            $pdf->SetXY(160,$pos_y);
-            $pdf->Cell(10,4,'Documento',0,0);
+        for ($i = 0; $i < $paginas; $i++) {
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->SetXY(20, $pos_y);
+            $pdf->Cell(10, 4, 'Nro.', 0, 0);
+            $pdf->SetXY(30, $pos_y);
+            $pdf->Cell(10, 4, 'Parent.', 0, 0);
+            $pdf->SetXY(45, $pos_y);
+            $pdf->Cell(50, 4, 'Nombre', 0, 0);
+            $pdf->SetXY(90, $pos_y);
+            $pdf->Cell(65, 4, 'Apellido', 0, 0);
+            $pdf->SetXY(160, $pos_y);
+            $pdf->Cell(10, 4, 'Documento', 0, 0);
 
-            //$pos_y+=5;
-            $pdf->SetFont('Arial','',10);
+            $pdf->SetFont('Arial', '', 10);
             $pos_y = 30;
             $pdf->SetY($pos_y);
-            for($j = 0; $j < 45; $j++) {
-                    if(!($it < $registros))
-                        break;
-                        $pdf->SetXY(20,$pos_y);
-                        $pdf->Cell(10,4,$row[$it]->getId(),0,0);
-                        $pdf->SetXY(30,$pos_y);
-                        $pdf->Cell(10,4,$row[$it]->getParentezco(),0,0);
-                        $pdf->SetXY(45,$pos_y);
-                        $pdf->Cell(50,4,utf8_decode(utf8_decode($row[$it]->getNombre())),0,0);
-                        $pdf->SetXY(90,$pos_y);
-                        $pdf->Cell(50,4,utf8_decode(utf8_decode($row[$it]->getApellido())),0,0);
-                        $pdf->SetXY(160,$pos_y);
-                        $pdf->Cell(10,4,$row[$it]->getDocumento(),0,1);
-                        $pos_y+=5;
-                        $pdf->SetY($pos_y);
-
-                        $it++;
-
-                }
-
-                if($pdf->PageNo() < $paginas) {
-                    $pdf->SetY($pos_y + 10);
-                    $pdf->SetFont('Arial','I',8);
-                    $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
-                    $pos_y = 25;
-                    $pdf->AddPage();
-                } else {
-                    $pdf->SetY($pos_y + 10);
-                    $pdf->SetFont('Arial','B',12);
-                    $pdf->SetX(20);
-                    $pdf->Cell(0,10,'Cantidad de familiares: '.$registros, 0,0,'L');
-                    $pdf->SetY($pos_y + 30);
-                    $pdf->SetFont('Arial','I',8);
-                    $pdf->Cell(0,10,utf8_decode('Página ').$pdf->PageNo().' de {nb}',0,0,'C');
-                    $pos_y = 25;
-                }
-
-
-
-            //$pdf->SetFillColor(236,235,236);
-
-
-
+            for ($j = 0; $j < 45; $j++) {
+                if (!($it < $registros)) break;
+                $pdf->SetXY(20, $pos_y);
+                $pdf->Cell(10, 4, $row[$it]->getId(), 0, 0);
+                $pdf->SetXY(30, $pos_y);
+                $pdf->Cell(10, 4, $row[$it]->getParentezco(), 0, 0);
+                $pdf->SetXY(45, $pos_y);
+                $pdf->Cell(50, 4, $this->iso($row[$it]->getNombre()), 0, 0);
+                $pdf->SetXY(90, $pos_y);
+                $pdf->Cell(50, 4, $this->iso($row[$it]->getApellido()), 0, 0);
+                $pdf->SetXY(160, $pos_y);
+                $pdf->Cell(10, 4, $row[$it]->getDocumento(), 0, 1);
+                $pos_y += 5;
+                $pdf->SetY($pos_y);
+                $it++;
             }
 
-            $pdf->Output();
-
-    }
-
-    public function nuevoAdelanto() {
-
-          if(!Session::get('autenticado')) {
-              $this->redireccionar('login');
-          }
-          $this->_view->titulo = 'Titulo';
-          $this->_view->renderizar('nuevo-adelanto');
-    }
-
-    public function editarAdelanto($id) {
-
-      if(!Session::get('autenticado')) {
-          $this->redireccionar('login');
-      }
-
-      $modelo  = $this->loadModel('socios');
-      $adelanto = $modelo->getAdelanto($id);
-      $this->_view->adelanto = $adelanto;
-
-      $this->_view->renderizar('editar-adelanto');
-    }
-
-    public function listarParientes($idSocio) {
-        if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
+            if ($pdf->PageNo() < $paginas) {
+                $pdf->SetY($pos_y + 10);
+                $pdf->SetFont('Arial', 'I', 8);
+                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                $pos_y = 25;
+                $pdf->AddPage();
+            } else {
+                $pdf->SetY($pos_y + 10);
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->SetX(20);
+                $pdf->Cell(0, 10, 'Cantidad de familiares: ' . $registros, 0, 0, 'L');
+                $pdf->SetY($pos_y + 30);
+                $pdf->SetFont('Arial', 'I', 8);
+                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                $pos_y = 25;
+            }
         }
-        $modelo  = $this->loadModel('socios');
+        $pdf->Output();
+    }
+
+    public function nuevoAdelanto(): void
+    {
+        $this->requireAuth();
+        $this->_view->titulo = 'Titulo';
+        $this->_view->renderizar('nuevo-adelanto');
+    }
+
+    public function editarAdelanto(int $id): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
+        $this->_view->adelanto = $modelo->getAdelanto($id);
+        $this->_view->renderizar('editar-adelanto');
+    }
+
+    public function listarParientes(int $idSocio): void
+    {
+        $this->requireAuth();
+        $modelo = $this->loadModel('socios');
         $this->_view->idSocio = $idSocio;
         $this->_view->parientes = $modelo->getAllParentsBySocio($idSocio);
         $this->_view->renderizar('parientes');
-
     }
 
-     public function guardarParientes() {
-        /*if(!Session::get('autenticado')) {
-            $this->redireccionar('login');
-        }*/
-       $modelo  = $this->loadModel('socios');
-        if(isset($_POST['idsoc'])) {
-            $idSocio = filter_input(INPUT_POST ,'idsoc', FILTER_SANITIZE_NUMBER_INT);
-            $id      = filter_input(INPUT_POST ,'id', FILTER_SANITIZE_NUMBER_INT);
-            if($id == 0) {
-                $socio = $modelo->buildPariente();
-                $socioRef = $modelo->getById($idSocio);
-                $nombre = utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING));
-                $arreglo = explode(" ",$nombre);
-                $nombreCap = '';
-                foreach($arreglo as $valor) {
-                    $nombreCap.= ucfirst($valor) . " ";
-                }
-                $nombreCap = trim($nombreCap);
-                $socio->setNombre($nombreCap);
-                $apellido = utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING));
-                $arregloApellido = explode(" ", $apellido);
-                $apellidoCap = '';
-                foreach($arregloApellido as $valor) {
-                    $apellidoCap.= ucfirst($valor) . " ";
-                }
-                $apellidoCap = trim($apellidoCap);
-                $socio->setApellido($apellidoCap);
-                $socio->setDocumento(filter_input(INPUT_POST ,'documento', FILTER_SANITIZE_NUMBER_INT));
-                $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
-                $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
-                $socio->setSocio($socioRef);
-                //$nro = $modelo->getNroNuevo('socios');
-
-                $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
-                //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
-                $socio->setFechaNacimiento($nacimiento);
-                if($modelo->savePariente($socio, Session::get('usuario')->idusuario)) { 
-                    // Session::get('usuario')->idusuario)) {
-                    echo json_encode(array('mensaje' => "Registro guardado", 'color' => 'green'));
-                } else {
-                    echo json_encode(array('mensaje' => "Ocurrió un error al guardar, verifique", 'color' => 'red'));
-                }
-                
-                //$this->_view->renderizar('resultado');
-
-            } else {
-                $socio = $modelo->buildPariente();
-                $socio->setId($id);
-                $nombre = utf8_encode(filter_input(INPUT_POST ,'nombre', FILTER_SANITIZE_STRING));
-                $arreglo = explode(" ",$nombre);
-                $nombreCap = '';
-                foreach($arreglo as $valor) {
-                    $nombreCap.= ucfirst($valor) . " ";
-                }
-                $nombreCap = trim($nombreCap);
-                $socio->setNombre($nombreCap);
-                $apellido = utf8_encode(filter_input(INPUT_POST ,'apellido', FILTER_SANITIZE_STRING));
-                $arregloApellido = explode(" ", $apellido);
-                $apellidoCap = '';
-                foreach($arregloApellido as $valor) {
-                    $apellidoCap.= ucfirst($valor) . " ";
-                }
-                $apellidoCap = trim($apellidoCap);
-                $socio->setApellido($apellidoCap);
-                $socio->setDocumento(filter_input(INPUT_POST ,'documento', FILTER_SANITIZE_NUMBER_INT));
-                $socio->setParentezco(filter_input(INPUT_POST ,'parentezco', FILTER_SANITIZE_STRING));
-                $socio->setSexo(filter_input(INPUT_POST ,'sexo', FILTER_SANITIZE_STRING));
-                $nacimiento = filter_input(INPUT_POST ,'fecha_nacimiento', FILTER_SANITIZE_STRING);
-                //$nacimiento = $this->cambiarfecha_mysql($nacimiento);
-                $socio->setFechaNacimiento($nacimiento);
-                if($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
-                    echo json_encode(array('mensaje' => "Registro guardado", 'color' => 'green'));
-                } else {
-                    echo json_encode(array('mensaje' => "Ocurrió un error al guardar, verifique", 'color' => 'red'));
-                }
-                
-            }
-        
-
-           // $this->_view->renderizar('resultado');
+    public function guardarParientes(): void
+    {
+        $modelo = $this->loadModel('socios');
+        if (!isset($_POST['idsoc'])) {
+            return;
         }
-         //echo json_encode(array('mensaje' => "Ocurrió un error al guardar, verifique", 'color' => 'red'));
-    }  
-    
-    public function removePariente() {
-        $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
-        $modelo  = $this->loadModel('socios');
-        $result = $modelo->removePariente($id);
-        $objeto = array(
-            'id'        => $id
-          );
-        echo json_encode($objeto);
+
+        $idSocio = filter_input(INPUT_POST, 'idsoc', FILTER_VALIDATE_INT) ?: 0;
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
+
+        if ($id == 0) {
+            $socio = $modelo->buildPariente();
+            $socioRef = $modelo->getById($idSocio);
+            $nombre = $this->capitalizeName((string) $_POST['nombre']);
+            $apellido = $this->capitalizeName((string) $_POST['apellido']);
+            $socio->setNombre($nombre);
+            $socio->setApellido($apellido);
+            $socio->setDocumento(filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0);
+            $socio->setParentezco(sanitize((string) $_POST['parentezco']));
+            $socio->setSexo(sanitize((string) $_POST['sexo']));
+            $socio->setSocio($socioRef);
+            $socio->setFechaNacimiento((string) $_POST['fecha_nacimiento']);
+            if ($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
+                echo json_encode(['mensaje' => "Registro guardado", 'color' => 'green']);
+            } else {
+                echo json_encode(['mensaje' => "Ocurrio un error al guardar, verifique", 'color' => 'red']);
+            }
+        } else {
+            $socio = $modelo->buildPariente();
+            $socio->setId($id);
+            $socio->setNombre($this->capitalizeName((string) $_POST['nombre']));
+            $socio->setApellido($this->capitalizeName((string) $_POST['apellido']));
+            $socio->setDocumento(filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0);
+            $socio->setParentezco(sanitize((string) $_POST['parentezco']));
+            $socio->setSexo(sanitize((string) $_POST['sexo']));
+            $socio->setFechaNacimiento((string) $_POST['fecha_nacimiento']);
+            if ($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
+                echo json_encode(['mensaje' => "Registro guardado", 'color' => 'green']);
+            } else {
+                echo json_encode(['mensaje' => "Ocurrio un error al guardar, verifique", 'color' => 'red']);
+            }
+        }
     }
 
+    public function removePariente(): void
+    {
+        $id = sanitize((string) $_POST['id']);
+        $modelo = $this->loadModel('socios');
+        $modelo->removePariente($id);
+        echo json_encode(['id' => $id]);
+    }
+
+    private function capitalizeName(string $name): string
+    {
+        return mb_convert_case(trim($name), MB_CASE_TITLE, "UTF-8");
+    }
+
+    private function iso(string $text): string
+    {
+        return mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
+    }
 }
