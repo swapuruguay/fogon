@@ -1,5 +1,8 @@
 <?php
 
+use App\Core\Controller;
+use App\Core\Session;
+
 require_once 'libs/Paginador.php';
 
 class sociosController extends Controller

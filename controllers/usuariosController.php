@@ -1,5 +1,8 @@
 <?php
 
+use App\Core\Controller;
+use App\Core\Session;
+
 class usuariosController extends Controller {
 
     private $_ajax;

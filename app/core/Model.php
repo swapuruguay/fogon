@@ -5,7 +5,7 @@ namespace App\Core;
 class Model
 {
     protected Database $db;
-    protected $_db;
+    protected Database $_db;
 
     public function __construct()
     {

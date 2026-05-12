@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Model;
+
 require_once 'Ajuste.php';
 
 class ajustesModel extends Model {

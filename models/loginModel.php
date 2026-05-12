@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Model;
+
 class LoginModel extends Model {
     public function __construct() {
         parent::__construct();

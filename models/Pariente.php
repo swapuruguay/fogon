@@ -12,88 +12,107 @@
  * @author walter
  */
 
-class Pariente {
+class Pariente
+{
 
-    private $_id;
-    private $_socio;
-    private $_nombre;
-    private $_apellido;
-    private $_documento;
-    private $_fechaNacimiento;
-    private $_sexo;
-    private $_parentezco;
+    private int $_id;
+    private Socio $_socio;
+    private string $_nombre;
+    private string $_apellido;
+    private string $_documento;
+    private string $_fechaNacimiento;
+    private string $_sexo;
+    private string $_parentezco;
 
-    public function __construct($id, $nombre, $apellido) {
+    public function __construct($id, $nombre, $apellido)
+    {
         $this->_id = $id;
         $this->_apellido = $apellido;
         $this->_nombre = $nombre;
     }
 
-    public function getId(){
+    public function getId()
+    {
         return $this->_id;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->_id = $id;
     }
 
-    public function getSocio(){
+    public function getSocio()
+    {
         return $this->_socio;
     }
 
-    public function setSocio(Socio $socio) {
+    public function setSocio(Socio $socio)
+    {
         $this->_socio = $socio;
     }
 
-    public function getNombre() {
+    public function getNombre()
+    {
         return $this->_nombre;
     }
 
-    public function setNombre($nombre) {
+    public function setNombre($nombre)
+    {
         $this->_nombre = $nombre;
     }
 
-    public function getApellido() {
+    public function getApellido()
+    {
         return $this->_apellido;
     }
 
-    public function setApellido($apellido) {
+    public function setApellido($apellido)
+    {
         $this->_apellido = $apellido;
     }
 
-    public function getDocumento() {
+    public function getDocumento()
+    {
         return $this->_documento;
     }
 
-    public function setDocumento($documento) {
+    public function setDocumento($documento)
+    {
         $this->_documento = $documento;
     }
 
-    public  function getSexo() {
+    public  function getSexo()
+    {
         return $this->_sexo;
     }
 
-    public function setSexo($sexo) {
+    public function setSexo($sexo)
+    {
         $this->_sexo = $sexo;
     }
 
-    public function getParentezco() {
+    public function getParentezco()
+    {
         return $this->_parentezco;
     }
 
-    public function setParentezco($parentezco) {
+    public function setParentezco($parentezco)
+    {
         $this->_parentezco = $parentezco;
     }
 
-    public function getFechaNacimiento() {
+    public function getFechaNacimiento()
+    {
         return $this->_fechaNacimiento;
     }
 
-    public function setFechaNacimiento($fechaNacimiento) {
+    public function setFechaNacimiento($fechaNacimiento)
+    {
         $this->_fechaNacimiento = $fechaNacimiento;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->_nombre . ' ' . $this->_apellido;
     }
 }

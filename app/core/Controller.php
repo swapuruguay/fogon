@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use App\Core\Session;
+
 abstract class Controller
 {
     protected View $view;

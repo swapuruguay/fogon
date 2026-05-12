@@ -81,6 +81,9 @@
 </head>
 
 <body style="font-family: 'Lato', system-ui;">
+  <?php
+  use App\Core\Session;
+  ?>
   <section id="main">
     <div id="app"></div>
     <header>

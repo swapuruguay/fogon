@@ -25,19 +25,10 @@ try {
     require_once APP_PATH . 'core/Model.php';
     require_once APP_PATH . 'core/Bootstrap.php';
 
-    // Compatibility aliases for legacy controllers
-    class_alias('App\Core\Database', 'Database');
-    class_alias('App\Core\Session', 'Session');
-    class_alias('App\Core\Request', 'Request');
-    class_alias('App\Core\View', 'View');
-    class_alias('App\Core\Controller', 'Controller');
-    class_alias('App\Core\Model', 'Model');
-    class_alias('App\Core\Bootstrap', 'Bootstrap');
-
     App\Core\Session::init();
 
-    if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-        $token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'DELETE', 'PATCH'])) {
+        $token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if (!App\Core\Session::csrfVerify($token)) {
             http_response_code(419);
             die('CSRF token mismatch');

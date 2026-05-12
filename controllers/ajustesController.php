@@ -1,5 +1,8 @@
 <?php
 
+use App\Core\Controller;
+use App\Core\Session;
+
 class ajustesController extends Controller {
 
     public function __construct() {

@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Model;
+
 require_once 'Categoria.php';
 
 class categoriasModel extends Model {

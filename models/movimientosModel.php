@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Model;
+
 require_once 'Movimiento.php';
 require_once 'Socio.php';
 require_once 'sociosModel.php';

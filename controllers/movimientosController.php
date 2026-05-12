@@ -1,5 +1,8 @@
 <?php
 
+use App\Core\Controller;
+use App\Core\Session;
+
 class movimientosController extends Controller
 {
 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Controller;
+
 class indexController extends Controller {
 
     public function __construct() {
