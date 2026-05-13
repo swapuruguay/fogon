@@ -365,16 +365,16 @@ class movimientosController extends Controller
             $pdf->AliasNbPages();
             $pdf->SetTopMargin(5);
             $pdf->SetFont('Arial', 'B', 14);
-
+            $pos_y = 13;
+            $pdf->SetXY(20, $pos_y);
+            $pdf->AddPage();
+            // TITULO (Tu Feature)
+            $titulo = utf8_decode('Listado de emisión de recibos ') . $mesPost . '/' . $anioPost;
+            $pdf->Cell(0, 8, $titulo, 0, 0, 'C');
             $it = 0;
             for ($i = 0; $i < $paginas; $i++) {
-                $pdf->AddPage();
-                $pos_y = 13;
-                $pdf->SetXY(20, $pos_y);
 
-                // TITULO (Tu Feature)
-                $titulo = utf8_decode('Listado de emisión de recibos ') . $mesPost . '/' . $anioPost;
-                $pdf->Cell(0, 8, $titulo, 0, 0, 'C');
+
 
                 // CABECERA DE TABLA
                 $pos_y = 25;
@@ -424,13 +424,17 @@ class movimientosController extends Controller
                 }
 
                 // PIE DE PÁGINA O TOTALES
-                if ($it < $registros) {
-                    $pdf->SetY(280); // Ajusta según tu FPDF
+                if ($pdf->PageNo() < $paginas) {
+                    $pdf->SetY($pos_y + 10); // Ajusta según tu FPDF
                     $pdf->SetFont('Arial', 'I', 8);
                     $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                    $pos_y = 25;
+                    $pdf->AddPage();
                 } else {
-                    // Última página: Totales
-                    $pos_y += 10;
+                    $pdf->SetY($pos_y + 10); // Ajusta según tu FPDF
+                    $pdf->SetFont('Arial', 'I', 8);
+                    $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                    $pos_y += 20;
                     $tot = json_decode($this->getTotalesE($mesPost, $anioPost, $direPost));
                     $totales = ($tot[0]->importe ?? 0) + ($tot[1]->importe ?? 0) + ($tot[2]->importe ?? 0);
                     $pdf->SetY($pos_y);

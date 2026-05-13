@@ -459,13 +459,13 @@ class sociosController extends Controller
         $pdf->AliasNbPages();
         $pdf->SetTopMargin(5);
         $pdf->SetFont('Arial', 'B', 14);
+        $pdf->AddPage();
+        $pos_y = 13;
+        $pdf->SetXY(20, $pos_y);
+        $pdf->Cell(0, 8, 'Listado de Socios', 0, 0, 'C');
 
         $it = 0;
         for ($i = 0; $i < $paginas; $i++) {
-            $pdf->AddPage();
-            $pos_y = 13;
-            $pdf->SetXY(20, $pos_y);
-            $pdf->Cell(0, 8, 'Listado de Socios', 0, 0, 'C');
 
             $pos_y = 25;
             $pdf->SetFont('Arial', 'B', 10);
@@ -479,7 +479,7 @@ class sociosController extends Controller
             $pdf->Cell(10, 4, 'Cat', 0, 0);
 
             $pdf->SetFont('Arial', '', 10);
-            $pos_y = 28;
+            $pos_y = 30;
 
             for ($j = 0; $j < 45; $j++) {
                 if (!($it < $registros)) break;
@@ -509,13 +509,26 @@ class sociosController extends Controller
             }
 
             // PIE DE PÁGINA O RESUMEN FINAL
-            if ($it < $registros) {
-                $pdf->SetY(280);
+            if ($pdf->PageNo() < $paginas) {
+                $pdf->SetY($pos_y + 10);
                 $pdf->SetFont('Arial', 'I', 8);
                 $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                $pos_y = 30;
+                $pdf->AddPage();
             } else {
-                // Totales finales al terminar el bucle de registros
                 $pdf->SetY($pos_y + 10);
+                $pdf->SetFont('Arial', 'I', 8);
+                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                // Totales finales al terminar el bucle de registros
+                if ($it > 40) {
+                    $pdf->AddPage();
+                    $pos_y = 10;
+                    $pdf->SetY(265);
+                    $pdf->SetFont('Arial', 'I', 8);
+                    $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                }
+
+                $pdf->SetY($pos_y + 20);
                 $pdf->SetFont('Arial', 'B', 12);
                 $pdf->SetX(20);
                 $pdf->Cell(0, 10, 'Cantidad de socios: ' . $registros, 0, 0, 'L');
@@ -528,10 +541,6 @@ class sociosController extends Controller
                 $pdf->SetY($pdf->GetY() + 5);
                 $pdf->SetX(20);
                 $pdf->Cell(0, 10, 'Cantidad hijas: ' . $mujeres, 0, 0, 'L');
-
-                $pdf->SetY(280);
-                $pdf->SetFont('Arial', 'I', 8);
-                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
             }
         }
         $pdf->Output();
