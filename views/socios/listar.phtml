@@ -123,7 +123,7 @@ $filter = $this->filter ?? 'all';
                   class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
               </div>
               <div class="min-w-0">
-                <p class="font-semibold text-gray-900 truncate"><?php echo $socio; ?></p>
+                <p class="font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($socio); ?></p>
                 <div class="flex items-center space-x-4 mt-1">
                   <span class="text-xs text-gray-400 font-mono">#<?php echo $socio->getId(); ?></span>
                   <?php
@@ -303,7 +303,12 @@ $filter = $this->filter ?? 'all';
           const badge = s.domicilio && (s.domicilio.toLowerCase().includes('fog')) ?
             '<span class="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800">En el Club</span>' :
             '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">En Calle</span>';
-          const nombreCompleto = s.nombre + ' ' + s.apellido;
+          const nombreCompleto = (s.nombre + ' ' + s.apellido)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
           const docFormatted = s.documento && s.documento.length >= 6 ?
             (s.documento.slice(0, -1).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + '-' + s.documento.slice(-1)) :
             '';
