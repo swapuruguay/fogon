@@ -125,7 +125,8 @@ class sociosController extends Controller
         $modelo = $this->loadModel('socios');
         $resultado = $modelo->buscar($termino);
 
-        echo json_encode($resultado);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
     }
 
     public function nuevo(): void

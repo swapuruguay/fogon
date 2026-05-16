@@ -113,7 +113,7 @@ $filter = $this->filter ?? 'all';
 
           <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition member-row"
             data-collection-type="<?php echo $socio->getCollectionType(); ?>"
-            data-name="<?php echo strtolower($socio->getNombre() . ' ' . $socio->getApellido()); ?>"
+            data-name="<?php echo htmlspecialchars(strtolower($socio->getNombre() . ' ' . $socio->getApellido())); ?>"
             data-doc="<?php echo $socio->getDocumento(); ?>">
 
             <!-- Left: Photo + Name + Document (clickable) -->
@@ -162,7 +162,7 @@ $filter = $this->filter ?? 'all';
             <!-- Category + Status -->
             <div class="hidden md:flex items-center space-x-6">
               <div class="text-right">
-                <p class="text-sm font-medium text-gray-800"><?php echo $socio->getCategoria() ? $socio->getCategoria()->getNombre() : 'Sin categoría'; ?></p>
+                <p class="text-sm font-medium text-gray-800"><?php echo htmlspecialchars($socio->getCategoria() ? $socio->getCategoria()->getNombre() : 'Sin categoría'); ?></p>
                 <p class="text-xs text-gray-500">$ <?php echo number_format($socio->getCategoria() ? $socio->getCategoria()->getImporte() : 0, 2, ',', '.'); ?></p>
               </div>
               <div class="text-right">
