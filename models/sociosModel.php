@@ -342,15 +342,15 @@ class sociosModel extends Model
         foreach ($listado as $valor) {
             $arreglo[] = [
                 'id_socio' => (int) $valor->id_socio,
-                'nombre' => $valor->nombre,
-                'apellido' => $valor->apellido,
+                'nombre' => $this->fixEncoding($valor->nombre),
+                'apellido' => $this->fixEncoding($valor->apellido),
                 'documento' => $valor->documento,
-                'domicilio' => $valor->domicilio ?? '',
+                'domicilio' => $this->fixEncoding($valor->domicilio ?? ''),
                 'telefono' => $valor->telefono ?? '',
                 'email' => $valor->email ?? '',
                 'estado' => $valor->estado,
                 'foto' => $valor->foto ?? 'socio.png',
-                'categoria' => $valor->cat_nombre ?? 'Sin categoría',
+                'categoria' => $this->fixEncoding($valor->cat_nombre ?? 'Sin categoría'),
                 'cat_importe' => (float) ($valor->cat_importe ?? 0),
             ];
         }
