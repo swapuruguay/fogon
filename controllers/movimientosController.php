@@ -400,19 +400,19 @@ class movimientosController extends Controller
                     $socio = $modelSocios->getById($row[$it]->id_socio_fk);
 
                     // LÓGICA DEL FIX (Nombres capitalizados que venía de Master)
-                    $nombreCompleto = $socio->__toString();
-                    $apellidoLow = mb_strtolower($nombreCompleto, 'UTF-8');
-                    $apellidos = explode(' ', $apellidoLow);
-                    $apellidosCap = [];
-                    foreach ($apellidos as $a) {
-                        $apellidosCap[] = mb_ucfirst($a, 'UTF-8');
+                    $nombreCompleto = $this->iso($socio->getApellido() . ', ' . $socio->getNombre());
+                    $nombreLow = strtolower($nombreCompleto);
+                    $partes = explode(' ', $nombreLow);
+                    $partesCap = [];
+                    foreach ($partes as $p) {
+                        $partesCap[] = ucfirst($p);
                     }
-                    $nombreFormateado = implode(' ', $apellidosCap);
+                    $nombreFormateado = implode(' ', $partesCap);
 
                     $pdf->SetXY(20, $pos_y);
                     $pdf->Cell(10, 4, $socio->getId(), 0, 0);
                     $pdf->SetXY(30, $pos_y);
-                    $pdf->Cell(50, 4, $this->iso($nombreFormateado), 0, 0);
+                    $pdf->Cell(50, 4, $nombreFormateado, 0, 0);
                     $pdf->SetXY(90, $pos_y);
                     $pdf->Cell(65, 4, $this->iso($socio->getDomicilio()), 0, 0);
                     $pdf->SetXY(160, $pos_y);
