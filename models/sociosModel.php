@@ -22,17 +22,31 @@ class sociosModel extends Model
         return in_array($orden, $allowed, true) ? $orden : 'id_socio';
     }
 
+    private function fixEncoding(string $str): string
+    {
+        if (empty($str)) return $str;
+        return utf8_decode($str);
+    }
+
     private function buildSocioFromRow(object $valor): Socio
     {
-        $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
+        $socio = new Socio(
+            $valor->id_socio,
+            $this->fixEncoding($valor->nombre),
+            $this->fixEncoding($valor->apellido)
+        );
         $socio->setDocumento($valor->documento);
-        $socio->setDomicilio($valor->domicilio ?? '');
+        $socio->setDomicilio($this->fixEncoding($valor->domicilio ?? ''));
         $socio->setTelefono($valor->telefono ?? '');
         $socio->setEmail($valor->email ?? '');
         $socio->setEstado($valor->estado);
         $socio->setFoto($valor->foto ?? 'socio.png');
         $socio->setSaldo($valor->saldo ?? 0);
-        $cat = new Categoria($valor->id_categoria_fk ?? 0, $valor->cat_nombre ?? 'Sin categoría', $valor->cat_importe ?? 0);
+        $cat = new Categoria(
+            $valor->id_categoria_fk ?? 0,
+            $this->fixEncoding($valor->cat_nombre ?? 'Sin categoría'),
+            $valor->cat_importe ?? 0
+        );
         $socio->setCategoria($cat);
         return $socio;
     }
