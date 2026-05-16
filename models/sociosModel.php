@@ -40,10 +40,11 @@ class sociosModel extends Model
     private function queryWithSaldo(string $orden, bool $prefixTable = true): array
     {
         $orderBy = $prefixTable ? "ORDER BY s.$orden" : "ORDER BY $orden";
-        return $this->_db->query("SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe,
+        $sql = "SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe,
             COALESCE((SELECT SUM(cu.importe) FROM cuotas cu WHERE cu.id_socio_fk = s.id_socio), 0) as saldo
             FROM socios s LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
-            WHERE s.estado='A' $orderBy")->fetchAll(PDO::FETCH_OBJ);
+            WHERE s.estado='A' $orderBy";
+        return $this->_db->select($sql)->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getAll(string $orden = 'id_socio'): array
