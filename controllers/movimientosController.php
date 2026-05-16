@@ -562,11 +562,17 @@ class movimientosController extends Controller
     public function guardarAdelanto(int $id): void
     {
         $this->requireAuth();
-        $modelo = $this->loadModel('socios');
-        if (!isset($_POST['idsoc'])) {
+        $modelo = $this->loadModel('movimientos');
+        if (!isset($_POST['id'])) {
             return;
         }
-        $this->_view->renderizar('resultado');
+        $adelanto = [
+            'id_socio_fk' => filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0,
+            'desde' => (string) $_POST['desde'],
+            'hasta' => (string) $_POST['hasta'],
+        ];
+        $modelo->updateAdelanto($id, $adelanto);
+        echo json_encode(['ok' => true, 'texto' => 'Registro actualizado']);
     }
 
     public function prueba(): void

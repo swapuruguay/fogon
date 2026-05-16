@@ -630,6 +630,7 @@ class sociosController extends Controller
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
         $this->_view->adelanto = $modelo->getAdelanto($id);
+        $this->_view->adelantoid = $id;
         $this->_view->renderizar('editar-adelanto');
     }
 

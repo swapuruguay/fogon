@@ -1,34 +1,130 @@
-<div class="max-w-7xl mx-auto px-4">
-<h2>Listado de socios</h2>
-<article id="formularios" class="w-full">
-<table class="table table-bordered table-condensed table-striped overflow-x-auto w-full">
-    <tr>
-        <th>Nro.</th><th>Nombre</th><th>Apellido</th><th>Categor&iacute;a</th><th>Saldo</th><th></th><th></th>
-    </tr>
+<?php
 
-    <?php foreach($this->socios as $soc): ?>
-        <?php if($soc->getCategoria()->getImporte() > 0) : ?>
-            <?php if($soc->getSaldo() / $soc->getCategoria()->getImporte() >= 2 ) : ?>
+use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-6">
 
-                    <tr>
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Socios Atrasados</h1>
+      <p class="text-gray-500 text-sm mt-1">Socios con 2 o más cuotas pendientes</p>
+    </div>
+    <a href="<?php echo BASE_URL . 'socios/listar'; ?>"
+      class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Volver
+    </a>
+  </div>
 
-                    <td><?php echo $soc->getId(); ?></td>
-                    <td><?php echo $soc->getNombre(); ?></td>
-                    <td><?php echo $soc->getApellido(); ?></td>
-                    <td><?php echo $soc->getCategoria()->getNombre() ?></td>
-                    <td><?php echo $soc->getSaldo(); ?></td>
-                    <td><a href="<?php echo BASE_URL . 'socios/editar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
-                    <td><a href="<?php echo BASE_URL . 'socios/confirmar/' . $soc->getId(); ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
+  <!-- Warning Banner -->
+  <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 text-amber-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+      <p class="text-sm text-amber-800">
+        Los socios con <strong>6 o más cuotas</strong> impagas serán dados de baja automáticamente.
+      </p>
+    </div>
+  </div>
 
+  <!-- Filter -->
+  <div class="mb-4">
+    <input type="text" id="filtro" placeholder="Buscar por ID, nombre o apellido..."
+      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+  </div>
 
-                    </tr>
+  <!-- List -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <?php
+    $hayAtrasados = false;
+    foreach ($this->socios as $soc):
+      if ($soc->getCategoria()->getImporte() > 0 && $soc->getSaldo() / $soc->getCategoria()->getImporte() >= 2):
+        $hayAtrasados = true;
+      endif;
+    endforeach;
+    ?>
 
-            <?php endif ?>
-        <?php endif ?>
-    <?php endforeach; ?>
-</table>
-    </article>
+    <?php if ($hayAtrasados): ?>
+      <div class="divide-y divide-gray-100">
+        <?php foreach ($this->socios as $soc): ?>
+          <?php if ($soc->getCategoria()->getImporte() > 0): ?>
+            <?php
+            $cuotas = $soc->getSaldo() / $soc->getCategoria()->getImporte();
+            if ($cuotas >= 2):
+              $n = (int) ceil($cuotas);
+              $n = min($n, 6);
+
+              $c = match ($n) {
+                6 => ['bg' => 'bg-red-200', 'border' => 'border-red-600', 'badge' => 'bg-red-600 text-white'],
+                5 => ['bg' => 'bg-red-100', 'border' => 'border-red-500', 'badge' => 'bg-red-500 text-white'],
+                4 => ['bg' => 'bg-orange-200', 'border' => 'border-orange-500', 'badge' => 'bg-orange-500 text-white'],
+                3 => ['bg' => 'bg-yellow-100', 'border' => 'border-yellow-500', 'badge' => 'bg-yellow-600 text-white'],
+                default => ['bg' => 'bg-lime-100', 'border' => 'border-yellow-500', 'badge' => 'bg-yellow-500 text-white'],
+              };
+            ?>
+
+              <a href="<?php echo BASE_URL . 'socios/editar/' . $soc->getId(); ?>"
+                class="socio-row flex items-center justify-between p-4 hover:opacity-80 transition <?php echo $c['bg']; ?> border-b border-gray-100 <?php echo $c['border']; ?>"
+                data-id="<?php echo $soc->getId(); ?>"
+                data-nombre="<?php echo strtolower($soc->getNombre() . ' ' . $soc->getApellido()); ?>">
+
+                <!-- Left: Photo + Name + Cuotas -->
+                <div class="flex items-center space-x-4 flex-1 min-w-0">
+                  <div class="shrink-0">
+                    <img src="<?php echo BASE_URL . 'views/socios/img/' . ($soc->getFoto() ?: 'socio.png'); ?>"
+                      class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="font-semibold truncate text-gray-900"><?php echo $soc; ?></p>
+                    <div class="flex items-center space-x-3 mt-1">
+                      <span class="text-xs text-gray-500 font-mono">#<?php echo $soc->getId(); ?></span>
+                      <span class="text-xs text-gray-500"><?php echo $soc->getCategoria()->getNombre(); ?></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Cuotas Badge + Saldo -->
+                <div class="flex items-center space-x-4">
+                  <div class="text-right">
+                    <p class="text-xs opacity-75">Saldo</p>
+                    <p class="font-bold">$<?php echo number_format($soc->getSaldo(), 0, '', '.'); ?></p>
+                  </div>
+                  <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold <?php echo $c['badge']; ?>">
+                    <?php echo $n; ?> cuota<?php echo $n > 1 ? 's' : ''; ?>
+                  </span>
+                  <svg class="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </div>
+              </a>
+
+            <?php endif; ?>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </div>
+    <?php else: ?>
+      <div class="p-12 text-center">
+        <svg class="mx-auto w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="mt-4 text-gray-500">No hay socios atrasados</p>
+      </div>
+    <?php endif; ?>
+  </div>
 </div>
-<br>
 
-<br><br>
+<script>
+document.getElementById('filtro').addEventListener('input', function(e) {
+  const q = e.target.value.trim().toLowerCase();
+  const rows = document.querySelectorAll('.socio-row');
+  rows.forEach(row => {
+    const id = row.dataset.id || '';
+    const nombre = row.dataset.nombre || '';
+    const match = q === '' || id.includes(q) || nombre.includes(q);
+    row.style.display = match ? '' : 'none';
+  });
+});
+</script>

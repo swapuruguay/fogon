@@ -1,36 +1,81 @@
-<div class="max-w-7xl mx-auto px-4">
-<h2>Listado de socios con cuotas adelantadas</h2>
-<article id="formularios" class="w-full">
+<?php
 
-<br>
-<div class="flex flex-wrap -mx-2">
-  <div class="w-full md:w-2/3">
-    <table id="tabla" class="table table-striped table-condensed table-bordered w-full">
-      <tr>
-          <th>Nro.</th><th>Nombre</th><th>Apellido</th><th>Desde</th><th>Hasta</th><th></th>
-          <th></th>
-      </tr>
-      <?php $contador = 1; ?>
-      <?php foreach($this->socios as $soc): ?>
+use App\Core\Session; ?>
+<div class="max-w-4xl mx-auto px-4 py-6">
 
-       <tr>
-           <td><?php echo $soc['id_socio_fk']; ?></td>
-           <td><?php echo $soc['nombre']; ?></td>
-           <td><?php echo $soc['apellido']; ?></td>
-           <td><input type="date" value="<?php echo $soc['desde']; ?>" readonly style="border: none; background: transparent;"></td>
-           <td><input type="date" value="<?php echo $soc['hasta']; ?>" readonly style="border: none; background: transparent;"></td>
-           <td><a href="<?php echo BASE_URL . 'socios/editarAdelanto/' . $soc['id']; ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/edit.png' ?>"></a></td>
-           <td><a href="<?php echo BASE_URL . 'socios/confirmarAdelanto/' . $soc['id_socio_fk']; ?>"><img src="<?php echo BASE_URL . 'views/layout/' .DEFAULT_LAYOUT .'/img/delete.png' ?>"></a></td>
-               <?php $contador++; ?>
-       </tr>
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Pagos Adelantados</h1>
+      <p class="text-gray-500 text-sm mt-1"><?php echo count($this->socios); ?> registros</p>
+    </div>
+    <a href="<?php echo BASE_URL . 'socios/listar'; ?>"
+      class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Volver
+    </a>
+  </div>
 
+  <!-- List -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <?php if (count($this->socios) > 0): ?>
+      <div class="divide-y divide-gray-100">
+        <?php foreach ($this->socios as $adv): ?>
+          <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition">
+            <!-- Left: ID + Name -->
+            <div class="flex items-center space-x-4 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-fogon-100 flex items-center justify-center">
+                <img src="<?php echo BASE_URL . 'views/socios/img/' . ($adv['foto'] ?: 'socio.png');
+                          ?>"
+                  class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
+              </div>
+              <div class=" min-w-0 flex-1">
+                <p class="font-semibold text-gray-900"><?php echo $adv['nombre'] . ' ' . $adv['apellido']; ?></p>
+                <div class="flex items-center space-x-3 mt-1">
+                  <span class="text-xs text-gray-500 font-mono">#<?php echo $adv['id_socio_fk']; ?></span>
+                  <span class="text-xs text-gray-400">Adelanto #<?php echo $adv['id']; ?></span>
+                </div>
+              </div>
+            </div>
 
-      <?php endforeach; ?>
-    </table>
+            <!-- Dates -->
+            <div class="flex items-center space-x-6">
+              <div class="text-center">
+                <p class="text-xs text-gray-400">Desde</p>
+                <p class="text-sm font-medium"><?php echo date('d/m/Y', strtotime($adv['desde'])); ?></p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs text-gray-400">Hasta</p>
+                <p class="text-sm font-medium"><?php echo date('d/m/Y', strtotime($adv['hasta'])); ?></p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <a href="<?php echo BASE_URL . 'socios/editarAdelanto/' . $adv['id']; ?>"
+                  class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </a>
+                <a href="<?php echo BASE_URL . 'socios/confirmarAdelanto/' . $adv['id_socio_fk']; ?>"
+                  class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Eliminar"
+                  onclick="return confirm('¿Eliminar este adelantos?');">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php else: ?>
+      <div class="p-12 text-center">
+        <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <p class="mt-4 text-gray-500">No hay adelantos registrados</p>
+      </div>
+    <?php endif; ?>
   </div>
 </div>
-    </article>
-  </div>
-<br>
-
-<br><br>

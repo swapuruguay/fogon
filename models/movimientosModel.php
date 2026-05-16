@@ -54,6 +54,10 @@ class movimientosModel extends Model {
         return $this->_db->insert('adelantos', $datos);
     }
 
+    public function updateAdelanto(int $id, array $datos): bool {
+        return $this->_db->update('adelantos', $datos, 'idadelanto = ?', [$id]);
+    }
+
     public function update(Movimiento $movimiento): bool {
         $datos = [
             'id_socio_fk' => $movimiento->getSocio()->getId(),

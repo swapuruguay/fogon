@@ -22,6 +22,30 @@ class sociosModel extends Model
         return in_array($orden, $allowed, true) ? $orden : 'id_socio';
     }
 
+    private function buildSocioFromRow(object $valor): Socio
+    {
+        $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
+        $socio->setDocumento($valor->documento);
+        $socio->setDomicilio($valor->domicilio ?? '');
+        $socio->setTelefono($valor->telefono ?? '');
+        $socio->setEmail($valor->email ?? '');
+        $socio->setEstado($valor->estado);
+        $socio->setFoto($valor->foto ?? 'socio.png');
+        $socio->setSaldo($valor->saldo ?? 0);
+        $cat = new Categoria($valor->id_categoria_fk ?? 0, $valor->cat_nombre ?? 'Sin categoría', $valor->cat_importe ?? 0);
+        $socio->setCategoria($cat);
+        return $socio;
+    }
+
+    private function queryWithSaldo(string $orden, bool $prefixTable = true): array
+    {
+        $orderBy = $prefixTable ? "ORDER BY s.$orden" : "ORDER BY $orden";
+        return $this->_db->query("SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe,
+            COALESCE((SELECT SUM(cu.importe) FROM cuotas cu WHERE cu.id_socio_fk = s.id_socio), 0) as saldo
+            FROM socios s LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
+            WHERE s.estado='A' $orderBy")->fetchAll(PDO::FETCH_OBJ);
+    }
+
     public function getAll(string $orden = 'id_socio'): array
     {
         $ordenMap = [
@@ -31,22 +55,10 @@ class sociosModel extends Model
             'apellido' => 'apellido',
         ];
         $orden = $ordenMap[$orden] ?? 'id_socio';
-        $listado = $this->_db->query("SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe
-            FROM socios s LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
-            WHERE s.estado='A' ORDER BY s.$orden")->fetchAll(PDO::FETCH_OBJ);
+        $listado = $this->queryWithSaldo($orden);
         $arreglo = [];
         foreach ($listado as $valor) {
-            $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
-            $cat = new Categoria($valor->id_categoria_fk ?? 0, $valor->cat_nombre ?? 'Sin categoría', $valor->cat_importe ?? 0);
-            $socio->setCategoria($cat);
-            $socio->setDomicilio($valor->domicilio ?? '');
-            $socio->setDocumento($valor->documento);
-            $socio->setTelefono($valor->telefono ?? '');
-            $socio->setEmail($valor->email ?? '');
-            $socio->setEstado($valor->estado);
-            $socio->setFoto($valor->foto ?? 'socio.png');
-            $socio->setSaldo($valor->saldo ?? 0);
-            $arreglo[] = $socio;
+            $arreglo[] = $this->buildSocioFromRow($valor);
         }
         return $arreglo;
     }
@@ -98,7 +110,7 @@ class sociosModel extends Model
     public function getAdelantos(string $orden = 'id_socio_fk'): array
     {
         $orden = $this->validateOrder($orden, ['id_socio_fk', 'desde', 'hasta', 'nombre']);
-        $sql = "SELECT a.*, s.nombre, s.apellido FROM adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk ORDER BY $orden";
+        $sql = "SELECT a.*, s.nombre, s.apellido, s.foto FROM adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk WHERE a.hasta >= CURDATE() ORDER BY $orden";
         $listado = $this->_db->query($sql)->fetchAll(PDO::FETCH_OBJ);
         $arreglo = [];
         foreach ($listado as $valor) {
@@ -106,6 +118,7 @@ class sociosModel extends Model
                 'nombre' => $valor->nombre,
                 'id' => $valor->idadelanto,
                 'apellido' => $valor->apellido,
+                'foto' => $valor->foto,
                 'id_socio_fk' => $valor->id_socio_fk,
                 'desde' => $valor->desde,
                 'hasta' => $valor->hasta,
@@ -151,9 +164,9 @@ class sociosModel extends Model
         if (strlen($termino) < 2) {
             return $this->getEliminados();
         }
-        
+
         $esNumero = is_numeric($termino);
-        
+
         if ($esNumero) {
             $sql = "SELECT * FROM socios WHERE estado='B' AND documento LIKE ? ORDER BY nombre";
             $listado = $this->_db->select($sql, ["%$termino%"])->fetchAll(PDO::FETCH_OBJ);
@@ -161,7 +174,7 @@ class sociosModel extends Model
             $sql = "SELECT * FROM socios WHERE estado='B' AND (nombre LIKE ? OR apellido LIKE ?) ORDER BY nombre";
             $listado = $this->_db->select($sql, ["%$termino%", "%$termino%"])->fetchAll(PDO::FETCH_OBJ);
         }
-        
+
         $arreglo = [];
         foreach ($listado as $valor) {
             $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
@@ -187,7 +200,7 @@ class sociosModel extends Model
         return $arreglo;
     }
 
-public function getPaginados(int $desde): array
+    public function getPaginados(int $desde): array
     {
         $sql = "SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe
                 FROM socios s
@@ -459,25 +472,12 @@ public function getPaginados(int $desde): array
 
     public function getAtrasados(): array
     {
-        $sql = "SELECT s.*, SUM(c.importe) as saldo, cat.nombre as cat_nombre, cat.importe as cat_importe
-                FROM socios s 
-                JOIN cuotas c ON s.id_socio = c.id_socio_fk 
-                LEFT JOIN categorias cat ON s.id_categoria_fk = cat.id_categoria
-                WHERE s.estado='A' 
-                GROUP BY s.id_socio 
-                HAVING saldo > 0
-                ORDER BY saldo DESC, s.apellido";
-        $listado = $this->_db->query($sql)->fetchAll(PDO::FETCH_OBJ);
+        $listado = $this->queryWithSaldo('saldo DESC, s.apellido', false);
         $arreglo = [];
         foreach ($listado as $valor) {
-            $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
-            $socio->setDocumento($valor->documento);
-            $socio->setDomicilio($valor->domicilio ?? '');
-            $socio->setSaldo($valor->saldo);
-            $cat = new Categoria($valor->id_categoria_fk ?? 0, $valor->cat_nombre ?? 'Sin categoría', $valor->cat_importe ?? 0);
-            $socio->setCategoria($cat);
-            $socio->setFoto($valor->foto ?? 'socio.png');
-            $arreglo[] = $socio;
+            if (($valor->saldo ?? 0) > 0) {
+                $arreglo[] = $this->buildSocioFromRow($valor);
+            }
         }
         return $arreglo;
     }
