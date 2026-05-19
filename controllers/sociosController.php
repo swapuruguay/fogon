@@ -322,10 +322,13 @@ class sociosController extends Controller
             $retorno = $this->_ajax->getByDocumento($documento);
             if ($retorno) {
                 $nombre = $this->fixEncoding($retorno->getNombre() . ' ' . $retorno->getApellido());
+                $categoria = $retorno->getCategoria();
                 echo json_encode([
                     'id' => $retorno->getId(),
                     'nombre' => $nombre,
                     'documento' => $retorno->getDocumento(),
+                    'categoria' => $categoria ? $categoria->getNombre() : '',
+                    'importe' => $categoria ? $categoria->getImporte() : 0,
                 ], JSON_UNESCAPED_UNICODE);
             } else {
                 echo json_encode(['documento' => 0]);
@@ -509,7 +512,7 @@ class sociosController extends Controller
                 $it++;
             }
 
-            // PIE DE PÁGINA O RESUMEN FINAL
+// PIE DE PÁGINA O RESUMEN FINAL
             if ($pdf->PageNo() < $paginas) {
                 $pdf->SetY($pos_y + 10);
                 $pdf->SetFont('Arial', 'I', 8);
@@ -517,31 +520,64 @@ class sociosController extends Controller
                 $pos_y = 30;
                 $pdf->AddPage();
             } else {
-                $pdf->SetY($pos_y + 10);
-                $pdf->SetFont('Arial', 'I', 8);
-                $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
-                // Totales finales al terminar el bucle de registros
-                if ($it > 40) {
+                // ULTIMA PÁGINA: verificar si hay espacio para el resumen
+                // Resumen ocupa 4 líneas x 6mm = 24mm + espacio después = ~30mm
+                // Si pos_y + 30 > 265 (margen inferior), no hay espacio suficiente
+                $espacio_disponible = 265 - $pos_y;
+                $espacio_necesario = 35; // 24mm para resumen + 11mm para pie
+
+                if ($espacio_disponible >= $espacio_necesario) {
+                    // Hay espacio: imprimir resumen al final de la página, luego el pie
+                    // Primero el resumen
+                    $pdf->SetY($pos_y + 10);
+                    $pdf->SetFont('Arial', 'B', 12);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad de socios: ' . $registros, 0, 0, 'L');
+                    $pdf->SetY($pdf->GetY() + 6);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad conyuges: ' . $conyuges, 0, 0, 'L');
+                    $pdf->SetY($pdf->GetY() + 6);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad hijos varones: ' . $varones, 0, 0, 'L');
+                    $pdf->SetY($pdf->GetY() + 6);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad hijos mujeres: ' . $mujeres, 0, 0, 'L');
+                    
+                    // Luego el número de página al pie
+                    $pdf->SetY(265);
+                    $pdf->SetFont('Arial', 'I', 8);
+                    $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                } else {
+                    // No hay espacio: poner pie en esta página y resumen en nueva página
+                    // Pie de página en la página de los últimos socios
+                    $pdf->SetY(265);
+                    $pdf->SetFont('Arial', 'I', 8);
+                    $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                    
+                    // Nueva página para el resumen
                     $pdf->AddPage();
-                    $pos_y = 10;
+                    $pos_y = 30;
+                    
+                    // Resumen en la nueva página
+                    $pdf->SetY($pos_y);
+                    $pdf->SetFont('Arial', 'B', 12);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad de socios: ' . $registros, 0, 0, 'L');
+                    $pdf->SetY($pdf->GetY() + 6);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad conyuges: ' . $conyuges, 0, 0, 'L');
+                    $pdf->SetY($pdf->GetY() + 6);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad hijos varones: ' . $varones, 0, 0, 'L');
+                    $pdf->SetY($pdf->GetY() + 6);
+                    $pdf->SetX(20);
+                    $pdf->Cell(0, 10, 'Cantidad hijos mujeres: ' . $mujeres, 0, 0, 'L');
+                    
+                    // Pie de página en la página del resumen (al final)
                     $pdf->SetY(265);
                     $pdf->SetFont('Arial', 'I', 8);
                     $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
                 }
-
-                $pdf->SetY($pos_y + 20);
-                $pdf->SetFont('Arial', 'B', 12);
-                $pdf->SetX(20);
-                $pdf->Cell(0, 10, 'Cantidad de socios: ' . $registros, 0, 0, 'L');
-                $pdf->SetY($pdf->GetY() + 5);
-                $pdf->SetX(20);
-                $pdf->Cell(0, 10, 'Cantidad conyuges: ' . $conyuges, 0, 0, 'L');
-                $pdf->SetY($pdf->GetY() + 5);
-                $pdf->SetX(20);
-                $pdf->Cell(0, 10, 'Cantidad hijos varones: ' . $varones, 0, 0, 'L');
-                $pdf->SetY($pdf->GetY() + 5);
-                $pdf->SetX(20);
-                $pdf->Cell(0, 10, 'Cantidad hijas: ' . $mujeres, 0, 0, 'L');
             }
         }
         $pdf->Output();

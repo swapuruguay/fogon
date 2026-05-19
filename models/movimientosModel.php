@@ -58,6 +58,10 @@ class movimientosModel extends Model {
         return $this->_db->update('adelantos', $datos, 'idadelanto = ?', [$id]);
     }
 
+    public function saveCuotaManual(array $datos): bool {
+        return $this->_db->insert('cuotas', $datos);
+    }
+
     public function update(Movimiento $movimiento): bool {
         $datos = [
             'id_socio_fk' => $movimiento->getSocio()->getId(),
@@ -104,6 +108,8 @@ class movimientosModel extends Model {
             $fogon = " AND c.cobrado = 'F'";
         } elseif ($dire == 2) {
             $fogon = " AND c.cobrado = 'C'";
+        } elseif ($dire == 3) {
+            $fogon = " AND c.cobrado IN ('F', 'C')";
         }
 
         $sql = "SELECT c.mes, c.anio, c.importe, c.estado, s.nombre, s.apellido, s.id_socio, c.id_socio_fk

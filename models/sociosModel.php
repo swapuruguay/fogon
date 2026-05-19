@@ -298,13 +298,21 @@ class sociosModel extends Model
 
     public function getByDocumento(int $id): ?Socio
     {
-        $sql = "SELECT id_socio, nombre, apellido, documento FROM socios WHERE documento = ?";
+        $sql = "SELECT s.id_socio, s.nombre, s.apellido, s.documento, s.id_categoria_fk, c.nombre as categoria, c.importe 
+                FROM socios s 
+                LEFT JOIN categorias c ON c.id_categoria = s.id_categoria_fk 
+                WHERE s.documento = ?";
         $stmt = $this->_db->prepare($sql);
         $stmt->execute([$id]);
         $listado = $stmt->fetch(PDO::FETCH_OBJ);
         if ($listado) {
             $socio = new Socio($listado->id_socio, $listado->nombre, $listado->apellido);
             $socio->setDocumento($listado->documento);
+            // Cargar categoría
+            if ($listado->id_categoria_fk) {
+                $categoria = new Categoria($listado->id_categoria_fk, $listado->categoria, $listado->importe);
+                $socio->setCategoria($categoria);
+            }
             return $socio;
         }
         return null;

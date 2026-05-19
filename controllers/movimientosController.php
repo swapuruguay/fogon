@@ -130,11 +130,18 @@ class movimientosController extends Controller
 
     public function ingresarPago(string $tipo = 'S'): void
     {
+        // Validar que el importe sea positivo (anti-trampa)
+        $importe = filter_input(INPUT_POST, 'importe', FILTER_VALIDATE_FLOAT) ?: 0;
+        if ($importe <= 0) {
+            echo json_encode(['error' => 'El importe debe ser mayor a 0']);
+            return;
+        }
+        
         $mov = $this->_ajax->buildMovimiento();
         $modeloSocio = $this->loadModel('socios');
         $socioId = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $mov->setSocio($modeloSocio->getById($socioId));
-        $mov->setImporte(- (filter_input(INPUT_POST, 'importe', FILTER_VALIDATE_FLOAT) ?: 0));
+        $mov->setImporte(- $importe);
         $ingreso = (string) $_POST['fecha'];
         $mes = (int) date('m', strtotime($ingreso));
         $anio = (int) date('Y', strtotime($ingreso));
@@ -426,27 +433,64 @@ class movimientosController extends Controller
 
                 // PIE DE PÁGINA O TOTALES
                 if ($pdf->PageNo() < $paginas) {
-                    $pdf->SetY($pos_y + 10); // Ajusta según tu FPDF
+                    $pdf->SetY(265);
                     $pdf->SetFont('Arial', 'I', 8);
                     $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
                     $pos_y = 25;
                     $pdf->AddPage();
                 } else {
-                    $pdf->SetY($pos_y + 10); // Ajusta según tu FPDF
-                    $pdf->SetFont('Arial', 'I', 8);
-                    $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
-                    $pos_y += 20;
+                    // ULTIMA PÁGINA: verificar si hay espacio para los totales
+                    // Totales: 5 líneas x 5mm = 25mm + pie = 35mm aprox
+                    $espacio_disponible = 265 - $pos_y;
+                    $espacio_necesario = 35; // para totales + pie
+
                     $tot = json_decode($this->getTotalesE($mesPost, $anioPost, $direPost));
                     $totales = ($tot[0]->importe ?? 0) + ($tot[1]->importe ?? 0) + ($tot[2]->importe ?? 0);
-                    $pdf->SetY($pos_y);
-                    $pdf->Cell(0, 10, 'Total Activos: $' . ($tot[0]->importe ?? 0), 0, 0, 'C');
-                    $pdf->SetY($pos_y + 5);
-                    $pdf->Cell(0, 10, 'Total Cadetes: $' . ($tot[1]->importe ?? 0), 0, 0, 'C');
-                    $pdf->SetY($pos_y + 10);
-                    $pdf->Cell(0, 10, 'Total Jubilados: $' . ($tot[2]->importe ?? 0), 0, 0, 'C');
-                    $pdf->SetY($pos_y + 15);
-                    $pdf->SetFont('Arial', 'B', 10);
-                    $pdf->Cell(0, 10, 'Total General: $' . $totales, 0, 0, 'C');
+
+                    if ($espacio_disponible >= $espacio_necesario) {
+                        // Hay espacio: imprimir totales al final, luego el pie
+                        $pdf->SetY($pos_y + 10);
+                        $pdf->SetFont('Arial', 'I', 10);
+                        $pdf->Cell(0, 10, 'Total Activos: $' . ($tot[0]->importe ?? 0), 0, 0, 'C');
+                        $pdf->SetY($pdf->GetY() + 5);
+                        $pdf->Cell(0, 10, 'Total Cadetes: $' . ($tot[1]->importe ?? 0), 0, 0, 'C');
+                        $pdf->SetY($pdf->GetY() + 5);
+                        $pdf->Cell(0, 10, 'Total Jubilados: $' . ($tot[2]->importe ?? 0), 0, 0, 'C');
+                        $pdf->SetY($pdf->GetY() + 5);
+                        $pdf->SetFont('Arial', 'B', 10);
+                        $pdf->Cell(0, 10, 'Total General: $' . $totales, 0, 0, 'C');
+                        
+                        // Número de página al pie
+                        $pdf->SetY(265);
+                        $pdf->SetFont('Arial', 'I', 8);
+                        $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                    } else {
+                        // No hay espacio: poner pie en esta página y totales en nueva página
+                        $pdf->SetY(265);
+                        $pdf->SetFont('Arial', 'I', 8);
+                        $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                        
+                        // Nueva página para los totales
+                        $pdf->AddPage();
+                        $pos_y = 30;
+                        
+                        // Totales en la nueva página
+                        $pdf->SetY($pos_y);
+                        $pdf->SetFont('Arial', 'I', 10);
+                        $pdf->Cell(0, 10, 'Total Activos: $' . ($tot[0]->importe ?? 0), 0, 0, 'C');
+                        $pdf->SetY($pdf->GetY() + 5);
+                        $pdf->Cell(0, 10, 'Total Cadetes: $' . ($tot[1]->importe ?? 0), 0, 0, 'C');
+                        $pdf->SetY($pdf->GetY() + 5);
+                        $pdf->Cell(0, 10, 'Total Jubilados: $' . ($tot[2]->importe ?? 0), 0, 0, 'C');
+                        $pdf->SetY($pdf->GetY() + 5);
+                        $pdf->SetFont('Arial', 'B', 10);
+                        $pdf->Cell(0, 10, 'Total General: $' . $totales, 0, 0, 'C');
+                        
+                        // Pie de página en la página de totales
+                        $pdf->SetY(265);
+                        $pdf->SetFont('Arial', 'I', 8);
+                        $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
+                    }
                 }
             }
             $pdf->Output();
@@ -574,6 +618,63 @@ class movimientosController extends Controller
         ];
         $modelo->updateAdelanto($id, $adelanto);
         echo json_encode(['ok' => true, 'texto' => 'Registro actualizado']);
+    }
+
+    public function emitirCuotaManual(): void
+    {
+        $this->requireAuth();
+        
+        // Si es POST, procesa y devuelve JSON
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->csrfVerify();
+            header('Content-Type: application/json; charset=utf-8');
+            
+            $id_socio = filter_input(INPUT_POST, 'id_socio', FILTER_VALIDATE_INT) ?: 0;
+            $fecha = (string) $_POST['fecha'];
+            $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT) ?: 0;
+            $anio = filter_input(INPUT_POST, 'anio', FILTER_VALIDATE_INT) ?: 0;
+            $importe = filter_input(INPUT_POST, 'importe', FILTER_VALIDATE_INT) ?: 0;
+            
+            if (!$id_socio || !$mes || !$anio || !$importe) {
+                echo json_encode(['ok' => false, 'mensaje' => 'Datos incompletos']);
+                return;
+            }
+            
+            $modelo = $this->loadModel('socios');
+            $socio = $modelo->getById($id_socio);
+            
+            if (!$socio) {
+                echo json_encode(['ok' => false, 'mensaje' => 'Socio no encontrado']);
+                return;
+            }
+            
+            // Determinar cobrado: F si el domicilio contiene "fog", sino C
+            $domicilio = mb_strtolower($socio->getDomicilio() ?? '', 'UTF-8');
+            $cobrado = (strpos($domicilio, 'fog') !== false) ? 'F' : 'C';
+            
+            $modelMov = $this->loadModel('movimientos');
+            $datos = [
+                'id_socio_fk' => $id_socio,
+                'mes' => $mes,
+                'anio' => $anio,
+                'fecha_computo' => $fecha,
+                'importe' => $importe,
+                'cobrado' => $cobrado,
+            ];
+            
+            $result = $modelMov->saveCuotaManual($datos);
+            
+            if ($result) {
+                echo json_encode(['ok' => true, 'mensaje' => 'Cuota emitida correctamente']);
+            } else {
+                echo json_encode(['ok' => false, 'mensaje' => 'Error al guardar la cuota']);
+            }
+            return;
+        }
+        
+        // Si es GET, renderiza la vista
+        $this->_view->titulo = 'Emitir Cuota Manual';
+        $this->_view->renderizar('emitir-cuota');
     }
 
     public function prueba(): void

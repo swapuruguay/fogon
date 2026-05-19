@@ -1,178 +1,215 @@
-<div class="max-w-7xl mx-auto px-4">
-    <form id="form1" action="<?php echo BASE_URL . 'socios/guardarParientes/'?>" method="POST" class="space-y-4">
+<?php
+
+use App\Core\Session; ?>
+<div class="max-w-2xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Editar Pariente</h1>
+      <p class="text-gray-500 text-sm mt-1">Modificar datos de familiar</p>
+    </div>
+    <a href="<?php echo BASE_URL . 'socios/parientes/' . $this->pariente->getSocio()->getId(); ?>"
+      class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Volver
+    </a>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <form id="form1" class="space-y-5">
       <?php echo csrf_field(); ?>
-      <div class="mb-4">
-        <label class="font-semibold">Nro de Socio</label>
-        <div class="w-full md:w-1/4">
-          <input type="text" name='idsoc' id='idsoc' value="<?php echo $this->pariente->getSocio()->getId(); ?>" readonly class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"> <span><?php echo $this->pariente->getSocio()->getNombre() . ' ' . $this->pariente->getSocio()->getApellido(); ?></span>
-        </div>
-      </div>
+
       <input type="hidden" name="id" id="id" value="<?php echo $this->pariente->getId(); ?>">
-      <div class="mb-4">
-        <label class="font-semibold">Nombre</label>
-        <div class="w-full md:w-1/3">
-          <input type="text" name='nombre' id='nombre' value="<?php echo $this->pariente->getNombre(); ?>"  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
-        </div>
-      </div>
-      <div class="mb-4">
-        <label class="font-semibold">Apellido</label>
-        <div class="w-full md:w-1/3">
-          <input type="text" name='apellido' id='apellido' value="<?php echo $this->pariente->getApellido(); ?>"  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
-        </div>
+      <input type="hidden" name="idsoc" id="idsoc" value="<?php echo $this->pariente->getSocio()->getId(); ?>">
 
-      </div>
-      <div class="mb-4">
-        <label class="font-semibold">Documento</label>
-        <div class="w-full md:w-1/3">
-          <label for="check">Deshabilitar para extranjero</label>
-          <input type="checkbox" name="check" id="check">
-          <input type="text" onblur="quitaPuntos();" onkeypress="return soloNumeros(event);" name='documento' id='documento' value="<?php echo $this->pariente->getDocumento(); ?>"  class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <span id="alerta" style="color:red; font-weight:bold;"></span>
+      <!-- Socio (read-only) -->
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-gray-700">Socio</label>
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-2 bg-gray-100 rounded-lg text-gray-700 font-medium">
+            #<?php echo $this->pariente->getSocio()->getId(); ?> - <?php echo $this->pariente->getSocio()->getNombre() . ' ' . $this->pariente->getSocio()->getApellido(); ?>
+          </span>
         </div>
-
       </div>
-      <div class="mb-4">
-        <label class="font-semibold">Parentezco</label>
-        <div class="w-full md:w-1/3">
-          <select name="parentezco" id="parentezco">
-            <option  value="A">--Parentezco--</option>
-            <option <?php echo ($this->pariente->getParentezco() == 'C')? 'SELECTED' : '' ?> value="C">Cónyuge</option>
-            <option <?php echo ($this->pariente->getParentezco() == 'H')? 'SELECTED' : '' ?> value="H">Hijo/a</option>
+
+      <!-- Nombre y Apellido -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-gray-700">Nombre</label>
+          <input type="text" name="nombre" id="nombre"
+            value="<?php echo utf8_decode($this->pariente->getNombre()); ?>"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+        </div>
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-gray-700">Apellido</label>
+          <input type="text" name="apellido" id="apellido"
+            value="<?php echo utf8_decode($this->pariente->getApellido()); ?>"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+        </div>
+      </div>
+
+      <!-- Documento -->
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-gray-700">Documento</label>
+        <div class="flex items-center gap-3">
+          <label class="flex items-center text-sm text-gray-600">
+            <input type="checkbox" name="check" id="check" class="mr-2 rounded border-gray-300 text-fogon-600 focus:ring-fogon-500">
+            Extranjero (sin validación)
+          </label>
+        </div>
+        <input type="text" name="documento" id="documento" data-doc="<?php echo $this->pariente->getDocumento(); ?>"
+          value="<?php echo $this->pariente->getDocumento(); ?>"
+          onblur="documento.value = documento.value.replace(/\./g, '');"
+          onkeypress="return soloNumeros(event);"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+        <span id="alerta" class="text-sm text-red-600 font-medium"></span>
+      </div>
+
+      <!-- Parentezco y Sexo -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-gray-700">Parentezco</label>
+          <select name="parentezco" id="parentezco"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+            <option value="A">-- Parentezco --</option>
+            <option <?php echo ($this->pariente->getParentezco() == 'C') ? 'SELECTED' : ''; ?> value="C">Cónyuge</option>
+            <option <?php echo ($this->pariente->getParentezco() == 'H') ? 'SELECTED' : ''; ?> value="H">Hijo/a</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-gray-700">Sexo</label>
+          <select name="sexo" id="sexo"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
+            <option <?php echo ($this->pariente->getSexo() == 'F') ? 'SELECTED' : ''; ?> value="F">Femenino</option>
+            <option <?php echo ($this->pariente->getSexo() == 'M') ? 'SELECTED' : ''; ?> value="M">Masculino</option>
           </select>
         </div>
       </div>
-      <div class="mb-4">
-        <label class="font-semibold">Sexo</label>
-        <div class="w-full md:w-1/3">
-          <select name="sexo" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <option <?php echo ($this->pariente->getSexo() == 'F')? 'SELECTED' : '' ?> value="F">Femenino</option>
-            <option <?php echo ($this->pariente->getSexo() == 'M')? 'SELECTED' : '' ?>  value="M">Masculino</option>
-          </select>
-        </div>
-      </div>
-      <div class="mb-4">
-        <label class="font-semibold">Fecha Nacimiento</label>
-        <div class="w-full md:w-1/4">
-          <input type="date" name='fecha_nacimiento' id='fecha_nacimiento' value="<?php echo date('Y-m-d',  strtotime($this->pariente->getFechaNacimiento())); ?>" class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
-        </div>
 
+      <!-- Fecha Nacimiento -->
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-gray-700">Fecha de Nacimiento</label>
+        <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
+          value="<?php echo date('Y-m-d', strtotime($this->pariente->getFechaNacimiento())); ?>"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
       </div>
-      <input type="submit" value="Guardar" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"/>
-      <input type="button" id="btn-remove" value="Eliminar" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-  </form>
+
+      <!-- Buttons -->
+      <div class="pt-4 flex gap-3">
+        <button type="submit"
+          class="flex-1 bg-fogon-900 text-white font-semibold py-3 rounded-lg hover:bg-fogon-800 transition">
+          Guardar Cambios
+        </button>
+        <button type="button" id="btn-remove"
+          class="px-6 bg-red-500 text-white font-semibold py-3 rounded-lg hover:bg-red-600 transition">
+          Eliminar
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<script type="text/javascript">
+<script>
   const remove = async (evt) => {
-    let $id = document.getElementById('id')
-    let $idsoc = document.getElementById('idsoc')
-    const formData = new FormData()
-    formData.append('id', $id.value)
-    let res = await fetch('/socios/removePariente', {
-    method: 'post',
-    body: formData
-  })
-  let result = await res.json()
-  window.location.href = `/socios/editar/${$idsoc.value}`
-}
-  
- const frm = document.getElementById('form1')
- const btnRemove = document.getElementById('btn-remove')
+    if (!confirm('¿Eliminar este pariente?')) return;
 
+    let $id = document.getElementById('id');
+    let $idsoc = document.getElementById('idsoc');
+    let formData = new FormData();
+    formData.append('id', $id.value);
+    let res = await fetch('<?php echo BASE_URL; ?>socios/removePariente', {
+      method: 'post',
+      body: formData
+    });
+    let result = await res.json();
+    window.location.href = '<?php echo BASE_URL; ?>socios/editar/' + $idsoc.value;
+  };
 
- btnRemove.addEventListener('click', remove')
- 
-frm.addEventListener('submit', async (evt) => {
-  evt.preventDefault()
-  if(frm.apellido.value == '') {
-    alert('Debe ingresar nombre y apellido por separado')
-    return
-  }
-  let formData = new FormData()
-  formData.append('documento', frm.documento.value)
-  let res = await fetch('/socios/getByDocumento', {
-    method: 'post',
-    body: formData
-  })
-  let resultado = await res.json()
-  //console.log(resultado)
-  if(frm.documento.dataset.doc != frm.documento.value) {
-    if(resultado.documento != 0) {
-      let alerta = document.getElementById('alerta')
-      alerta.innerHTML = 'Socio existente en la base de datos, revise'
-      frm.documento.focus()
-      return
+  const frm = document.getElementById('form1');
+  const btnRemove = document.getElementById('btn-remove');
+
+  btnRemove.addEventListener('click', remove);
+
+  frm.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    if (frm.apellido.value == '') {
+      alert('Debe ingresar nombre y apellido por separado');
+      return;
     }
 
-    if(digitoCedula(frm.documento.value)) {
+    let formData = new FormData();
+    formData.append('documento', frm.documento.value);
+    let res = await fetch('<?php echo BASE_URL; ?>socios/getByDocumento', {
+      method: 'post',
+      body: formData
+    });
+    let resultado = await res.json();
 
-      frm.submit()
-    } else {
-      alert('Cédula erronea, verifique')
-      frm.documento.focus()
+    if (frm.documento.dataset.doc != frm.documento.value) {
+      if (resultado.documento != 0) {
+        document.getElementById('alerta').innerHTML = 'Socio existente en la base de datos, revise';
+        frm.documento.focus();
+        return;
+      }
+
+      if (!digitoCedula(frm.documento.value)) {
+        alert('Cédula errónea, verifique');
+        frm.documento.focus();
+        return;
+      }
     }
-  } else {
 
-    frm.submit()
+    formData = new FormData();
+    formData.append('id', frm.id.value);
+    formData.append('idsoc', frm.idsoc.value);
+    formData.append('nombre', frm.nombre.value);
+    formData.append('apellido', frm.apellido.value);
+    formData.append('documento', frm.documento.value);
+    formData.append('parentezco', frm.parentezco.value);
+    formData.append('sexo', frm.sexo.value);
+    formData.append('fecha_nacimiento', frm.fecha_nacimiento.value);
+
+    let result = await fetch('<?php echo BASE_URL; ?>socios/guardarParientes', {
+      method: 'post',
+      body: formData
+    });
+    let resultado2 = await result.json();
+
+    alert(resultado2.mensaje);
+    window.location.href = '<?php echo BASE_URL; ?>socios/parientes/' + frm.idsoc.value;
+  });
+
+  function digitoCedula(ci) {
+    if (document.getElementById('check').checked) return true;
+    if (ci.length < 6) return false;
+
+    let digitoIngresado = ci.slice(-1);
+    let cedula = ci.slice(0, -1);
+    let arrayCedula = cedula.split('');
+
+    if (arrayCedula.length === 6) arrayCedula.unshift('0');
+
+    let testigo = [2, 9, 8, 7, 6, 3, 4];
+    let sumatoria = 0;
+    for (let i = 0; i < testigo.length; i++) {
+      sumatoria += testigo[i] * parseInt(arrayCedula[i] || 0);
+    }
+
+    return (10 - (sumatoria % 10)) == digitoIngresado;
   }
-})
 
+  function soloNumeros(e) {
+    let key = e.keyCode || e.which;
+    let numeros = "0123456789";
+    let especiales = [8, 9, 37, 39, 46];
+    let teclado = String.fromCharCode(key);
 
-
-function digitoCedula(ci) {
-  if(document.getElementById('check').checked) {
-    return true
+    if (numeros.indexOf(teclado) == -1 && !especiales.includes(key)) {
+      return false;
+    }
   }
-  
- let digitoIngresado = ci.substring(ci.length -1)
- let cedula = ci.substring(0, ci.length - 1)
-
- let arrayCedula = cedula.split('')
- if(arrayCedula.length < 6) {
-   return false
- } else if (arrayCedula.length == 6) {
-   arrayCedula.unshift(0)
- }
- let testigo = [2,9,8,7,6,3,4]
- let sumatoria = 0
- for(let i in testigo) {
-   sumatoria+= testigo[i] * arrayCedula[i]
- }
-
- let modulo = sumatoria % 10
- if(modulo == 0) {
-   modulo = 10
- }
-
- return 10-(modulo) == digitoIngresado
-
-}
-
-function soloNumeros(e)
-{
-
- key = e.keyCode || e.which
- //console.log(key)
- let numeros = "0123456789"
- let teclado = String.fromCharCode(key)
-
- let especiales = [8,9,37,39,46]
-
- let teclado_especial = false
- for(let i = 0; i< especiales.length; i++) {
-   if(key == especiales[i]) {
-
-     teclado_especial = true
-   }
- }
-
- if(numeros.indexOf(teclado) ==-1 && !teclado_especial) {
-   return false
- }
-}
-
-function quitaPuntos() {
-  let valor = document.getElementById('documento').value
-  document.getElementById('documento').value = valor.replace(/\./g, '')
-}
 </script>
