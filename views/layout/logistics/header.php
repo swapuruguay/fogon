@@ -36,15 +36,57 @@ $isCollector = $perfil === 3;
     }
   </script>
   <meta name=" viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <style>
+    .sidebar {
+      transition: transform 0.3s ease-in-out;
+    }
+    .hide-on-desktop {
+      display: block;
+    }
+    @media (max-width: 767px) {
+      .sidebar {
+        position: fixed;
+        inset: 0;
+        left: 0;
+        top: 0;
+        z-index: 40;
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .main-content {
+        width: 100% !important;
+      }
+      .hide-on-desktop {
+        display: block;
+      }
+    }
+    @media (min-width: 768px) {
+      .main-content {
+        width: auto;
+      }
+      .hide-on-desktop {
+        display: none;
+      }
+    }
+  </style>
   <?php echo csrf_js(); ?>
 </head>
 
 <body class="bg-gray-100 font-sans antialiased">
 
-  <div class="flex h-screen overflow-hidden">
+  <div class="flex h-screen overflow-hidden relative">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-fogon-900 text-white flex-shrink-0 flex flex-col">
+    <!-- Botón de menú fijo para móvil -->
+    <button id="menu-toggle" class="hide-on-desktop fixed bottom-4 left-4 z-30 bg-fogon-900 text-white p-3 rounded-full shadow-lg hover:bg-fogon-800 focus:outline-none focus:ring-2 focus:ring-fogon-500">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+
+    <!-- Sidebar (oculto en móvil) -->
+    <aside id="sidebar" class="sidebar w-64 bg-fogon-900 text-white flex-shrink-0 flex flex-col">
 
       <!-- Logo -->
       <div class="p-4 border-b border-fogon-800">
@@ -194,10 +236,10 @@ $isCollector = $perfil === 3;
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto">
+    <main class="main-content flex-1 overflow-y-auto">
 
       <!-- Top Bar -->
-      <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <header class="bg-white shadow-sm border-b border-gray-200 px-4 py-4 md:px-6">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xl font-semibold text-gray-800"><?php echo $this->titulo ?? 'Dashboard'; ?></h2>
@@ -209,6 +251,9 @@ $isCollector = $perfil === 3;
           </div>
         </div>
       </header>
+
+      <!-- Overlay para móvil -->
+      <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden transition-opacity duration-300"></div>
 
       <!-- Page Content -->
       <article id="contenido" class="p-6">
