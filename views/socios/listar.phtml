@@ -234,7 +234,7 @@ $filter = $this->filter ?? 'all';
           </p>
           <div class="flex items-center space-x-1">
             <?php if ($currentPage > 1): ?>
-              <a href="<?php echo BASE_URL . 'socios/listar/' . ($currentPage - 1) . '?filter=' . $filter; ?>"
+              <a href="<?php echo BASE_URL . 'socios/listar/' . ($currentPage - 2) . '?filter=' . $filter; ?>"
                 class="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm font-medium transition">
                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -247,13 +247,13 @@ $filter = $this->filter ?? 'all';
             $end = min($totalPages, $currentPage + 2);
             for ($i = $start; $i <= $end; $i++):
             ?>
-              <a href="<?php echo BASE_URL . 'socios/listar/' . $i . '?filter=' . $filter; ?>"
+              <a href="<?php echo BASE_URL . 'socios/listar/' . ($i - 1) . '?filter=' . $filter; ?>"
                 class="w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-medium transition <?php echo ($i === $currentPage) ? 'bg-fogon-900 text-white border-fogon-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'; ?>">
                 <?php echo $i; ?>
               </a>
             <?php endfor; ?>
             <?php if ($currentPage < $totalPages): ?>
-              <a href="<?php echo BASE_URL . 'socios/listar/' . ($currentPage + 1) . '?filter=' . $filter; ?>"
+              <a href="<?php echo BASE_URL . 'socios/listar/' . $currentPage . '?filter=' . $filter; ?>"
                 class="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm font-medium transition">
                 Siguiente
                 <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -342,6 +342,6 @@ $filter = $this->filter ?? 'all';
   }
 
   function filterSocios(filter) {
-    window.location.href = '<?php echo BASE_URL . 'socios/listar/1?filter='; ?>' + filter;
+    window.location.href = '<?php echo BASE_URL . 'socios/listar/0?filter='; ?>' + filter;
   }
 </script>

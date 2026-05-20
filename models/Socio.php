@@ -12,7 +12,8 @@
  * @author walter
  */
 require_once 'Categoria.php';
-class Socio {
+class Socio
+{
 
     private $_id;
     private $_nombre;
@@ -29,25 +30,30 @@ class Socio {
     private $_exento;
     private $_foto;
 
-    public function __construct($id, $nombre, $apellido) {
+    public function __construct($id, $nombre, $apellido)
+    {
         $this->_id = $id;
         $this->_apellido = $apellido;
         $this->_nombre = $nombre;
     }
 
-    public function getId(){
+    public function getId()
+    {
         return $this->_id;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->_id = $id;
     }
 
-    public function getNombre() {
-        return $this->fixEncoding($this->_nombre);
+    public function getNombre()
+    {
+        return $this->_nombre;
     }
 
-    private function fixEncoding(?string $str): string {
+    private function fixEncoding(?string $str): string
+    {
         if ($str === null) {
             return '';
         }
@@ -62,120 +68,149 @@ class Socio {
         return str_replace(array_keys($fixes), array_values($fixes), $str);
     }
 
-    public function setNombre($nombre) {
+    public function setNombre($nombre)
+    {
         $this->_nombre = $nombre;
     }
 
-    public function getApellido() {
-        return $this->fixEncoding($this->_apellido);
+    public function getApellido()
+    {
+        return $this->_apellido;
     }
 
-    public function setApellido($apellido) {
+    public function setApellido($apellido)
+    {
         $this->_apellido = $apellido;
     }
 
-    public function getDocumento() {
+    public function getDocumento()
+    {
         return $this->_documento;
     }
 
-    public function setDocumento($documento) {
+    public function setDocumento($documento)
+    {
         $this->_documento = $documento;
     }
 
-    public  function getDomicilio() {
+    public  function getDomicilio()
+    {
         return $this->fixEncoding($this->_domicilio);
     }
 
-    public function setDomicilio($domicilio) {
+    public function setDomicilio($domicilio)
+    {
         $this->_domicilio = $domicilio;
     }
 
-    public function getTelefono() {
+    public function getTelefono()
+    {
         return $this->_telefono;
     }
 
-    public function setTelefono($telefono) {
+    public function setTelefono($telefono)
+    {
         $this->_telefono = $telefono;
     }
 
-    public function getEmail() {
+    public function getEmail()
+    {
         return $this->_email;
     }
 
-    public function setEmail($email) {
+    public function setEmail($email)
+    {
         $this->_email = $email;
     }
 
-    public function getFechaNacimiento() {
+    public function getFechaNacimiento()
+    {
         return $this->_fechaNacimiento;
     }
 
-    public function setFechaNacimiento($fechaNacimiento) {
+    public function setFechaNacimiento($fechaNacimiento)
+    {
         $this->_fechaNacimiento = $fechaNacimiento;
     }
 
-    public function getFechaIngreso() {
+    public function getFechaIngreso()
+    {
         return $this->_fechaIngreso;
     }
 
-    public function setFechaIngreso($fechaIngreso) {
+    public function setFechaIngreso($fechaIngreso)
+    {
         $this->_fechaIngreso = $fechaIngreso;
     }
 
-    public function getEstado() {
+    public function getEstado()
+    {
         return $this->_estado;
     }
 
-    public function setEstado($estado) {
+    public function setEstado($estado)
+    {
         $this->_estado = $estado;
     }
 
-    public function getCategoria() {
+    public function getCategoria()
+    {
         return $this->_categoria;
     }
 
-    public function setCategoria(Categoria $categoria) {
+    public function setCategoria(Categoria $categoria)
+    {
         $this->_categoria = $categoria;
     }
 
-    public function setSaldo($saldo) {
+    public function setSaldo($saldo)
+    {
         $this->_saldo = $saldo;
     }
 
-    public function getSaldo() {
+    public function getSaldo()
+    {
         return $this->_saldo;
     }
 
-    public function setExento($exento) {
+    public function setExento($exento)
+    {
         $this->_exento = $exento;
     }
 
-    public function getExento() {
+    public function getExento()
+    {
         return $this->_exento;
     }
 
-    public function setFoto($foto) {
+    public function setFoto($foto)
+    {
         $this->_foto = $foto;
     }
 
-    public function getFoto() {
+    public function getFoto()
+    {
         return $this->_foto;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->_nombre . ' ' . $this->_apellido;
     }
 
-    public function isInHouse(): bool {
+    public function isInHouse(): bool
+    {
         $domicilio = strtolower(trim($this->_domicilio ?? ''));
         return $domicilio === 'el fogon' || $domicilio === 'el fogón' || $domicilio === 'fogon';
     }
 
-    public function getCollectionType(): string {
+    public function getCollectionType(): string
+    {
         return $this->isInHouse() ? 'in_house' : 'street';
     }
 
-    public function getCollectionTypeLabel(): string {
+    public function getCollectionTypeLabel(): string
+    {
         return $this->isInHouse() ? 'En el Club' : 'En Calle';
     }
 }
