@@ -25,7 +25,17 @@ class sociosModel extends Model
     private function fixEncoding(string $str): string
     {
         if (empty($str)) return $str;
-        return utf8_decode($str);
+        // Corregir doble codificación UTF-8
+        $decoded = @iconv('UTF-8', 'ISO-8859-1//IGNORE', $str);
+        // Solo usar decoded si es más corto Y es UTF-8 válido
+        if ($decoded !== false && strlen($decoded) < strlen($str) && mb_check_encoding($decoded, 'UTF-8')) {
+            return $decoded;
+        }
+        // Si no es UTF-8 válido, convertir desde ISO-8859-1
+        if (!mb_check_encoding($str, 'UTF-8')) {
+            return mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1');
+        }
+        return $str;
     }
 
     private function buildSocioFromRow(object $valor): Socio

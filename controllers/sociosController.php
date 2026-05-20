@@ -112,13 +112,14 @@ class sociosController extends Controller
         $this->_view->renderizar('listar');
     }
 
-    public function buscar(): void
+public function buscar(): void
     {
         $this->requireAuth();
         $termino = trim($_GET['q'] ?? '');
 
         if (strlen($termino) < 2) {
-            echo json_encode([]);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([], JSON_UNESCAPED_UNICODE);
             return;
         }
 
@@ -227,9 +228,9 @@ class sociosController extends Controller
             }
             $socio->setExento(isset($_POST['exento']) ? 1 : 0);
             $ingreso = to_mysql_date((string) $_POST['fecha_ingreso']);
-            $socio->setFechaIngreso($ingreso);
+            $socio->setFechaIngreso($ingreso !== '' ? $ingreso : null);
             $nacimiento = to_mysql_date((string) $_POST['fecha_nacimiento']);
-            $socio->setFechaNacimiento($nacimiento);
+            $socio->setFechaNacimiento($nacimiento !== '' ? $nacimiento : null);
             $idcat = (string) $_POST['categorias'];
             $id_parts = explode("_", $idcat);
             $socio->setEmail(sanitize((string) $_POST['email']));

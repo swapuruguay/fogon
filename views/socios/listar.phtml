@@ -52,13 +52,13 @@ $filter = $this->filter ?? 'all';
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="border-b border-gray-200">
       <nav class="flex -mb-px" aria-label="Tabs">
-        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=all'; ?>"
+        <a href="<?php echo BASE_URL . 'socios/listar/0?filter=all'; ?>"
           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'all' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
           data-tab="all">
           Todos
           <span class="ml-2 px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600"><?php echo $counts['all']; ?></span>
         </a>
-        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=club'; ?>"
+        <a href="<?php echo BASE_URL . 'socios/listar/0?filter=club'; ?>"
           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'club' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
           data-tab="club">
           <span class="flex items-center">
@@ -67,7 +67,7 @@ $filter = $this->filter ?? 'all';
           </span>
           <span class="ml-2 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700"><?php echo $counts['club']; ?></span>
         </a>
-        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=street'; ?>"
+        <a href="<?php echo BASE_URL . 'socios/listar/0?filter=street'; ?>"
           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'street' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
           data-tab="street">
           <span class="flex items-center">
@@ -76,7 +76,7 @@ $filter = $this->filter ?? 'all';
           </span>
           <span class="ml-2 px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700"><?php echo $counts['street']; ?></span>
         </a>
-        <a href="<?php echo BASE_URL . 'socios/listar/1?filter=late'; ?>"
+        <a href="<?php echo BASE_URL . 'socios/listar/0?filter=late'; ?>"
           class="tab-btn px-6 py-4 text-sm font-medium border-b-2 <?php echo $filter === 'late' ? 'border-fogon-500 text-fogon-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'; ?>"
           data-tab="late">
           <span class="flex items-center">
@@ -289,6 +289,12 @@ $filter = $this->filter ?? 'all';
         const resp = await fetch('<?php echo BASE_URL; ?>socios/buscar?q=' + encodeURIComponent(value), {
           credentials: 'same-origin'
         });
+        
+        if (!resp.ok) {
+          console.error('Search HTTP error:', resp.status);
+          return;
+        }
+        
         const socios = await resp.json();
 
         if (socios.length === 0) {
