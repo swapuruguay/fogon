@@ -278,11 +278,11 @@ class sociosModel extends Model
             FROM socios s LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
             WHERE s.id_socio = ?";
         $listado = $this->_db->select($sql, [$id])->fetch(PDO::FETCH_OBJ);
-        $socio = new Socio($listado->id_socio, $listado->nombre, $listado->apellido);
+        $socio = new Socio($listado->id_socio, $this->fixEncoding($listado->nombre), $this->fixEncoding($listado->apellido));
         $socio->setDocumento($listado->documento);
-        $cat = new Categoria($listado->id_categoria_fk ?? 0, $listado->cat_nombre ?? 'Sin categoría', $listado->cat_importe ?? 0);
+        $cat = new Categoria($listado->id_categoria_fk ?? 0, $this->fixEncoding($listado->cat_nombre ?? 'Sin categoría'), $listado->cat_importe ?? 0);
         $socio->setCategoria($cat);
-        $socio->setDomicilio($listado->domicilio ?? '');
+        $socio->setDomicilio($this->fixEncoding($listado->domicilio ?? ''));
         $socio->setEstado($listado->estado);
         $socio->setFechaIngreso($listado->fecha_ingreso);
         $socio->setFechaNacimiento($listado->fecha_nacimiento);

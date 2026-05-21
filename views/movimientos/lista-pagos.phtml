@@ -35,7 +35,7 @@
         <?php foreach ($this->pagos as $p): ?>
         <tr class="hover:bg-gray-50 fila-pago"
             data-id="<?php echo $p->socio->getId(); ?>"
-            data-nombre="<?php echo strtolower($p->socio->getNombre() . ' ' . $p->socio->getApellido()); ?>">
+            data-nombre="<?php echo mb_strtolower($p->socio->getNombre() . ' ' . $p->socio->getApellido(), 'UTF-8'); ?>">
           <td class="px-3 py-2 text-gray-900 font-mono"><?php echo $p->socio->getId(); ?></td>
           <td class="px-3 py-2 text-gray-900"><?php echo htmlspecialchars($p->socio->getNombre() . ' ' . $p->socio->getApellido()); ?></td>
           <td class="px-3 py-2 text-right font-semibold">$<?php echo number_format($p->importe, 0, '', '.'); ?></td>
