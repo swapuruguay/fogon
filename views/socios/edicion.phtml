@@ -219,13 +219,23 @@
     <div class="flex items-center justify-between pt-4">
       <div class="flex items-center space-x-4">
         <?php if (Session::get('usuario')->perfil < 3): ?>
+        <?php if ($this->socio->getEstado() == 'B'): ?>
+        <button type="button" onclick="mostrarModalActivar()"
+                class="px-4 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 active:bg-green-800 transition cursor-pointer flex items-center shadow-sm hover:shadow">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Activar Socio
+        </button>
+        <?php else: ?>
         <button type="button" onclick="mostrarModalEliminar()"
-                class="px-4 py-2.5 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition flex items-center">
+                class="px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 active:bg-red-800 transition cursor-pointer flex items-center shadow-sm hover:shadow">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
           </svg>
           Eliminar Socio
         </button>
+        <?php endif; ?>
         <?php endif; ?>
       </div>
       <div class="flex items-center space-x-4">
@@ -582,6 +592,20 @@
   function confirmarEliminar() {
     window.location.href = '<?php echo BASE_URL . 'socios/eliminar/' . $this->socio->getId(); ?>';
   }
+
+  function mostrarModalActivar() {
+    const modal = document.getElementById('modal-activar');
+    modal.classList.remove('hidden');
+  }
+
+  function cerrarModalActivar() {
+    const modal = document.getElementById('modal-activar');
+    modal.classList.add('hidden');
+  }
+
+  function confirmarActivar() {
+    window.location.href = '<?php echo BASE_URL . 'socios/activar/' . $this->socio->getId(); ?>';
+  }
 </script>
 
 <!-- Modal Eliminar -->
@@ -605,6 +629,34 @@
           </button>
           <button onclick="confirmarEliminar()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
             Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Activar -->
+<div id="modal-activar" class="hidden fixed inset-0 z-50 overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen px-4">
+    <div class="fixed inset-0 bg-black opacity-50 transition-opacity" onclick="cerrarModalActivar()"></div>
+    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 transform transition-all">
+      <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-green-100 mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">¿Activar este socio?</h3>
+        <p class="text-gray-500 mb-6">
+          Esta acción reactivará al socio "<strong><?php echo htmlspecialchars($this->socio->getNombre() . ' ' . $this->socio->getApellido()); ?></strong>" y lo devolverá al directorio activo.
+        </p>
+        <div class="flex items-center justify-center space-x-4">
+          <button onclick="cerrarModalActivar()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+            Cancelar
+          </button>
+          <button onclick="confirmarActivar()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+            Activar
           </button>
         </div>
       </div>
