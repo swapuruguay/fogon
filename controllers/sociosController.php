@@ -398,7 +398,12 @@ public function buscar(): void
     {
         $this->requireAuth();
         $modelo = $this->loadModel('socios');
-        $this->_view->socios = $modelo->getAdelantos();
+        $socios = $modelo->getAdelantos();
+        foreach ($socios as &$s) {
+            $s['nombre'] = $this->fixEncoding($s['nombre'] ?? '');
+            $s['apellido'] = $this->fixEncoding($s['apellido'] ?? '');
+        }
+        $this->_view->socios = $socios;
         $this->_view->renderizar('listar-adelantos');
     }
 
