@@ -319,7 +319,7 @@ class movimientosController extends Controller
                 $pdf->Cell(80, 4, $this->iso($socio->getDomicilio()), 0, 0, 'C');
                 $pdf->SetXY($posX + 80, $pos_y + 18);
                 $pdf->Cell(90, 4, $this->iso($socio->getDomicilio()), 0, 0, 'C');
-                $pdf->SetXY($posX + 170, $pos_y + 20);
+                $pdf->SetXY($posX + 170, $pos_y + 17);
                 $pdf->Cell(50, 4, $this->iso(substr($socio->getCategoria()->getNombre(), 0, 1)), 0, 0);
                 $pdf->SetXY($posX + 18, $pos_y + 27);
                 $pdf->Cell(50, 4, $this->iso(substr($socio->getCategoria()->getNombre(), 0, 1)), 0, 0);
