@@ -136,12 +136,12 @@ class movimientosController extends Controller
             echo json_encode(['error' => 'El importe debe ser mayor a 0']);
             return;
         }
-        
+
         $mov = $this->_ajax->buildMovimiento();
         $modeloSocio = $this->loadModel('socios');
         $socioId = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: 0;
         $mov->setSocio($modeloSocio->getById($socioId));
-        $mov->setImporte(- $importe);
+        $mov->setImporte(-$importe);
         $ingreso = (string) $_POST['fecha'];
         $mes = (int) date('m', strtotime($ingreso));
         $anio = (int) date('Y', strtotime($ingreso));
@@ -295,7 +295,7 @@ class movimientosController extends Controller
                 } else {
                     $socio = $modelSocios->getById($lista[$it]->id);
                 }
-                $pdf->SetXY($posX + 21, $pos_y);
+                $pdf->SetXY($posX + 18, $pos_y);
                 $pdf->Cell(50, 4, $socio->getId(), 0, 0);
                 $pdf->SetXY($posX + 53, $pos_y);
                 if (count($lista) === 0) {
@@ -319,9 +319,9 @@ class movimientosController extends Controller
                 $pdf->Cell(80, 4, $this->iso($socio->getDomicilio()), 0, 0, 'C');
                 $pdf->SetXY($posX + 80, $pos_y + 18);
                 $pdf->Cell(90, 4, $this->iso($socio->getDomicilio()), 0, 0, 'C');
-                $pdf->SetXY($posX + 160, $pos_y + 20);
+                $pdf->SetXY($posX + 170, $pos_y + 20);
                 $pdf->Cell(50, 4, $this->iso(substr($socio->getCategoria()->getNombre(), 0, 1)), 0, 0);
-                $pdf->SetXY($posX + 21, $pos_y + 27);
+                $pdf->SetXY($posX + 18, $pos_y + 27);
                 $pdf->Cell(50, 4, $this->iso(substr($socio->getCategoria()->getNombre(), 0, 1)), 0, 0);
                 $pdf->SetXY($posX + 53, $pos_y + 27);
                 if (count($lista) === 0) {
@@ -459,7 +459,7 @@ class movimientosController extends Controller
                         $pdf->SetY($pdf->GetY() + 5);
                         $pdf->SetFont('Arial', 'B', 10);
                         $pdf->Cell(0, 10, 'Total General: $' . $totales, 0, 0, 'C');
-                        
+
                         // Número de página al pie
                         $pdf->SetY(265);
                         $pdf->SetFont('Arial', 'I', 8);
@@ -469,11 +469,11 @@ class movimientosController extends Controller
                         $pdf->SetY(265);
                         $pdf->SetFont('Arial', 'I', 8);
                         $pdf->Cell(0, 10, 'Pagina ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
-                        
+
                         // Nueva página para los totales
                         $pdf->AddPage();
                         $pos_y = 30;
-                        
+
                         // Totales en la nueva página
                         $pdf->SetY($pos_y);
                         $pdf->SetFont('Arial', 'I', 10);
@@ -485,7 +485,7 @@ class movimientosController extends Controller
                         $pdf->SetY($pdf->GetY() + 5);
                         $pdf->SetFont('Arial', 'B', 10);
                         $pdf->Cell(0, 10, 'Total General: $' . $totales, 0, 0, 'C');
-                        
+
                         // Pie de página en la página de totales
                         $pdf->SetY(265);
                         $pdf->SetFont('Arial', 'I', 8);
@@ -623,35 +623,35 @@ class movimientosController extends Controller
     public function emitirCuotaManual(): void
     {
         $this->requireAuth();
-        
+
         // Si es POST, procesa y devuelve JSON
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->csrfVerify();
             header('Content-Type: application/json; charset=utf-8');
-            
+
             $id_socio = filter_input(INPUT_POST, 'id_socio', FILTER_VALIDATE_INT) ?: 0;
             $fecha = (string) $_POST['fecha'];
             $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT) ?: 0;
             $anio = filter_input(INPUT_POST, 'anio', FILTER_VALIDATE_INT) ?: 0;
             $importe = filter_input(INPUT_POST, 'importe', FILTER_VALIDATE_INT) ?: 0;
-            
+
             if (!$id_socio || !$mes || !$anio || !$importe) {
                 echo json_encode(['ok' => false, 'mensaje' => 'Datos incompletos']);
                 return;
             }
-            
+
             $modelo = $this->loadModel('socios');
             $socio = $modelo->getById($id_socio);
-            
+
             if (!$socio) {
                 echo json_encode(['ok' => false, 'mensaje' => 'Socio no encontrado']);
                 return;
             }
-            
+
             // Determinar cobrado: F si el domicilio contiene "fog", sino C
             $domicilio = mb_strtolower($socio->getDomicilio() ?? '', 'UTF-8');
             $cobrado = (strpos($domicilio, 'fog') !== false) ? 'F' : 'C';
-            
+
             $modelMov = $this->loadModel('movimientos');
             $datos = [
                 'id_socio_fk' => $id_socio,
@@ -661,9 +661,9 @@ class movimientosController extends Controller
                 'importe' => $importe,
                 'cobrado' => $cobrado,
             ];
-            
+
             $result = $modelMov->saveCuotaManual($datos);
-            
+
             if ($result) {
                 echo json_encode(['ok' => true, 'mensaje' => 'Cuota emitida correctamente']);
             } else {
@@ -671,7 +671,7 @@ class movimientosController extends Controller
             }
             return;
         }
-        
+
         // Si es GET, renderiza la vista
         $this->_view->titulo = 'Emitir Cuota Manual';
         $this->_view->renderizar('emitir-cuota');
