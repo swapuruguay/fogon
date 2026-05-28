@@ -22,7 +22,7 @@ class ajustesModel extends Model {
             [
                 'margen' => $ajuste->getMargen(),
                 'espacio' => $ajuste->getEspacio(),
-                'izquierda' => $ajuste->getLeft(),
+                // 'izquierda' => $ajuste->getLeft(), // columna no existe en BD
             ],
             '1=1'
         );

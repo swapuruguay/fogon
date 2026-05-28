@@ -31,7 +31,7 @@ public function setajustes(): void
         $ajuste = $modelo->get();
         $ajuste->setMargen(filter_input(INPUT_POST, 'margen', FILTER_VALIDATE_INT) ?: 0);
         $ajuste->setEspacio(filter_input(INPUT_POST, 'espacio', FILTER_VALIDATE_INT) ?: 0);
-        $ajuste->setLeft(filter_input(INPUT_POST, 'left', FILTER_VALIDATE_INT) ?: 0);
+        // $ajuste->setLeft(filter_input(INPUT_POST, 'left', FILTER_VALIDATE_INT) ?: 0); // columna no existe en BD
         if ($modelo->set($ajuste, Session::get('usuario')->idusuario)) {
             echo json_encode(["mensaje" => "Ajustes guardados con éxito", "color" => "green"]);
         } else {

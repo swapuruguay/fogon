@@ -43,19 +43,21 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Espacio entre Recibos (mm)</label>
           <input type="number" name='espacio' id='espacio' 
-                 value="<?php echo (int) $this->espacio; ?>" min="0" max="20"
+                 value="<?php echo (int) $this->espacio; ?>" min="0"
                  class="border border-gray-200 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
           <p class="mt-1 text-xs text-gray-400">Espacio vertical entre cada recibo</p>
         </div>
 
         <!-- Left -->
+        <!-- Campo comentado: la base de datos no tiene esta columna
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Ajuste Izquierda (mm)</label>
-          <input type="number" name='left' id='left' 
+          <input type="number" name='left' id='left'
                  value="<?php echo (int) $this->left; ?>" min="0" max="30"
                  class="border border-gray-200 rounded-lg px-4 py-2.5 w-full focus:ring-2 focus:ring-fogon-500 focus:border-fogon-500">
           <p class="mt-1 text-xs text-gray-400">Desplazamiento horizontal desde el borde izquierdo</p>
         </div>
+        -->
 
         <!-- Message -->
         <div id="message" class="hidden"></div>
