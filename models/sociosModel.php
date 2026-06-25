@@ -9,7 +9,7 @@ require_once 'categoriasModel.php';
 class sociosModel extends Model
 {
 
-    private $_modeloCategorias;
+    private categoriasModel $_modeloCategorias;
 
     public function __construct()
     {
@@ -22,9 +22,9 @@ class sociosModel extends Model
         return in_array($orden, $allowed, true) ? $orden : 'id_socio';
     }
 
-    private function fixEncoding(string $str): string
+    private function fixEncoding(?string $str): string
     {
-        if (empty($str)) return $str;
+        if (empty($str)) return $str ?? '';
         // Corregir doble codificación UTF-8
         $decoded = @iconv('UTF-8', 'ISO-8859-1//IGNORE', $str);
         // Solo usar decoded si es más corto Y es UTF-8 válido
