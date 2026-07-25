@@ -721,6 +721,7 @@ public function buscar(): void
             $socio->setDocumento(filter_input(INPUT_POST, 'documento', FILTER_VALIDATE_INT) ?: 0);
             $socio->setParentezco(sanitize((string) $_POST['parentezco']));
             $socio->setSexo(sanitize((string) $_POST['sexo']));
+            $socio->setSocio($modelo->getById($idSocio));
             $socio->setFechaNacimiento((string) $_POST['fecha_nacimiento']);
             if ($modelo->savePariente($socio, Session::get('usuario')->idusuario)) {
                 echo json_encode(['mensaje' => "Registro guardado", 'color' => 'green']);
