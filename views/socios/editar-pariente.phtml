@@ -123,6 +123,7 @@ use App\Core\Session; ?>
     formData.append('id', $id.value);
     let res = await fetch('<?php echo BASE_URL; ?>socios/removePariente', {
       method: 'post',
+      headers: { 'X-CSRF-TOKEN': csrfToken },
       body: formData
     });
     let result = await res.json();
@@ -145,6 +146,7 @@ use App\Core\Session; ?>
     formData.append('documento', frm.documento.value);
     let res = await fetch('<?php echo BASE_URL; ?>socios/getByDocumento', {
       method: 'post',
+      headers: { 'X-CSRF-TOKEN': csrfToken },
       body: formData
     });
     let resultado = await res.json();
@@ -175,6 +177,7 @@ use App\Core\Session; ?>
 
     let result = await fetch('<?php echo BASE_URL; ?>socios/guardarParientes', {
       method: 'post',
+      headers: { 'X-CSRF-TOKEN': csrfToken },
       body: formData
     });
     let resultado2 = await result.json();

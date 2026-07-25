@@ -120,6 +120,7 @@
     formData.append('documento', frm.documento.value);
     let res = await fetch('<?php echo BASE_URL; ?>socios/getParentByDocumento', {
       method: 'post',
+      headers: { 'X-CSRF-TOKEN': csrfToken },
       body: formData
     });
     let resultado = await res.json();
@@ -147,6 +148,7 @@
 
     let result = await fetch('<?php echo BASE_URL; ?>socios/guardarParientes', {
       method: 'post',
+      headers: { 'X-CSRF-TOKEN': csrfToken },
       body: formData
     });
     let resultado2 = await result.json();
