@@ -439,6 +439,9 @@ class sociosModel extends Model
             'id_socio' => $pariente->getSocio()->getId(),
             'usuario' => $usuario,
         ];
+        if ($pariente->getId() > 0) {
+            return $this->_db->update('parientes', $datos, 'id_pariente = ?', [$pariente->getId()]);
+        }
         return $this->_db->insert('parientes', $datos);
     }
 
