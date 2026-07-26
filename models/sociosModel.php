@@ -25,16 +25,20 @@ class sociosModel extends Model
     private function fixEncoding(?string $str): string
     {
         if (empty($str)) return $str ?? '';
+
         // Corregir doble codificación UTF-8
         $decoded = @iconv('UTF-8', 'ISO-8859-1//IGNORE', $str);
+
         // Solo usar decoded si es más corto Y es UTF-8 válido
         if ($decoded !== false && strlen($decoded) < strlen($str) && mb_check_encoding($decoded, 'UTF-8')) {
             return $decoded;
         }
+
         // Si no es UTF-8 válido, convertir desde ISO-8859-1
         if (!mb_check_encoding($str, 'UTF-8')) {
             return mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1');
         }
+
         return $str;
     }
 
@@ -45,6 +49,7 @@ class sociosModel extends Model
             $this->fixEncoding($valor->nombre),
             $this->fixEncoding($valor->apellido)
         );
+
         $socio->setDocumento($valor->documento);
         $socio->setDomicilio($this->fixEncoding($valor->domicilio ?? ''));
         $socio->setTelefono($valor->telefono ?? '');
@@ -52,22 +57,27 @@ class sociosModel extends Model
         $socio->setEstado($valor->estado);
         $socio->setFoto($valor->foto ?? 'socio.png');
         $socio->setSaldo($valor->saldo ?? 0);
+
         $cat = new Categoria(
             $valor->id_categoria_fk ?? 0,
             $this->fixEncoding($valor->cat_nombre ?? 'Sin categoría'),
             $valor->cat_importe ?? 0
         );
+
         $socio->setCategoria($cat);
+
         return $socio;
     }
 
     private function queryWithSaldo(string $orden, bool $prefixTable = true): array
     {
         $orderBy = $prefixTable ? "ORDER BY s.$orden" : "ORDER BY $orden";
+
         $sql = "SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe,
             COALESCE((SELECT SUM(cu.importe) FROM cuotas cu WHERE cu.id_socio_fk = s.id_socio), 0) as saldo
             FROM socios s LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
             WHERE s.estado='A' $orderBy";
+
         return $this->_db->select($sql)->fetchAll(PDO::FETCH_OBJ);
     }
 
@@ -79,22 +89,28 @@ class sociosModel extends Model
             'nombre' => 'nombre',
             'apellido' => 'apellido',
         ];
+
         $orden = $ordenMap[$orden] ?? 'id_socio';
         $listado = $this->queryWithSaldo($orden);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $arreglo[] = $this->buildSocioFromRow($valor);
         }
+
         return $arreglo;
     }
 
     public function getAllParents(string $orden = 'id_socio'): array
     {
         $orden = $this->validateOrder($orden, ['id_socio', 'nombre', 'apellido', 'parentezco']);
+
         $sql = "SELECT parentezco, id_pariente, p.nombre, p.apellido, s.telefono, p.documento, p.id_socio
                 FROM parientes p JOIN socios s ON p.id_socio = s.id_socio WHERE s.estado = 'a' ORDER BY $orden";
+
         $listado = $this->_db->query($sql)->fetchAll(PDO::FETCH_OBJ);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $pariente = new Pariente($valor->id_pariente, $valor->nombre, $valor->apellido);
             $pariente->setDocumento($valor->documento);
@@ -102,15 +118,19 @@ class sociosModel extends Model
             $pariente->setSocio($this->getById($valor->id_socio));
             $arreglo[] = $pariente;
         }
+
         return $arreglo;
     }
 
     public function getAllParentsBySocio(int $id, string $orden = 'parentezco'): array
     {
         $orden = $this->validateOrder($orden, ['id_pariente', 'nombre', 'apellido', 'parentezco']);
+
         $sql = "SELECT * FROM parientes WHERE id_socio = ? ORDER BY $orden";
+
         $listado = $this->_db->select($sql, [$id])->fetchAll(PDO::FETCH_OBJ);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $pariente = new Pariente($valor->id_pariente, $valor->nombre, $valor->apellido);
             $pariente->setSocio($this->getById($valor->id_socio));
@@ -120,24 +140,38 @@ class sociosModel extends Model
             $pariente->setFechaNacimiento($valor->fecha_nacimiento);
             $arreglo[] = $pariente;
         }
+
         return $arreglo;
     }
 
     public function getByParent(): array
     {
-        $listado = $this->_db->query("SELECT sexo, parentezco, COUNT(parentezco) as conteo FROM parientes GROUP BY parentezco, sexo")->fetchAll(PDO::FETCH_ASSOC);
+        $listado = $this->_db->query(
+            "SELECT sexo, parentezco, COUNT(parentezco) as conteo
+             FROM parientes
+             GROUP BY parentezco, sexo"
+        )->fetchAll(PDO::FETCH_ASSOC);
+
         if (count($listado) < 4) {
             $listado[] = ["sexo" => 'M', "parentezco" => 'C', "conteo" => 0];
         }
+
         return $listado;
     }
 
     public function getAdelantos(string $orden = 'id_socio_fk'): array
     {
         $orden = $this->validateOrder($orden, ['id_socio_fk', 'desde', 'hasta', 'nombre']);
-        $sql = "SELECT a.*, s.nombre, s.apellido, s.foto FROM adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk WHERE a.hasta >= CURDATE() ORDER BY $orden";
+
+        $sql = "SELECT a.*, s.nombre, s.apellido, s.foto
+                FROM adelantos a
+                JOIN socios s ON s.id_socio = a.id_socio_fk
+                WHERE a.hasta >= CURDATE()
+                ORDER BY $orden";
+
         $listado = $this->_db->query($sql)->fetchAll(PDO::FETCH_OBJ);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $arreglo[] = [
                 'nombre' => $valor->nombre,
@@ -149,13 +183,19 @@ class sociosModel extends Model
                 'hasta' => $valor->hasta,
             ];
         }
+
         return $arreglo;
     }
 
     public function getAdelanto(int $id): array
     {
-        $sql = "SELECT a.*, s.nombre, s.apellido FROM adelantos a JOIN socios s ON s.id_socio = a.id_socio_fk WHERE idadelanto = ?";
+        $sql = "SELECT a.*, s.nombre, s.apellido
+                FROM adelantos a
+                JOIN socios s ON s.id_socio = a.id_socio_fk
+                WHERE idadelanto = ?";
+
         $listado = $this->_db->select($sql, [$id])->fetch(PDO::FETCH_OBJ);
+
         return [
             'nombre' => $listado->nombre,
             'id' => $listado->idadelanto,
@@ -168,8 +208,12 @@ class sociosModel extends Model
 
     public function getEliminados(): array
     {
-        $listado = $this->_db->query("SELECT * FROM socios WHERE estado='B' ORDER BY nombre")->fetchAll(PDO::FETCH_OBJ);
+        $listado = $this->_db->query(
+            "SELECT * FROM socios WHERE estado='B' ORDER BY nombre"
+        )->fetchAll(PDO::FETCH_OBJ);
+
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
             $socio->setDocumento($valor->documento ?? '');
@@ -180,12 +224,14 @@ class sociosModel extends Model
             $socio->setFoto($valor->foto ?? 'socio.png');
             $arreglo[] = $socio;
         }
+
         return $arreglo;
     }
 
     public function buscarEliminados(string $termino): array
     {
         $termino = trim($termino);
+
         if (strlen($termino) < 2) {
             return $this->getEliminados();
         }
@@ -193,14 +239,24 @@ class sociosModel extends Model
         $esNumero = is_numeric($termino);
 
         if ($esNumero) {
-            $sql = "SELECT * FROM socios WHERE estado='B' AND documento LIKE ? ORDER BY nombre";
+            $sql = "SELECT * FROM socios
+                    WHERE estado='B' AND documento LIKE ?
+                    ORDER BY nombre";
+
             $listado = $this->_db->select($sql, ["%$termino%"])->fetchAll(PDO::FETCH_OBJ);
         } else {
-            $sql = "SELECT * FROM socios WHERE estado='B' AND (nombre LIKE ? OR apellido LIKE ?) ORDER BY nombre";
-            $listado = $this->_db->select($sql, ["%$termino%", "%$termino%"])->fetchAll(PDO::FETCH_OBJ);
+            $sql = "SELECT * FROM socios
+                    WHERE estado='B' AND (nombre LIKE ? OR apellido LIKE ?)
+                    ORDER BY nombre";
+
+            $listado = $this->_db->select(
+                $sql,
+                ["%$termino%", "%$termino%"]
+            )->fetchAll(PDO::FETCH_OBJ);
         }
 
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
             $socio->setDocumento($valor->documento);
@@ -211,17 +267,24 @@ class sociosModel extends Model
             $socio->setFoto($valor->foto ?? 'socio.png');
             $arreglo[] = $socio;
         }
+
         return $arreglo;
     }
 
     public function getEliminadosAuto(string $emision): array
     {
-        $sql = "SELECT * FROM socios s JOIN bajas b ON s.id_socio = b.id_socio_fk WHERE estado='B' AND b.fecha_baja = ? ORDER BY nombre";
+        $sql = "SELECT * FROM socios s
+                JOIN bajas b ON s.id_socio = b.id_socio_fk
+                WHERE estado='B' AND b.fecha_baja = ?
+                ORDER BY nombre";
+
         $listado = $this->_db->select($sql, [$emision])->fetchAll(PDO::FETCH_OBJ);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $arreglo[] = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
         }
+
         return $arreglo;
     }
 
@@ -233,11 +296,18 @@ class sociosModel extends Model
                 WHERE s.estado='A'
                 ORDER BY s.id_socio
                 LIMIT 15 OFFSET $desde";
+
         $listado = $this->_db->query($sql)->fetchAll(PDO::FETCH_OBJ);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
-            $cat = new Categoria($valor->id_categoria_fk ?? 0, $valor->cat_nombre ?? 'Sin categoría', $valor->cat_importe ?? 0);
+            $cat = new Categoria(
+                $valor->id_categoria_fk ?? 0,
+                $valor->cat_nombre ?? 'Sin categoría',
+                $valor->cat_importe ?? 0
+            );
+
             $socio->setCategoria($cat);
             $socio->setDomicilio($valor->domicilio ?? '');
             $socio->setDocumento($valor->documento);
@@ -247,19 +317,31 @@ class sociosModel extends Model
             $socio->setFoto($valor->foto ?? 'socio.png');
             $arreglo[] = $socio;
         }
+
         return $arreglo;
     }
 
     public function getPaginadosE(int $desde): array
     {
         $sql = "SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe
-            FROM socios s LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
-            WHERE s.estado='B' ORDER BY s.nombre LIMIT ?, 15";
+            FROM socios s
+            LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
+            WHERE s.estado='B'
+            ORDER BY s.nombre
+            LIMIT ?, 15";
+
         $listado = $this->_db->select($sql, [$desde])->fetchAll(PDO::FETCH_OBJ);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
-            $cat = new Categoria($valor->id_categoria_fk ?? 0, $valor->cat_nombre ?? 'Sin categoría', $valor->cat_importe ?? 0);
+
+            $cat = new Categoria(
+                $valor->id_categoria_fk ?? 0,
+                $valor->cat_nombre ?? 'Sin categoría',
+                $valor->cat_importe ?? 0
+            );
+
             $socio->setCategoria($cat);
             $socio->setDomicilio($valor->domicilio ?? '');
             $socio->setDocumento($valor->documento);
@@ -269,18 +351,33 @@ class sociosModel extends Model
             $socio->setFoto($valor->foto ?? 'socio.png');
             $arreglo[] = $socio;
         }
+
         return $arreglo;
     }
 
     public function getById(int $id): Socio
     {
         $sql = "SELECT s.*, c.nombre as cat_nombre, c.importe as cat_importe
-            FROM socios s LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
-            WHERE s.id_socio = ?";
+                FROM socios s
+                LEFT JOIN categorias c ON s.id_categoria_fk = c.id_categoria
+                WHERE s.id_socio = ?";
+
         $listado = $this->_db->select($sql, [$id])->fetch(PDO::FETCH_OBJ);
-        $socio = new Socio($listado->id_socio, $this->fixEncoding($listado->nombre), $this->fixEncoding($listado->apellido));
+
+        $socio = new Socio(
+            $listado->id_socio,
+            $this->fixEncoding($listado->nombre),
+            $this->fixEncoding($listado->apellido)
+        );
+
         $socio->setDocumento($listado->documento);
-        $cat = new Categoria($listado->id_categoria_fk ?? 0, $this->fixEncoding($listado->cat_nombre ?? 'Sin categoría'), $listado->cat_importe ?? 0);
+
+        $cat = new Categoria(
+            $listado->id_categoria_fk ?? 0,
+            $this->fixEncoding($listado->cat_nombre ?? 'Sin categoría'),
+            $listado->cat_importe ?? 0
+        );
+
         $socio->setCategoria($cat);
         $socio->setDomicilio($this->fixEncoding($listado->domicilio ?? ''));
         $socio->setEstado($listado->estado);
@@ -290,6 +387,7 @@ class sociosModel extends Model
         $socio->setEmail($listado->email ?? '');
         $socio->setExento($listado->exento == 1);
         $socio->setFoto($listado->foto ?? 'socio.png');
+
         return $socio;
     }
 
@@ -297,34 +395,56 @@ class sociosModel extends Model
     {
         $sql = "SELECT * FROM parientes WHERE id_pariente = ?";
         $listado = $this->_db->select($sql, [$id])->fetch(PDO::FETCH_OBJ);
-        $pariente = new Pariente($listado->id_pariente, $listado->nombre, $listado->apellido);
+
+        $pariente = new Pariente(
+            $listado->id_pariente,
+            $listado->nombre,
+            $listado->apellido
+        );
+
         $pariente->setDocumento($listado->documento);
         $pariente->setFechaNacimiento($listado->fecha_nacimiento);
         $pariente->setParentezco($listado->parentezco);
         $pariente->setSexo($listado->sexo);
         $pariente->setSocio($this->getById($listado->id_socio));
+
         return $pariente;
     }
 
     public function getByDocumento(int $id): ?Socio
     {
-        $sql = "SELECT s.id_socio, s.nombre, s.apellido, s.documento, s.id_categoria_fk, c.nombre as categoria, c.importe 
-                FROM socios s 
-                LEFT JOIN categorias c ON c.id_categoria = s.id_categoria_fk 
+        $sql = "SELECT s.id_socio, s.nombre, s.apellido, s.documento,
+                       s.id_categoria_fk, c.nombre as categoria, c.importe
+                FROM socios s
+                LEFT JOIN categorias c ON c.id_categoria = s.id_categoria_fk
                 WHERE s.documento = ?";
+
         $stmt = $this->_db->prepare($sql);
         $stmt->execute([$id]);
         $listado = $stmt->fetch(PDO::FETCH_OBJ);
+
         if ($listado) {
-            $socio = new Socio($listado->id_socio, $listado->nombre, $listado->apellido);
+            $socio = new Socio(
+                $listado->id_socio,
+                $listado->nombre,
+                $listado->apellido
+            );
+
             $socio->setDocumento($listado->documento);
-            // Cargar categoría
+
             if ($listado->id_categoria_fk) {
-                $categoria = new Categoria($listado->id_categoria_fk, $listado->categoria, $listado->importe);
+                $categoria = new Categoria(
+                    $listado->id_categoria_fk,
+                    $listado->categoria,
+                    $listado->importe
+                );
+
                 $socio->setCategoria($categoria);
             }
+
             return $socio;
         }
+
         return null;
     }
 
@@ -332,31 +452,46 @@ class sociosModel extends Model
     {
         $sql = "SELECT * FROM parientes WHERE documento = ?";
         $listado = $this->_db->select($sql, [$id])->fetch(PDO::FETCH_OBJ);
+
         if ($listado) {
-            $pariente = new Pariente($listado->id_pariente, $listado->nombre, $listado->apellido);
+            $pariente = new Pariente(
+                $listado->id_pariente,
+                $listado->nombre,
+                $listado->apellido
+            );
+
             $pariente->setDocumento($listado->documento);
+
             return $pariente;
         }
+
         return null;
     }
 
     public function getByApellido(string $texto): array
     {
-        $sql = "SELECT id_socio, nombre, apellido FROM socios
-                WHERE (nombre LIKE ? OR apellido LIKE ?) AND estado='A'";
-        return $this->_db->select($sql, ["%$texto%", "%$texto%"])->fetchAll(PDO::FETCH_OBJ);
+        $sql = "SELECT id_socio, nombre, apellido
+                FROM socios
+                WHERE (nombre LIKE ? OR apellido LIKE ?)
+                AND estado='A'";
+
+        return $this->_db->select(
+            $sql,
+            ["%$texto%", "%$texto%"]
+        )->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function buscar(string $termino): array
     {
         $termino = trim($termino);
+
         if (strlen($termino) < 2) {
             return [];
         }
 
         $listado = $this->buscarSmart($termino);
-
         $arreglo = [];
+
         foreach ($listado as $valor) {
             $arreglo[] = [
                 'id_socio' => (int) $valor->id_socio,
@@ -372,6 +507,7 @@ class sociosModel extends Model
                 'cat_importe' => (float) ($valor->cat_importe ?? 0),
             ];
         }
+
         return $arreglo;
     }
 
@@ -384,6 +520,7 @@ class sociosModel extends Model
 
         if (strpos($termino, '#') === 0 && strlen($termino) > 1) {
             $id = substr($termino, 1);
+
             if (is_numeric($id)) {
                 $sql = "$sqlBase AND s.id_socio = ?";
                 return $this->_db->select($sql, [(int) $id])->fetchAll(PDO::FETCH_OBJ);
@@ -397,14 +534,24 @@ class sociosModel extends Model
         }
 
         $sql = "$sqlBase AND (s.nombre LIKE ? OR s.apellido LIKE ?)";
-        return $this->_db->select($sql, ["%$termino%", "%$termino%"])->fetchAll(PDO::FETCH_OBJ);
+
+        return $this->_db->select(
+            $sql,
+            ["%$termino%", "%$termino%"]
+        )->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getByApellidoE(string $texto): array
     {
-        $sql = "SELECT id_socio, nombre, apellido FROM socios
-                WHERE (nombre LIKE ? OR apellido LIKE ?) AND estado='B'";
-        return $this->_db->select($sql, ["$texto%", "$texto%"])->fetchAll(PDO::FETCH_OBJ);
+        $sql = "SELECT id_socio, nombre, apellido
+                FROM socios
+                WHERE (nombre LIKE ? OR apellido LIKE ?)
+                AND estado='B'";
+
+        return $this->_db->select(
+            $sql,
+            ["$texto%", "$texto%"]
+        )->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function save(Socio $socio, int $usuario): bool
@@ -424,6 +571,7 @@ class sociosModel extends Model
             'id_categoria_fk' => $socio->getCategoria()->getId(),
             'usuario' => $usuario,
         ];
+
         return $this->_db->insert('socios', $datos);
     }
 
@@ -439,9 +587,16 @@ class sociosModel extends Model
             'id_socio' => $pariente->getSocio()->getId(),
             'usuario' => $usuario,
         ];
+
         if ($pariente->getId() > 0) {
-            return $this->_db->update('parientes', $datos, 'id_pariente = ?', [$pariente->getId()]);
+            return $this->_db->update(
+                'parientes',
+                $datos,
+                'id_pariente = ?',
+                [$pariente->getId()]
+            );
         }
+
         return $this->_db->insert('parientes', $datos);
     }
 
@@ -465,10 +620,17 @@ class sociosModel extends Model
             'id_categoria_fk' => $socio->getCategoria()->getId(),
             'usuario' => $usuario,
         ];
+
         if ($socio->getFoto()) {
             $datos['foto'] = $socio->getFoto();
         }
-        return $this->_db->update('socios', $datos, 'id_socio = ?', [$socio->getId()]);
+
+        return $this->_db->update(
+            'socios',
+            $datos,
+            'id_socio = ?',
+            [$socio->getId()]
+        );
     }
 
     public function updatePariente(Pariente $pariente, int $usuario): bool
@@ -482,7 +644,13 @@ class sociosModel extends Model
             'sexo' => $pariente->getSexo(),
             'usuario' => $usuario,
         ];
-        return $this->_db->update('parientes', $datos, 'id_pariente = ?', [$pariente->getId()]);
+
+        return $this->_db->update(
+            'parientes',
+            $datos,
+            'id_pariente = ?',
+            [$pariente->getId()]
+        );
     }
 
     public function buildSocio(): Socio
@@ -498,11 +666,19 @@ class sociosModel extends Model
     public function delete(Socio $socio, int $usuario, string $tipo = 'C'): bool
     {
         $sql = "INSERT INTO bajas (id_socio_fk, fecha_baja, tipo) VALUES (?, DATE(NOW()), ?)";
-        $flag = $this->_db->select($sql, [$socio->getId(), $tipo])->rowCount() > 0;
+        $flag = $this->_db->select(
+            $sql,
+            [$socio->getId(), $tipo]
+        )->rowCount() > 0;
+
         if ($flag) {
             $sql = "UPDATE socios SET estado='B', usuario=? WHERE id_socio = ?";
-            return $this->_db->select($sql, [$usuario, $socio->getId()])->rowCount() > 0;
+            return $this->_db->select(
+                $sql,
+                [$usuario, $socio->getId()]
+            )->rowCount() > 0;
         }
+
         return false;
     }
 
@@ -510,30 +686,48 @@ class sociosModel extends Model
     {
         $listado = $this->queryWithSaldo('saldo DESC, s.apellido', false);
         $arreglo = [];
+
         foreach ($listado as $valor) {
             if (($valor->saldo ?? 0) > 0) {
                 $arreglo[] = $this->buildSocioFromRow($valor);
             }
         }
+
         return $arreglo;
     }
 
     public function getHabilitados(): array
     {
-        $listado = $this->_db->query("SELECT * FROM socios WHERE estado='A' AND exento=0")->fetchAll(PDO::FETCH_OBJ);
+        $listado = $this->_db->query(
+            "SELECT * FROM socios WHERE estado='A' AND exento=0"
+        )->fetchAll(PDO::FETCH_OBJ);
+
         $arreglo = [];
+
         foreach ($listado as $valor) {
-            $socio = new Socio($valor->id_socio, $valor->nombre, $valor->apellido);
-            $socio->setCategoria($this->_modeloCategorias->getById($valor->id_categoria_fk));
+            $socio = new Socio(
+                $valor->id_socio,
+                $valor->nombre,
+                $valor->apellido
+            );
+
+            $socio->setCategoria(
+                $this->_modeloCategorias->getById($valor->id_categoria_fk)
+            );
+
             $socio->setDomicilio($valor->domicilio);
             $arreglo[] = $socio;
         }
+
         return $arreglo;
     }
 
     public function activar(Socio $socio, int $usuario): bool
     {
         $sql = "UPDATE socios SET estado='A', usuario = ? WHERE id_socio = ?";
-        return $this->_db->select($sql, [$usuario, $socio->getId()])->rowCount() > 0;
+        return $this->_db->select(
+            $sql,
+            [$usuario, $socio->getId()]
+        )->rowCount() > 0;
     }
 }
